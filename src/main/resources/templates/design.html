@@ -6,7 +6,7 @@
 			:root {
 				--bg-color: #121212;
 				--alt-color: #202020;
-				--border-color: #000000;
+				--border-color: #707070;
 				--header-color: #303030;
 				--text-color: #F2F2F2;
 				--text-color-alt: #D8D8D8;
@@ -23,7 +23,11 @@
 				margin: 0;
 			}
 			hr {
-				border-color: var(--header-color);
+				border-color: var(--border-color);
+			}
+			input[type="text"], input[type="password"] {
+				color: var(--text-color-alt);
+				background-color: var(--bg-color);
 			}
 			#root {
 				margin: 1rem auto;
@@ -44,7 +48,7 @@
 				background-color: var(--header-color);
 				border: solid;
 				border-color: var(--border-color);
-				border-width: 2px;
+				border-width: 1px;
 
 				padding: 0.3rem 0.5rem;
 				margin-bottom: 1rem;
@@ -64,8 +68,8 @@
 				flex-direction: column;
 
 				border: solid;
-				border-color: black;
-				border-width: 2px;
+				border-color: var(--border-color);
+				border-width: 1px;
 
 				margin-left: auto;
 				margin-right: auto;
@@ -111,8 +115,8 @@
 				grid-template-columns: 6fr 1.5fr 1.5fr 2fr;
 
 				border: solid;
-				border-color: black;
-				border-width: 2px;
+				border-color: var(--border-color);
+				border-width: 1px;
 
 				margin-bottom: 1rem;
 			}
@@ -149,8 +153,8 @@
 				grid-template-columns: 6fr 2fr 1fr 2fr;
 
 				border: solid;
-				border-color: black;
-				border-width: 2px;
+				border-color: var(--border-color);
+				border-width: 1px;
 
 				margin-bottom: 1rem;
 			}
@@ -204,8 +208,8 @@
 				flex-direction: column;
 
 				border: solid;
-				border-color: black;
-				border-width: 2px;
+				border-color: var(--border-color);
+				border-width: 1px;
 
 				margin-bottom: auto;
 			}
@@ -238,8 +242,8 @@
 				flex-direction: column;
 
 				border: solid;
-				border-color: black;
-				border-width: 2px;
+				border-color: var(--border-color);
+				border-width: 1px;
 
 				margin-bottom: 1rem;
 			}
@@ -275,7 +279,7 @@
 
 			<div class="login-container">
 				<div class="login-header">
-					<h1>Login</h1>
+					<h1>Log in</h1>
 				</div>
 				<div class="login-form">
 					<form action="#" method="post">
@@ -283,7 +287,7 @@
 						<input type="text" id="input_username" name="username">
 						<label for="input_password">Password:</label>
 						<input type="password" id="input_password" name="password">
-						<input type="submit" value="Login">
+						<input type="submit" value="Log in">
 					</form>
 					<p>or</p>
 					<p><a href="#">Register a new account</a></p>

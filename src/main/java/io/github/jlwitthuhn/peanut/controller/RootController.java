@@ -14,12 +14,12 @@ public class RootController
 	@GetMapping("/")
 	public String index(Model model)
 	{
-		return "index";
+		return "index.html";
 	}
 
 	@GetMapping("/design")
 	public String design(Model model)
 	{
-		return "design";
+		return "design.html";
 	}
 }

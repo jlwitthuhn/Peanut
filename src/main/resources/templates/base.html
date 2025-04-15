@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Design Sample</title>
+	<style>
+        {% include 'css/everything.css' %}
+	</style>
+</head>
+<body>
+<div id="root">
+	<div id="title-bar">
+		<h1>Website</h1>
+		<p><a href="#">Log In</a></p>
+	</div>
+	<nav id="top-nav">
+		<ul>
+			<li><a href="#">Home</a></li>
+			<li><a href="#">Forum Index</a></li>
+		</ul>
+		<ul>
+			<li></li>
+		</ul>
+	</nav>
+
+	{% block content %}{% endblock %}
+</div>
+</body>
+</html>

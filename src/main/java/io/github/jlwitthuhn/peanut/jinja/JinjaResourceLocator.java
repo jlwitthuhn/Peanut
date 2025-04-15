@@ -24,7 +24,7 @@ public class JinjaResourceLocator implements EnvironmentAware, ResourceLocator
 {
 	private final ResourceLoader resourceLoader = new DefaultResourceLoader();
 	private String pathPrefix = "classpath:/templates/";
-	private String pathSuffix = ".html";
+	private String pathSuffix = "";
 
 	@Override
 	public String getString(String fullName, Charset encoding, JinjavaInterpreter interpreter) throws IOException

@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.view.AbstractTemplateView;
 
 import java.io.PrintWriter;
@@ -24,7 +25,7 @@ public class JinjaView extends AbstractTemplateView
 	private final Logger logger = LoggerFactory.getLogger(JinjaView.class);
 
 	@Override
-	protected void renderMergedTemplateModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception
+	protected void renderMergedTemplateModel(@NonNull Map<String, Object> model, @NonNull HttpServletRequest request, @NonNull HttpServletResponse response) throws Exception
 	{
 		response.setContentType("text/html");
 		response.setCharacterEncoding("UTF-8");

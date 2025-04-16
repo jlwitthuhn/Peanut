@@ -1,473 +1,475 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>Design Sample</title>
-		<style>
-			:root {
-				--bg-color: #121212;
-				--alt-color: #202020;
-				--border-color: #707070;
-				--header-color: #303030;
-				--text-color: #F2F2F2;
-				--text-color-alt: #D8D8D8;
-			}
-			body {
-				background-color: var(--bg-color);
-				color: var(--text-color);
-				font-family: sans-serif;
-			}
-			a {
-				color: var(--text-color-alt);
-			}
-			h1, h2, p {
-				margin: 0;
-			}
-			hr {
-				border-color: var(--border-color);
-			}
-			input[type="text"], input[type="password"] {
-				color: var(--text-color-alt);
-				background-color: var(--bg-color);
-			}
-			#root {
-				margin: 1rem auto;
-				min-width: 850px;
-				max-width: 1040px;
-			}
+<head>
+	<title>Design Sample</title>
+	<style>
+		:root {
+			--bg-color: #121212;
+			--alt-color: #202020;
+			--border-color: #707070;
+			--header-color: #303030;
+			--text-color: #F2F2F2;
+			--text-color-alt: #D8D8D8;
+		}
+		body {
+			background-color: var(--bg-color);
+			color: var(--text-color);
+			font-family: sans-serif;
+		}
+		a {
+			color: var(--text-color-alt);
+		}
+		h1, h2, p {
+			margin: 0;
+		}
+		hr {
+			border-color: var(--border-color);
+		}
+		input[type="text"], input[type="password"] {
+			color: var(--text-color-alt);
+			background-color: var(--bg-color);
+		}
+		#root {
+			margin: 1rem auto;
+			min-width: 850px;
+			max-width: 1040px;
+		}
 
-			#title-bar {
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-			}
+		#title-bar {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
 
-			#top-nav {
-				display: flex;
-				justify-content: space-between;
+		#top-nav {
+			display: flex;
+			justify-content: space-between;
 
-				background-color: var(--header-color);
-				border: solid;
-				border-color: var(--border-color);
-				border-width: 1px;
+			background-color: var(--header-color);
+			border: solid;
+			border-color: var(--border-color);
+			border-width: 1px;
 
-				padding: 0.3rem 0.5rem;
-				margin-bottom: 1rem;
-			}
-			#top-nav ul {
-				display: flex;
-				gap: 1rem;
+			padding: 0.3rem 0.5rem;
+			margin-bottom: 1rem;
+		}
+		#top-nav ul {
+			display: flex;
+			gap: 1rem;
 
-				list-style: none;
-				margin: 0;
-				padding: 0;
-			}
+			list-style: none;
+			margin: 0;
+			padding: 0;
+		}
 
-			/* Login page */
-			.login-container {
-				display: flex;
-				flex-direction: column;
+		/* Generic panel */
+		.simple-panel-container {
+			display: flex;
+			flex-direction: column;
+		}
+		.simple-panel-container h1 {
+			font-size: 1.2rem;
+			font-weight: normal;
+		}
+		.simple-panel {
+			display: flex;
+			flex-direction: column;
 
-				border: solid;
-				border-color: var(--border-color);
-				border-width: 1px;
+			border: solid;
+			border-color: var(--border-color);
+			border-width: 1px;
 
-				margin-left: auto;
-				margin-right: auto;
-				max-width: 400px;
-			}
-			.login-container h1 {
-				font-size: 1.2rem;
-				font-weight: normal;
-			}
-			.login-header {
-				background-color: var(--header-color);
-				padding: 0.3rem 0.5rem;
+			margin-bottom: 1rem;
+		}
+		.simple-panel-header {
+			background-color: var(--header-color);
 
-				border-bottom: solid;
-				border-color: var(--border-color);
-				border-width: 1px;
-			}
-			.login-form {
-				display: flex;
-				flex-direction: column;
+			padding: 0.3rem 0.5rem;
+			border-bottom: solid;
+			border-color: var(--border-color);
+			border-width: 1px;
+		}
+		.simple-panel-content {
+			background-color: var(--alt-color);
+			padding: 0.3rem 0.5rem;
+		}
 
-				background-color: var(--alt-color);
-				padding: 0.3rem 0.5rem;
-			}
-			.login-form p {
-				margin-left: auto;
-				margin-right: auto;
-			}
-			.login-form form {
-				display: flex;
-				flex-direction: column;
+		/* Login page */
+		.login-container {
+			display: flex;
+			flex-direction: column;
 
-				margin-left: 20%;
-				margin-right: 20%;
-			}
-			.login-form form input {
-				margin-bottom: 0.5rem;
-			}
+			border: solid;
+			border-color: var(--border-color);
+			border-width: 1px;
 
-			/* Main index page */
-			.index-container {
-				display: grid;
-				grid-template-columns: 6fr 1.5fr 1.5fr 2fr;
+			margin-left: auto;
+			margin-right: auto;
+			max-width: 400px;
+		}
+		.login-container h1 {
+			font-size: 1.2rem;
+			font-weight: normal;
+		}
+		.login-header {
+			background-color: var(--header-color);
+			padding: 0.3rem 0.5rem;
 
-				border: solid;
-				border-color: var(--border-color);
-				border-width: 1px;
+			border-bottom: solid;
+			border-color: var(--border-color);
+			border-width: 1px;
+		}
+		.login-form {
+			display: flex;
+			flex-direction: column;
 
-				margin-bottom: 1rem;
-			}
-			.index-container h1 {
-				font-size: 1.2rem;
-				font-weight: normal;
-			}
-			.index-cell {
-				align-content: center;
-				padding: 0.3rem 0.5rem;
-				border-bottom: solid;
-				border-color: var(--border-color);
-				border-width: 1px;
-			}
-			.index-cell:nth-last-child(-n + 4) {
-				border-bottom: hidden;
-			}
-			.index-header {
-				background-color: var(--header-color);
-			}
-			.index-segment {
-				background-color: var(--alt-color);
-			}
-			.index-segment:nth-child(8n), .index-segment:nth-child(8n - 1), .index-segment:nth-child(8n - 2), .index-segment:nth-child(8n - 3){
-				background-color: var(--bg-color);
-			}
+			background-color: var(--alt-color);
+			padding: 0.3rem 0.5rem;
+		}
+		.login-form p {
+			margin-left: auto;
+			margin-right: auto;
+		}
+		.login-form form {
+			display: flex;
+			flex-direction: column;
 
-			/* Forum index */
-			.forum-index-breadcrumb p {
-				margin-bottom: 0.5rem;
-			}
-			.forum-index-container {
-				display: grid;
-				grid-template-columns: 6fr 2fr 1fr 2fr;
+			margin-left: 20%;
+			margin-right: 20%;
+		}
+		.login-form form input {
+			margin-bottom: 0.5rem;
+		}
 
-				border: solid;
-				border-color: var(--border-color);
-				border-width: 1px;
+		/* Main index page */
+		.index-container {
+			display: grid;
+			grid-template-columns: 6fr 1.5fr 1.5fr 2fr;
 
-				margin-bottom: 1rem;
-			}
-			.forum-index-cell {
-				align-content: center;
-				padding: 0.3rem 0.5rem;
-				border-bottom: solid;
-				border-color: var(--border-color);
-				border-width: 1px;
-			}
-			.forum-index-cell:nth-last-child(-n + 4) {
-				border-bottom: hidden;
-			}
-			.forum-index-container h1 {
-				font-size: 1.2rem;
-				font-weight: normal;
-			}
-			.forum-index-container h2 {
-				font-size: 1rem;
-				font-weight: normal;
-			}
-			.forum-index-header {
-				background-color: var(--header-color);
-			}
-			.forum-index-thread-title-block {
-				display: flex;
-				align-content: center;
-				justify-content: space-between;
-			}
-			.forum-index-thread-title-block p {
-				margin: auto 0;
-			}
-			.forum-index-segment {
-				background-color: var(--alt-color);
-			}
-			.forum-index-segment:nth-child(8n),
-			.forum-index-segment:nth-child(8n - 1),
-			.forum-index-segment:nth-child(8n - 2),
-			.forum-index-segment:nth-child(8n - 3) {
-				background-color: var(--bg-color);
-			}
+			border: solid;
+			border-color: var(--border-color);
+			border-width: 1px;
 
-			/* Control panel */
-			.cp-container {
-				display: grid;
-				grid-template-columns: 1fr 4fr;
-				gap: 1rem;
-			}
-			.cp-container nav {
-				display: flex;
-				flex-direction: column;
+			margin-bottom: 1rem;
+		}
+		.index-container h1 {
+			font-size: 1.2rem;
+			font-weight: normal;
+		}
+		.index-cell {
+			align-content: center;
+			padding: 0.3rem 0.5rem;
+			border-bottom: solid;
+			border-color: var(--border-color);
+			border-width: 1px;
+		}
+		.index-cell:nth-last-child(-n + 4) {
+			border-bottom: hidden;
+		}
+		.index-header {
+			background-color: var(--header-color);
+		}
+		.index-segment {
+			background-color: var(--alt-color);
+		}
+		.index-segment:nth-child(8n), .index-segment:nth-child(8n - 1), .index-segment:nth-child(8n - 2), .index-segment:nth-child(8n - 3){
+			background-color: var(--bg-color);
+		}
 
-				border: solid;
-				border-color: var(--border-color);
-				border-width: 1px;
+		/* Forum index */
+		.forum-index-breadcrumb p {
+			margin-bottom: 0.5rem;
+		}
+		.forum-index-container {
+			display: grid;
+			grid-template-columns: 6fr 2fr 1fr 2fr;
 
-				margin-bottom: auto;
-			}
-			.cp-container nav p {
-				align-content: center;
-				padding: 0.3rem 0.5rem;
-				border-bottom: solid;
-				border-color: var(--border-color);
-				border-width: 1px;
-			}
-			.cp-container nav p:nth-child(2n - 1) {
-				background-color: var(--alt-color);
-			}
-			.cp-container nav p:first-child {
-				background-color: var(--header-color);
-			}
-			.cp-container nav p:last-child {
-				border-bottom: hidden;
-			}
-			.cp-panel-container {
-				display: flex;
-				flex-direction: column;
-			}
-			.cp-panel-container h1 {
-				font-size: 1.2rem;
-				font-weight: normal;
-			}
-			.cp-panel {
-				display: flex;
-				flex-direction: column;
+			border: solid;
+			border-color: var(--border-color);
+			border-width: 1px;
 
-				border: solid;
-				border-color: var(--border-color);
-				border-width: 1px;
+			margin-bottom: 1rem;
+		}
+		.forum-index-cell {
+			align-content: center;
+			padding: 0.3rem 0.5rem;
+			border-bottom: solid;
+			border-color: var(--border-color);
+			border-width: 1px;
+		}
+		.forum-index-cell:nth-last-child(-n + 4) {
+			border-bottom: hidden;
+		}
+		.forum-index-container h1 {
+			font-size: 1.2rem;
+			font-weight: normal;
+		}
+		.forum-index-container h2 {
+			font-size: 1rem;
+			font-weight: normal;
+		}
+		.forum-index-header {
+			background-color: var(--header-color);
+		}
+		.forum-index-thread-title-block {
+			display: flex;
+			align-content: center;
+			justify-content: space-between;
+		}
+		.forum-index-thread-title-block p {
+			margin: auto 0;
+		}
+		.forum-index-segment {
+			background-color: var(--alt-color);
+		}
+		.forum-index-segment:nth-child(8n),
+		.forum-index-segment:nth-child(8n - 1),
+		.forum-index-segment:nth-child(8n - 2),
+		.forum-index-segment:nth-child(8n - 3) {
+			background-color: var(--bg-color);
+		}
 
-				margin-bottom: 1rem;
-			}
-			.cp-panel-header {
-				background-color: var(--header-color);
+		/* Control panel */
+		.cp-container {
+			display: grid;
+			grid-template-columns: 1fr 4fr;
+			gap: 1rem;
+		}
+		.cp-container nav {
+			display: flex;
+			flex-direction: column;
 
-				padding: 0.3rem 0.5rem;
-				border-bottom: solid;
-				border-color: var(--border-color);
-				border-width: 1px;
-			}
-			.cp-content {
-				background-color: var(--alt-color);
-				padding: 0.3rem 0.5rem;
-			}
-		</style>
-	</head>
-	<body>
-		<div id="root">
-			<div id="title-bar">
-				<h1>Website</h1>
-				<p><a href="#">Log Out</a></p>
-			</div>
-			<nav id="top-nav">
-				<ul>
-					<li><a href="#">Home</a></li>
-					<li><a href="#">Forum Index</a></li>
-				</ul>
-				<ul>
-					<li><a href="#">User Settings</a></li>
-				</ul>
-			</nav>
+			border: solid;
+			border-color: var(--border-color);
+			border-width: 1px;
 
-			<div class="login-container">
-				<div class="login-header">
-					<h1>Log in</h1>
-				</div>
-				<div class="login-form">
-					<form action="#" method="post">
-						<label for="input_username">Username:</label>
-						<input type="text" id="input_username" name="username">
-						<label for="input_password">Password:</label>
-						<input type="password" id="input_password" name="password">
-						<input type="submit" value="Log in">
-					</form>
-					<p>or</p>
-					<p><a href="#">Register a new account</a></p>
-				</div>
-			</div>
+			margin-bottom: auto;
+		}
+		.cp-container nav p {
+			align-content: center;
+			padding: 0.3rem 0.5rem;
+			border-bottom: solid;
+			border-color: var(--border-color);
+			border-width: 1px;
+		}
+		.cp-container nav p:nth-child(2n - 1) {
+			background-color: var(--alt-color);
+		}
+		.cp-container nav p:first-child {
+			background-color: var(--header-color);
+		}
+		.cp-container nav p:last-child {
+			border-bottom: hidden;
+		}
+	</style>
+</head>
+<body>
+<div id="root">
+	<div id="title-bar">
+		<h1>Website</h1>
+		<p><a href="#">Log Out</a></p>
+	</div>
+	<nav id="top-nav">
+		<ul>
+			<li><a href="#">Home</a></li>
+			<li><a href="#">Forum Index</a></li>
+		</ul>
+		<ul>
+			<li><a href="#">Section-specific links</a></li>
+		</ul>
+	</nav>
 
-			<hr>
+	<div class="login-container">
+		<div class="login-header">
+			<h1>Log in</h1>
+		</div>
+		<div class="login-form">
+			<form action="#" method="post">
+				<label for="input_username">Username:</label>
+				<input type="text" id="input_username" name="username">
+				<label for="input_password">Password:</label>
+				<input type="password" id="input_password" name="password">
+				<input type="submit" value="Log in">
+			</form>
+			<p>or</p>
+			<p><a href="#">Register a new account</a></p>
+		</div>
+	</div>
 
-			<div class="index-container">
-				<div class="index-cell index-header"><h1>Section Title</h1></div>
-				<div class="index-cell index-header"><h1>Threads</h1></div>
-				<div class="index-cell index-header"><h1>Posts</h1></div>
-				<div class="index-cell index-header"><h1>Last Post</h1></div>
+	<hr>
 
-				<div class="index-cell index-segment">
-					<div><h1><a href="#">Forum Title</a></h1></div>
-					<div><p>Description</p></div>
-				</div>
-				<div class="index-cell index-segment">123</div>
-				<div class="index-cell index-segment">456</div>
-				<div class="index-cell index-segment">Something</div>
+	<div class="index-container">
+		<div class="index-cell index-header"><h1>Section Title</h1></div>
+		<div class="index-cell index-header"><h1>Threads</h1></div>
+		<div class="index-cell index-header"><h1>Posts</h1></div>
+		<div class="index-cell index-header"><h1>Last Post</h1></div>
 
-				<div class="index-cell index-segment">
-					<div><h1><a href="#">Another One</a></h1></div>
-					<div><p>Description</p></div>
-				</div>
-				<div class="index-cell index-segment">111</div>
-				<div class="index-cell index-segment">222</div>
-				<div class="index-cell index-segment">Something</div>
+		<div class="index-cell index-segment">
+			<div><h1><a href="#">Forum Title</a></h1></div>
+			<div><p>Description</p></div>
+		</div>
+		<div class="index-cell index-segment">123</div>
+		<div class="index-cell index-segment">456</div>
+		<div class="index-cell index-segment">Something</div>
 
-				<div class="index-cell index-segment">
-					<div><h1><a href="#">Another One</a></h1></div>
-					<div><p>Description</p></div>
-				</div>
-				<div class="index-cell index-segment">333</div>
-				<div class="index-cell index-segment">444</div>
-				<div class="index-cell index-segment">Something</div>
+		<div class="index-cell index-segment">
+			<div><h1><a href="#">Another One</a></h1></div>
+			<div><p>Description</p></div>
+		</div>
+		<div class="index-cell index-segment">111</div>
+		<div class="index-cell index-segment">222</div>
+		<div class="index-cell index-segment">Something</div>
 
-				<div class="index-cell index-segment">
-					<div><h1><a href="#">Another One</a></h1></div>
-					<div><p>Description</p></div>
-				</div>
-				<div class="index-cell index-segment">555</div>
-				<div class="index-cell index-segment">666</div>
-				<div class="index-cell index-segment">Something</div>
-			</div>
+		<div class="index-cell index-segment">
+			<div><h1><a href="#">Another One</a></h1></div>
+			<div><p>Description</p></div>
+		</div>
+		<div class="index-cell index-segment">333</div>
+		<div class="index-cell index-segment">444</div>
+		<div class="index-cell index-segment">Something</div>
 
-			<hr>
+		<div class="index-cell index-segment">
+			<div><h1><a href="#">Another One</a></h1></div>
+			<div><p>Description</p></div>
+		</div>
+		<div class="index-cell index-segment">555</div>
+		<div class="index-cell index-segment">666</div>
+		<div class="index-cell index-segment">Something</div>
+	</div>
 
-			<div class="forum-index-breadcrumb">
-				<p>Category Name &gt; Forum Name</p>
-			</div>
-			<div class="forum-index-container">
-				<div class="forum-index-cell forum-index-header"><h1>Thread</h1></div>
-				<div class="forum-index-cell forum-index-header"><h1>Author</h1></div>
-				<div class="forum-index-cell forum-index-header"><h1>Replies</h1></div>
-				<div class="forum-index-cell forum-index-header"><h1>Last Post</h1></div>
+	<hr>
 
-				<div class="forum-index-cell forum-index-segment">
-					<div class="forum-index-thread-title-block">
-						<div>
-							<h1><a href="#">This one is a pretty long title for a thread</a></h1>
-							<p>
-								Page:
-								<a href="#">1</a>,
-								<a href="#">2</a>,
-								<a href="#">3</a>, ...
-								<a href="#">9</a>,
-								<a href="#">10</a>
-							</p>
-						</div>
-						<p>
-							(<a href="#">100</a>)
-							<a href="#">x</a>
-						</p>
-					</div>
-				</div>
-				<div class="forum-index-cell forum-index-segment"><h2>UserName</h2></div>
-				<div class="forum-index-cell forum-index-segment"><h2>420</h2></div>
-				<div class="forum-index-cell forum-index-segment"><h2>Something</h2></div>
+	<div class="forum-index-breadcrumb">
+		<p>Category Name &gt; Forum Name</p>
+	</div>
+	<div class="forum-index-container">
+		<div class="forum-index-cell forum-index-header"><h1>Thread</h1></div>
+		<div class="forum-index-cell forum-index-header"><h1>Author</h1></div>
+		<div class="forum-index-cell forum-index-header"><h1>Replies</h1></div>
+		<div class="forum-index-cell forum-index-header"><h1>Last Post</h1></div>
 
-				<div class="forum-index-cell forum-index-segment">
-					<div class="forum-index-thread-title-block">
-						<div>
-							<h1><a href="#">This one is a pretty long title for a thread</a></h1>
-							<p>
-								Page:
-								<a href="#">1</a>,
-								<a href="#">2</a>,
-								<a href="#">3</a>, ...
-								<a href="#">9</a>,
-								<a href="#">10</a>
-							</p>
-						</div>
-						<p>
-							(<a href="#">100</a>)
-							<a href="#">x</a>
-						</p>
-					</div>
-				</div>
-				<div class="forum-index-cell forum-index-segment"><h2>UserName</h2></div>
-				<div class="forum-index-cell forum-index-segment"><h2>420</h2></div>
-				<div class="forum-index-cell forum-index-segment"><h2>Something</h2></div>
-
-				<div class="forum-index-cell forum-index-segment">
-					<div class="forum-index-thread-title-block">
-						<div>
-							<h1><a href="#">This one is a pretty long title for a thread</a></h1>
-							<p>
-								Page:
-								<a href="#">1</a>,
-								<a href="#">2</a>,
-								<a href="#">3</a>, ...
-								<a href="#">9</a>,
-								<a href="#">10</a>
-							</p>
-						</div>
-						<p>
-							(<a href="#">100</a>)
-							<a href="#">x</a>
-						</p>
-					</div>
-				</div>
-				<div class="forum-index-cell forum-index-segment"><h2>UserName</h2></div>
-				<div class="forum-index-cell forum-index-segment"><h2>420</h2></div>
-				<div class="forum-index-cell forum-index-segment"><h2>Something</h2></div>
-
-				<div class="forum-index-cell forum-index-segment">
-					<div class="forum-index-thread-title-block">
-						<div>
-							<h1><a href="#">This one is a pretty long title for a thread</a></h1>
-							<p>
-								Page:
-								<a href="#">1</a>,
-								<a href="#">2</a>,
-								<a href="#">3</a>, ...
-								<a href="#">9</a>,
-								<a href="#">10</a>
-							</p>
-						</div>
-						<p>
-							(<a href="#">100</a>)
-							<a href="#">x</a>
-						</p>
-					</div>
-				</div>
-				<div class="forum-index-cell forum-index-segment"><h2>UserName</h2></div>
-				<div class="forum-index-cell forum-index-segment"><h2>420</h2></div>
-				<div class="forum-index-cell forum-index-segment"><h2>Something</h2></div>
-			</div>
-
-			<hr>
-
-			<div class="cp-container">
+		<div class="forum-index-cell forum-index-segment">
+			<div class="forum-index-thread-title-block">
 				<div>
-					<nav>
-						<p>Configuration</p>
-						<p><a href="#">Screen 1</a></p>
-						<p><a href="#">Screen 2</a></p>
-						<p><a href="#">Screen 3</a></p>
-						<p><a href="#">Screen 4</a></p>
-					</nav>
+					<h1><a href="#">This one is a pretty long title for a thread</a></h1>
+					<p>
+						Page:
+						<a href="#">1</a>,
+						<a href="#">2</a>,
+						<a href="#">3</a>, ...
+						<a href="#">9</a>,
+						<a href="#">10</a>
+					</p>
 				</div>
-				<div class="cp-panel-container">
-					<div class="cp-panel">
-						<div class="cp-panel-header"><h1>Control Panel Panel</h1></div>
-						<div class="cp-content cp-NAME">
-							<p>Settings to change would go here, probably</p>
-							<p>There are multiple lines</p>
-							<p>To test vertical scaling</p>
-						</div>
-					</div>
-					<div class="cp-panel">
-						<div class="cp-panel-header"><h1>Another Panel</h1></div>
-						<div class="cp-content cp-NAME">
-							<p>This one has less lines</p>
-						</div>
-					</div>
+				<p>
+					(<a href="#">100</a>)
+					<a href="#">x</a>
+				</p>
+			</div>
+		</div>
+		<div class="forum-index-cell forum-index-segment"><h2>UserName</h2></div>
+		<div class="forum-index-cell forum-index-segment"><h2>420</h2></div>
+		<div class="forum-index-cell forum-index-segment"><h2>Something</h2></div>
+
+		<div class="forum-index-cell forum-index-segment">
+			<div class="forum-index-thread-title-block">
+				<div>
+					<h1><a href="#">This one is a pretty long title for a thread</a></h1>
+					<p>
+						Page:
+						<a href="#">1</a>,
+						<a href="#">2</a>,
+						<a href="#">3</a>, ...
+						<a href="#">9</a>,
+						<a href="#">10</a>
+					</p>
+				</div>
+				<p>
+					(<a href="#">100</a>)
+					<a href="#">x</a>
+				</p>
+			</div>
+		</div>
+		<div class="forum-index-cell forum-index-segment"><h2>UserName</h2></div>
+		<div class="forum-index-cell forum-index-segment"><h2>420</h2></div>
+		<div class="forum-index-cell forum-index-segment"><h2>Something</h2></div>
+
+		<div class="forum-index-cell forum-index-segment">
+			<div class="forum-index-thread-title-block">
+				<div>
+					<h1><a href="#">This one is a pretty long title for a thread</a></h1>
+					<p>
+						Page:
+						<a href="#">1</a>,
+						<a href="#">2</a>,
+						<a href="#">3</a>, ...
+						<a href="#">9</a>,
+						<a href="#">10</a>
+					</p>
+				</div>
+				<p>
+					(<a href="#">100</a>)
+					<a href="#">x</a>
+				</p>
+			</div>
+		</div>
+		<div class="forum-index-cell forum-index-segment"><h2>UserName</h2></div>
+		<div class="forum-index-cell forum-index-segment"><h2>420</h2></div>
+		<div class="forum-index-cell forum-index-segment"><h2>Something</h2></div>
+
+		<div class="forum-index-cell forum-index-segment">
+			<div class="forum-index-thread-title-block">
+				<div>
+					<h1><a href="#">This one is a pretty long title for a thread</a></h1>
+					<p>
+						Page:
+						<a href="#">1</a>,
+						<a href="#">2</a>,
+						<a href="#">3</a>, ...
+						<a href="#">9</a>,
+						<a href="#">10</a>
+					</p>
+				</div>
+				<p>
+					(<a href="#">100</a>)
+					<a href="#">x</a>
+				</p>
+			</div>
+		</div>
+		<div class="forum-index-cell forum-index-segment"><h2>UserName</h2></div>
+		<div class="forum-index-cell forum-index-segment"><h2>420</h2></div>
+		<div class="forum-index-cell forum-index-segment"><h2>Something</h2></div>
+	</div>
+
+	<hr>
+
+	<div class="cp-container">
+		<div>
+			<nav>
+				<p>Configuration</p>
+				<p><a href="#">Screen 1</a></p>
+				<p><a href="#">Screen 2</a></p>
+				<p><a href="#">Screen 3</a></p>
+				<p><a href="#">Screen 4</a></p>
+			</nav>
+		</div>
+		<div class="simple-panel-container">
+			<div class="simple-panel">
+				<div class="simple-panel-header"><h1>Control Panel Panel</h1></div>
+				<div class="simple-panel-content cp-NAME">
+					<p>Settings to change would go here, probably</p>
+					<p>There are multiple lines</p>
+					<p>To test vertical scaling</p>
+				</div>
+			</div>
+			<div class="simple-panel">
+				<div class="simple-panel-header"><h1>Another Panel</h1></div>
+				<div class="simple-panel-content cp-NAME">
+					<p>This one has less lines</p>
 				</div>
 			</div>
 		</div>
-	</body>
+	</div>
+</div>
+</body>
 </html>

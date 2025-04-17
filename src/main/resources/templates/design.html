@@ -11,6 +11,8 @@
 			--text-color: #F2F2F2;
 			--text-color-alt: #D8D8D8;
 		}
+
+		/* Base styles */
 		body {
 			background-color: var(--bg-color);
 			color: var(--text-color);
@@ -41,6 +43,7 @@
 			align-items: center;
 		}
 
+		/* Navigation */
 		#top-nav {
 			display: flex;
 			justify-content: space-between;
@@ -94,6 +97,16 @@
 			padding: 0.3rem 0.5rem;
 		}
 
+		/* Info panel */
+		.info-panel-container {
+			display: flex;
+			flex-direction: column;
+
+			margin-left: auto;
+			margin-right: auto;
+			max-width: 500px;
+		}
+
 		/* Login page */
 		.login-container {
 			display: flex;
@@ -105,7 +118,7 @@
 
 			margin-left: auto;
 			margin-right: auto;
-			max-width: 400px;
+			max-width: 500px;
 		}
 		.login-container h1 {
 			font-size: 1.2rem;
@@ -278,6 +291,17 @@
 			<li><a href="#">Section-specific links</a></li>
 		</ul>
 	</nav>
+
+	<div class="info-panel-container">
+		<div class="simple-panel">
+			<div class="simple-panel-header">
+				<h1>Message</h1>
+			</div>
+			<div class="simple-panel-content">
+				<p>This is a message, for you.</p>
+			</div>
+		</div>
+	</div>
 
 	<div class="login-container">
 		<div class="login-header">

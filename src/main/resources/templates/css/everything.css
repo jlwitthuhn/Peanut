@@ -1,256 +1,249 @@
 :root {
-    --bg-color: #121212;
-    --alt-color: #202020;
-    --border-color: #707070;
-    --header-color: #303030;
-    --text-color: #F2F2F2;
-    --text-color-alt: #D8D8D8;
+	--bg-color: #121212;
+	--alt-color: #202020;
+	--border-color: #707070;
+	--header-color: #303030;
+	--text-color: #F2F2F2;
+	--text-color-alt: #D8D8D8;
 }
+
+/* Base styles */
 body {
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    font-family: sans-serif;
+	background-color: var(--bg-color);
+	color: var(--text-color);
+	font-family: sans-serif;
 }
 a {
-    color: var(--text-color-alt);
+	color: var(--text-color-alt);
 }
 h1, h2, p {
-    margin: 0;
+	margin: 0;
 }
 hr {
-    border-color: var(--border-color);
+	border-color: var(--border-color);
 }
 input[type="text"], input[type="password"] {
-    color: var(--text-color-alt);
-    background-color: var(--bg-color);
+	color: var(--text-color-alt);
+	background-color: var(--bg-color);
 }
 #root {
-    margin: 1rem auto;
-    min-width: 850px;
-    max-width: 1040px;
+	margin: 1rem auto;
+	min-width: 850px;
+	max-width: 1040px;
 }
 
 #title-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
 
+/* Navigation */
 #top-nav {
-    display: flex;
-    justify-content: space-between;
+	display: flex;
+	justify-content: space-between;
 
-    background-color: var(--header-color);
-    border: solid;
-    border-color: var(--border-color);
-    border-width: 1px;
+	background-color: var(--header-color);
+	border: solid;
+	border-color: var(--border-color);
+	border-width: 1px;
 
-    padding: 0.3rem 0.5rem;
-    margin-bottom: 1rem;
+	padding: 0.3rem 0.5rem;
+	margin-bottom: 1rem;
 }
 #top-nav ul {
-    display: flex;
-    gap: 1rem;
+	display: flex;
+	gap: 1rem;
 
-    list-style: none;
-    margin: 0;
-    padding: 0;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+/* Generic panel */
+.simple-panel-container {
+	display: flex;
+	flex-direction: column;
+}
+.simple-panel-container h1 {
+	font-size: 1.2rem;
+	font-weight: normal;
+}
+.simple-panel {
+	display: flex;
+	flex-direction: column;
+
+	border: solid;
+	border-color: var(--border-color);
+	border-width: 1px;
+
+	margin-bottom: 1rem;
+}
+.simple-panel h1 {
+	font-size: 1.2rem;
+	font-weight: normal;
+}
+.simple-panel-header {
+	background-color: var(--header-color);
+
+	padding: 0.3rem 0.5rem;
+	border-bottom: solid;
+	border-color: var(--border-color);
+	border-width: 1px;
+}
+.simple-panel-content {
+	background-color: var(--alt-color);
+	padding: 0.3rem 0.5rem;
+}
+
+/* Info panel */
+.info-panel-container {
+	display: flex;
+	flex-direction: column;
+
+	margin-left: auto;
+	margin-right: auto;
+	max-width: 500px;
 }
 
 /* Login page */
 .login-container {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    border: solid;
-    border-color: var(--border-color);
-    border-width: 1px;
+	border: solid;
+	border-color: var(--border-color);
+	border-width: 1px;
 
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 400px;
+	margin-left: auto;
+	margin-right: auto;
+	max-width: 500px;
 }
 .login-container h1 {
-    font-size: 1.2rem;
-    font-weight: normal;
+	font-size: 1.2rem;
+	font-weight: normal;
 }
 .login-header {
-    background-color: var(--header-color);
-    padding: 0.3rem 0.5rem;
+	background-color: var(--header-color);
+	padding: 0.3rem 0.5rem;
 
-    border-bottom: solid;
-    border-color: var(--border-color);
-    border-width: 1px;
+	border-bottom: solid;
+	border-color: var(--border-color);
+	border-width: 1px;
 }
 .login-form {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    background-color: var(--alt-color);
-    padding: 0.3rem 0.5rem;
+	background-color: var(--alt-color);
+	padding: 0.3rem 0.5rem;
 }
 .login-form p {
-    margin-left: auto;
-    margin-right: auto;
+	margin-left: auto;
+	margin-right: auto;
 }
 .login-form form {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    margin-left: 20%;
-    margin-right: 20%;
+	margin-left: 20%;
+	margin-right: 20%;
 }
 .login-form form input {
-    margin-bottom: 0.5rem;
+	margin-bottom: 0.5rem;
 }
 
 /* Main index page */
 .index-container {
-    display: grid;
-    grid-template-columns: 6fr 1.5fr 1.5fr 2fr;
+	display: grid;
+	grid-template-columns: 6fr 1.5fr 1.5fr 2fr;
 
-    border: solid;
-    border-color: var(--border-color);
-    border-width: 1px;
+	border: solid;
+	border-color: var(--border-color);
+	border-width: 1px;
 
-    margin-bottom: 1rem;
+	margin-bottom: 1rem;
 }
 .index-container h1 {
-    font-size: 1.2rem;
-    font-weight: normal;
+	font-size: 1.2rem;
+	font-weight: normal;
 }
 .index-cell {
-    align-content: center;
-    padding: 0.3rem 0.5rem;
-    border-bottom: solid;
-    border-color: var(--border-color);
-    border-width: 1px;
+	align-content: center;
+	padding: 0.3rem 0.5rem;
+	border-bottom: solid;
+	border-color: var(--border-color);
+	border-width: 1px;
 }
 .index-cell:nth-last-child(-n + 4) {
-    border-bottom: hidden;
+	border-bottom: hidden;
 }
 .index-header {
-    background-color: var(--header-color);
+	background-color: var(--header-color);
 }
 .index-segment {
-    background-color: var(--alt-color);
+	background-color: var(--alt-color);
 }
 .index-segment:nth-child(8n), .index-segment:nth-child(8n - 1), .index-segment:nth-child(8n - 2), .index-segment:nth-child(8n - 3){
-    background-color: var(--bg-color);
+	background-color: var(--bg-color);
 }
 
 /* Forum index */
 .forum-index-breadcrumb p {
-    margin-bottom: 0.5rem;
+	margin-bottom: 0.5rem;
 }
 .forum-index-container {
-    display: grid;
-    grid-template-columns: 6fr 2fr 1fr 2fr;
+	display: grid;
+	grid-template-columns: 6fr 2fr 1fr 2fr;
 
-    border: solid;
-    border-color: var(--border-color);
-    border-width: 1px;
+	border: solid;
+	border-color: var(--border-color);
+	border-width: 1px;
 
-    margin-bottom: 1rem;
+	margin-bottom: 1rem;
 }
 .forum-index-cell {
-    align-content: center;
-    padding: 0.3rem 0.5rem;
-    border-bottom: solid;
-    border-color: var(--border-color);
-    border-width: 1px;
+	align-content: center;
+	padding: 0.3rem 0.5rem;
+	border-bottom: solid;
+	border-color: var(--border-color);
+	border-width: 1px;
 }
 .forum-index-cell:nth-last-child(-n + 4) {
-    border-bottom: hidden;
+	border-bottom: hidden;
 }
 .forum-index-container h1 {
-    font-size: 1.2rem;
-    font-weight: normal;
+	font-size: 1.2rem;
+	font-weight: normal;
 }
 .forum-index-container h2 {
-    font-size: 1rem;
-    font-weight: normal;
+	font-size: 1rem;
+	font-weight: normal;
 }
 .forum-index-header {
-    background-color: var(--header-color);
+	background-color: var(--header-color);
 }
 .forum-index-thread-title-block {
-    display: flex;
-    align-content: center;
-    justify-content: space-between;
+	display: flex;
+	align-content: center;
+	justify-content: space-between;
 }
 .forum-index-thread-title-block p {
-    margin: auto 0;
+	margin: auto 0;
 }
 .forum-index-segment {
-    background-color: var(--alt-color);
+	background-color: var(--alt-color);
 }
 .forum-index-segment:nth-child(8n),
 .forum-index-segment:nth-child(8n - 1),
 .forum-index-segment:nth-child(8n - 2),
 .forum-index-segment:nth-child(8n - 3) {
-    background-color: var(--bg-color);
+	background-color: var(--bg-color);
 }
 
 /* Control panel */
 .cp-container {
-    display: grid;
-    grid-template-columns: 1fr 4fr;
-    gap: 1rem;
-}
-.cp-container nav {
-    display: flex;
-    flex-direction: column;
-
-    border: solid;
-    border-color: var(--border-color);
-    border-width: 1px;
-
-    margin-bottom: auto;
-}
-.cp-container nav p {
-    align-content: center;
-    padding: 0.3rem 0.5rem;
-    border-bottom: solid;
-    border-color: var(--border-color);
-    border-width: 1px;
-}
-.cp-container nav p:nth-child(2n - 1) {
-    background-color: var(--alt-color);
-}
-.cp-container nav p:first-child {
-    background-color: var(--header-color);
-}
-.cp-container nav p:last-child {
-    border-bottom: hidden;
-}
-.cp-panel-container {
-    display: flex;
-    flex-direction: column;
-}
-.cp-panel-container h1 {
-    font-size: 1.2rem;
-    font-weight: normal;
-}
-.cp-panel {
-    display: flex;
-    flex-direction: column;
-
-    border: solid;
-    border-color: var(--border-color);
-    border-width: 1px;
-
-    margin-bottom: 1rem;
-}
-.cp-panel-header {
-    background-color: var(--header-color);
-
-    padding: 0.3rem 0.5rem;
-    border-bottom: solid;
-    border-color: var(--border-color);
-    border-width: 1px;
-}
-.cp-content {
-    background-color: var(--alt-color);
-    padding: 0.3rem 0.5rem;
+	display: grid;
+	grid-template-columns: 1fr 4fr;
+	gap: 1rem;
 }

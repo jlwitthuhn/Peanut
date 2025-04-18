@@ -23,6 +23,6 @@ public class PeanutConfigurer implements WebMvcConfigurer
 	@Override
 	public void addInterceptors(@NonNull InterceptorRegistry registry)
 	{
-		registry.addInterceptor(databaseInitInterceptor);
+		registry.addInterceptor(databaseInitInterceptor).excludePathPatterns("/design*", "/setup*");
 	}
 }

@@ -28,12 +28,6 @@ public class DatabaseInitInterceptor implements HandlerInterceptor
 	@Override
 	public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler)
 	{
-		// These pages do not require the database to be initialized
-		if (request.getRequestURI().equals("/design") || request.getRequestURI().equals("/setup"))
-		{
-			return true;
-		}
-
 		try
 		{
 			String result = jdbcTemplate.queryForObject("SELECT value FROM config WHERE value = 'schema_version'", String.class);

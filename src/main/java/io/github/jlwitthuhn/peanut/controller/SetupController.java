@@ -5,6 +5,7 @@
 package io.github.jlwitthuhn.peanut.controller;
 
 import io.github.jlwitthuhn.peanut.model.form.SetupForm;
+import io.github.jlwitthuhn.peanut.util.ViewShortcuts;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,17 +31,11 @@ public class SetupController
 	{
 		if (form == null || !form.isValid())
 		{
-			var model = new HashMap<String, String>();
-			model.put("header", "Error");
-			model.put("message", "Form is invalid");
-			return new ModelAndView("simple_message.html", model, HttpStatus.BAD_REQUEST);
+			return ViewShortcuts.simpleMessage("Error", "Form is invalid.", HttpStatus.BAD_REQUEST);
 		}
 
 		// TODO: Create tables
 
-		var model = new HashMap<String, String>();
-		model.put("header", "Success");
-		model.put("message", "Database initialized successfully");
-		return new ModelAndView("simple_message.html", model);
+		return ViewShortcuts.simpleMessage("Success", "Database initialized successfully.");
 	}
 }

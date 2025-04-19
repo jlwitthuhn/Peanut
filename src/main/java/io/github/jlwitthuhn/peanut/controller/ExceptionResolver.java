@@ -5,6 +5,7 @@
 package io.github.jlwitthuhn.peanut.controller;
 
 import io.github.jlwitthuhn.peanut.err.DatabaseNotInitializedException;
+import io.github.jlwitthuhn.peanut.util.ViewShortcuts;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -30,32 +31,20 @@ public class ExceptionResolver extends AbstractHandlerExceptionResolver
 			case BadSqlGrammarException badSqlGrammarException ->
 			{
 				logger.error("Caught BadSqlGrammarException in ExceptionResolver", ex);
-				var model = new HashMap<String, String>();
-				model.put("header", "SQL Error");
-				model.put("message", "Failed to execute SQL query.");
-				return new ModelAndView("simple_message.html", model, HttpStatus.INTERNAL_SERVER_ERROR);
+				return ViewShortcuts.simpleMessage("SQL Error", "Failed to execute SQL query.", HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 			case CannotGetJdbcConnectionException cannotGetJdbcConnectionException ->
 			{
-				var model = new HashMap<String, String>();
-				model.put("header", "DB Error");
-				model.put("message", "Unable to connect to the database.");
-				return new ModelAndView("simple_message.html", model, HttpStatus.INTERNAL_SERVER_ERROR);
+				return ViewShortcuts.simpleMessage("DB Error", "Unable to connect to the database.", HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 			case DatabaseNotInitializedException databaseNotInitializedException ->
 			{
-				var model = new HashMap<String, String>();
-				model.put("header", "DB Error");
-				model.put("message", "Database has not been initialized");
-				return new ModelAndView("simple_message.html", model, HttpStatus.INTERNAL_SERVER_ERROR);
+				return ViewShortcuts.simpleMessage("DB Error", "Database has not been initialized.", HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 			default ->
 			{
 				logger.error("Caught unknown exception in ExceptionResolver", ex);
-				var model = new HashMap<String, String>();
-				model.put("header", "Error");
-				model.put("message", "Unknown error occurred");
-				return new ModelAndView("simple_message.html", model, HttpStatus.INTERNAL_SERVER_ERROR);
+				return ViewShortcuts.simpleMessage("Error", "Unknown error occurred.", HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 	}

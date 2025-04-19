@@ -31,14 +31,16 @@ public class SetupController
 		if (form == null || !form.isValid())
 		{
 			var model = new HashMap<String, String>();
+			model.put("header", "Error");
 			model.put("message", "Form is invalid");
-			return new ModelAndView("error.html", model, HttpStatus.BAD_REQUEST);
+			return new ModelAndView("simple_message.html", model, HttpStatus.BAD_REQUEST);
 		}
 
 		// TODO: Create tables
 
 		var model = new HashMap<String, String>();
+		model.put("header", "Success");
 		model.put("message", "Database initialized successfully");
-		return new ModelAndView("error.html", model);
+		return new ModelAndView("simple_message.html", model);
 	}
 }

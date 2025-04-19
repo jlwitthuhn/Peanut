@@ -31,27 +31,31 @@ public class ExceptionResolver extends AbstractHandlerExceptionResolver
 			{
 				logger.error("Caught BadSqlGrammarException in ExceptionResolver", ex);
 				var model = new HashMap<String, String>();
-				model.put("message", "SQL error");
-				return new ModelAndView("error.html", model, HttpStatus.INTERNAL_SERVER_ERROR);
+				model.put("header", "SQL Error");
+				model.put("message", "Failed to execute SQL query.");
+				return new ModelAndView("simple_message.html", model, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 			case CannotGetJdbcConnectionException cannotGetJdbcConnectionException ->
 			{
 				var model = new HashMap<String, String>();
-				model.put("message", "Unable to connect to the database");
-				return new ModelAndView("error.html", model, HttpStatus.INTERNAL_SERVER_ERROR);
+				model.put("header", "DB Error");
+				model.put("message", "Unable to connect to the database.");
+				return new ModelAndView("simple_message.html", model, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 			case DatabaseNotInitializedException databaseNotInitializedException ->
 			{
 				var model = new HashMap<String, String>();
+				model.put("header", "DB Error");
 				model.put("message", "Database has not been initialized");
-				return new ModelAndView("error.html", model, HttpStatus.INTERNAL_SERVER_ERROR);
+				return new ModelAndView("simple_message.html", model, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 			default ->
 			{
 				logger.error("Caught unknown exception in ExceptionResolver", ex);
 				var model = new HashMap<String, String>();
+				model.put("header", "Error");
 				model.put("message", "Unknown error occurred");
-				return new ModelAndView("error.html", model, HttpStatus.INTERNAL_SERVER_ERROR);
+				return new ModelAndView("simple_message.html", model, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 	}

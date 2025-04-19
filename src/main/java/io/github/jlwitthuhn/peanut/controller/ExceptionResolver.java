@@ -30,26 +30,26 @@ public class ExceptionResolver extends AbstractHandlerExceptionResolver
 			case BadSqlGrammarException badSqlGrammarException ->
 			{
 				logger.error("Caught BadSqlGrammarException in ExceptionResolver", ex);
-				HashMap<String, String> model = new HashMap<>();
+				var model = new HashMap<String, String>();
 				model.put("message", "SQL error");
 				return new ModelAndView("error.html", model, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 			case CannotGetJdbcConnectionException cannotGetJdbcConnectionException ->
 			{
-				HashMap<String, String> model = new HashMap<>();
+				var model = new HashMap<String, String>();
 				model.put("message", "Unable to connect to the database");
 				return new ModelAndView("error.html", model, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 			case DatabaseNotInitializedException databaseNotInitializedException ->
 			{
-				HashMap<String, String> model = new HashMap<>();
+				var model = new HashMap<String, String>();
 				model.put("message", "Database has not been initialized");
 				return new ModelAndView("error.html", model, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 			default ->
 			{
 				logger.error("Caught unknown exception in ExceptionResolver", ex);
-				HashMap<String, String> model = new HashMap<>();
+				var model = new HashMap<String, String>();
 				model.put("message", "Unknown error occurred");
 				return new ModelAndView("error.html", model, HttpStatus.INTERNAL_SERVER_ERROR);
 			}

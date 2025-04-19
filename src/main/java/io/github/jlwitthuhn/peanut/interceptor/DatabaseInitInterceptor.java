@@ -4,6 +4,7 @@
 
 package io.github.jlwitthuhn.peanut.interceptor;
 
+import io.github.jlwitthuhn.peanut.err.BadDatabaseSchemaException;
 import io.github.jlwitthuhn.peanut.err.DatabaseNotInitializedException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,7 +31,11 @@ public class DatabaseInitInterceptor implements HandlerInterceptor
 	{
 		try
 		{
-			String result = jdbcTemplate.queryForObject("SELECT value FROM config WHERE value = 'schema_version'", String.class);
+			Long result = jdbcTemplate.queryForObject("SELECT value FROM config_int WHERE name = 'schemaVersion'", Long.class);
+			if (result == null || result != 1)
+			{
+				throw new BadDatabaseSchemaException();
+			}
 		}
 		catch (BadSqlGrammarException ex)
 		{

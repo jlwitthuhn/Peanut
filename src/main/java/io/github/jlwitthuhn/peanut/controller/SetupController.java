@@ -4,6 +4,7 @@
 
 package io.github.jlwitthuhn.peanut.controller;
 
+import io.github.jlwitthuhn.peanut.db.setup.DatabaseInitializer;
 import io.github.jlwitthuhn.peanut.model.form.SetupForm;
 import io.github.jlwitthuhn.peanut.util.ViewShortcuts;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,13 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/setup")
 public class SetupController
 {
+	private final DatabaseInitializer databaseInitializer;
+
+	public SetupController(DatabaseInitializer databaseInitializer)
+	{
+		this.databaseInitializer = databaseInitializer;
+	}
+
 	@GetMapping("")
 	public String index()
 	{
@@ -32,7 +40,10 @@ public class SetupController
 			return ViewShortcuts.simpleMessage("Error", "Form is invalid.", HttpStatus.BAD_REQUEST);
 		}
 
-		// TODO: Create tables
+		if (!databaseInitializer.doInit())
+		{
+			return ViewShortcuts.simpleMessage("Error", "Encountered error while initializing database.", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 
 		return ViewShortcuts.simpleMessage("Success", "Database initialized successfully.");
 	}

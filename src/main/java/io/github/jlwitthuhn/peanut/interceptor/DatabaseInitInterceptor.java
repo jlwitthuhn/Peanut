@@ -4,13 +4,13 @@
 
 package io.github.jlwitthuhn.peanut.interceptor;
 
+import io.github.jlwitthuhn.peanut.db.ConfigDAO;
 import io.github.jlwitthuhn.peanut.err.BadDatabaseSchemaException;
 import io.github.jlwitthuhn.peanut.err.DatabaseNotInitializedException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.BadSqlGrammarException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -18,12 +18,12 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Component
 public class DatabaseInitInterceptor implements HandlerInterceptor
 {
-	JdbcTemplate jdbcTemplate;
+	ConfigDAO configDAO;
 
 	@Autowired
-	public DatabaseInitInterceptor(JdbcTemplate jdbcTemplate)
+	public DatabaseInitInterceptor(ConfigDAO configDAO)
 	{
-		this.jdbcTemplate = jdbcTemplate;
+		this.configDAO = configDAO;
 	}
 
 	@Override
@@ -31,8 +31,8 @@ public class DatabaseInitInterceptor implements HandlerInterceptor
 	{
 		try
 		{
-			Long result = jdbcTemplate.queryForObject("SELECT value FROM config_int WHERE name = 'schemaVersion'", Long.class);
-			if (result == null || result != 1)
+			Long version = configDAO.getLong("schemaVersion");
+			if (version == null || version != 1)
 			{
 				throw new BadDatabaseSchemaException();
 			}

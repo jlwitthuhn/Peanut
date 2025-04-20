@@ -9,7 +9,6 @@ import io.github.jlwitthuhn.peanut.err.BadDatabaseSchemaException;
 import io.github.jlwitthuhn.peanut.err.DatabaseNotInitializedException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -20,7 +19,6 @@ public class DatabaseInitInterceptor implements HandlerInterceptor
 {
 	ConfigDAO configDAO;
 
-	@Autowired
 	public DatabaseInitInterceptor(ConfigDAO configDAO)
 	{
 		this.configDAO = configDAO;

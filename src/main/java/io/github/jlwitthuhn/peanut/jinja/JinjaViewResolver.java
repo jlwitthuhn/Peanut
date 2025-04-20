@@ -5,7 +5,6 @@
 package io.github.jlwitthuhn.peanut.jinja;
 
 import com.hubspot.jinjava.Jinjava;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
@@ -18,7 +17,6 @@ public class JinjaViewResolver extends AbstractTemplateViewResolver
 {
 	private final Jinjava jinjava;
 
-	@Autowired
 	public JinjaViewResolver(Jinjava jinjava)
 	{
 		this.jinjava = jinjava;

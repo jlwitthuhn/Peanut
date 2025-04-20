@@ -21,4 +21,10 @@ public class RootController
 	{
 		return "design.html";
 	}
+
+	@GetMapping("/login")
+	public String login()
+	{
+		return "login.html";
+	}
 }

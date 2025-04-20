@@ -11,11 +11,11 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class PeanutConfigurer implements WebMvcConfigurer
+public class PeanutConfiguration implements WebMvcConfigurer
 {
 	private final DatabaseInitInterceptor databaseInitInterceptor;
 
-	public PeanutConfigurer(DatabaseInitInterceptor databaseInitInterceptor)
+	public PeanutConfiguration(DatabaseInitInterceptor databaseInitInterceptor)
 	{
 		this.databaseInitInterceptor = databaseInitInterceptor;
 	}

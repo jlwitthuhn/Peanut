@@ -20,12 +20,14 @@ public class PeanutSecurityConfiguration
 		http.authorizeHttpRequests(
 			(authorizeHttpRequests) ->
 				authorizeHttpRequests
-					.requestMatchers("/login", "/design").permitAll()
+					.requestMatchers("/login", "/setup", "/design").permitAll()
 					.anyRequest().authenticated()
 		);
 		http.formLogin(
 			(formLogin) ->
-				formLogin.loginPage("/login")
+				formLogin
+					.defaultSuccessUrl("/")
+					.loginPage("/login")
 		);
 
 		return http.build();

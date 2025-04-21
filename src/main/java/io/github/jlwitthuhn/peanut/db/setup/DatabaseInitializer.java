@@ -34,13 +34,21 @@ public class DatabaseInitializer
 	{
 		final String CREATE_TABLE_CONFIG = """
 			CREATE TABLE config_int (
-				name varchar(255) PRIMARY KEY,
-				value bigint NOT NULL
+				name VARCHAR(255) PRIMARY KEY,
+				value BIGINT NOT NULL
+			);
+			""";
+		final String CREATE_TABLE_USERS = """
+			CREATE TABLE users (
+			    id BIGSERIAL PRIMARY KEY,
+			    name VARCHAR(255) UNIQUE NOT NULL,
+			    password VARCHAR(255) NOT NULL
 			);
 			""";
 		try
 		{
 			jdbcTemplate.execute(CREATE_TABLE_CONFIG);
+			jdbcTemplate.execute(CREATE_TABLE_USERS);
 		}
 		catch (Exception e)
 		{

@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -28,7 +29,10 @@ public class PeanutSecurityConfiguration
 					.defaultSuccessUrl("/")
 					.loginPage("/login")
 		);
-		http.csrf(AbstractHttpConfigurer::disable);
+		http.csrf(
+			(csrf) ->
+			csrf.csrfTokenRepository(new HttpSessionCsrfTokenRepository())
+		);
 
 		return http.build();
 	}

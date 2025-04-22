@@ -1,3 +1,7 @@
+// This file is part of Peanut and is licensed under the AGPLv3
+// https://www.gnu.org/licenses/agpl-3.0.en.html
+// SPDX-License-Identifier: AGPL-3.0-only
+
 package io.github.jlwitthuhn.peanut.db;
 
 import io.github.jlwitthuhn.peanut.model.db.UserRow;
@@ -12,12 +16,18 @@ public class UserDAO
 {
 	private final JdbcTemplate jdbcTemplate;
 
-	public UserDAO(final JdbcTemplate jdbcTemplate)
+	public UserDAO(JdbcTemplate jdbcTemplate)
 	{
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	public UserRow getByName(final String name)
+	public void createRow(String name, String password)
+	{
+		final String SQL = "INSERT INTO users (name, password) VALUES (?, ?)";
+		jdbcTemplate.update(SQL, name, password);
+	}
+
+	public UserRow getByName(String name)
 	{
 		final String SQL = "SELECT id, name, password FROM users WHERE name = ?";
 		final List<UserRow> results = jdbcTemplate.query(SQL, new UserRowMapper(), name);

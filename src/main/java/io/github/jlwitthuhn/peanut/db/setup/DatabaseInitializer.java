@@ -4,6 +4,7 @@
 
 package io.github.jlwitthuhn.peanut.db.setup;
 
+import io.github.jlwitthuhn.peanut.cfg.ConfigKeyNames;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -65,7 +66,7 @@ public class DatabaseInitializer
 			""";
 		try
 		{
-			jdbcTemplate.update(INSERT_SCHEMA_VERSION, "schemaVersion", 1);
+			jdbcTemplate.update(INSERT_SCHEMA_VERSION, ConfigKeyNames.SCHEMA_VERSION, 1);
 		}
 		catch (Exception e)
 		{

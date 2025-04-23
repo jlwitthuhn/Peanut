@@ -4,6 +4,7 @@
 
 package io.github.jlwitthuhn.peanut.interceptor;
 
+import io.github.jlwitthuhn.peanut.cfg.ConfigKeyNames;
 import io.github.jlwitthuhn.peanut.db.ConfigDAO;
 import io.github.jlwitthuhn.peanut.err.BadDatabaseSchemaException;
 import io.github.jlwitthuhn.peanut.err.DatabaseNotInitializedException;
@@ -29,7 +30,7 @@ public class DatabaseInitInterceptor implements HandlerInterceptor
 	{
 		try
 		{
-			Long version = configDAO.getLong("schemaVersion");
+			Long version = configDAO.getLong(ConfigKeyNames.SCHEMA_VERSION);
 			if (version == null || version != 1)
 			{
 				throw new BadDatabaseSchemaException();

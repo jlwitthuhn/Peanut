@@ -11,21 +11,17 @@ import io.github.jlwitthuhn.peanut.err.BadDatabaseSchemaException;
 import io.github.jlwitthuhn.peanut.err.DatabaseNotInitializedException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
+@RequiredArgsConstructor
 public class DatabaseInitInterceptor implements HandlerInterceptor
 {
 	ConfigDAO configDAO;
 	InformationSchemaDAO informationSchemaDAO;
-
-	public DatabaseInitInterceptor(ConfigDAO configDAO, InformationSchemaDAO informationSchemaDAO)
-	{
-		this.configDAO = configDAO;
-		this.informationSchemaDAO = informationSchemaDAO;
-	}
 
 	@Override
 	public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler)

@@ -10,8 +10,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
 import org.springframework.web.servlet.view.AbstractUrlBasedView;
 
-import java.util.Map;
-
 @Component
 public class JinjaViewResolver extends AbstractTemplateViewResolver
 {

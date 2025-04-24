@@ -5,22 +5,19 @@
 package io.github.jlwitthuhn.peanut.db.setup;
 
 import io.github.jlwitthuhn.peanut.cfg.ConfigKeyNames;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class DatabaseInitializer
 {
 	private final JdbcTemplate jdbcTemplate;
 
 	private final Logger logger = LoggerFactory.getLogger(DatabaseInitializer.class);
-
-	public DatabaseInitializer(JdbcTemplate jdbcTemplate)
-	{
-		this.jdbcTemplate = jdbcTemplate;
-	}
 
 	public boolean doInit()
 	{

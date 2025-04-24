@@ -17,8 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.AbstractHandlerExceptionResolver;
 
-import java.util.HashMap;
-
 @Component
 public class ExceptionResolver extends AbstractHandlerExceptionResolver
 {

@@ -10,6 +10,7 @@ import io.github.jlwitthuhn.peanut.model.form.SetupForm;
 import io.github.jlwitthuhn.peanut.model.spring.PeanutUserDetails;
 import io.github.jlwitthuhn.peanut.security.PeanutUserService;
 import io.github.jlwitthuhn.peanut.util.ViewShortcuts;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -23,25 +24,13 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/setup")
+@RequiredArgsConstructor
 public class SetupController
 {
 	private final DatabaseInitializer databaseInitializer;
 	private final InformationSchemaDAO informationSchemaDAO;
 	private final PasswordEncoder passwordEncoder;
 	private final PeanutUserService peanutUserService;
-
-	public SetupController(
-		DatabaseInitializer databaseInitializer,
-		InformationSchemaDAO informationSchemaDAO,
-		PasswordEncoder passwordEncoder,
-		PeanutUserService peanutUserService
-	)
-	{
-		this.databaseInitializer = databaseInitializer;
-		this.informationSchemaDAO = informationSchemaDAO;
-		this.passwordEncoder = passwordEncoder;
-		this.peanutUserService = peanutUserService;
-	}
 
 	@GetMapping("")
 	public ModelAndView index(Map<String, Object> model)

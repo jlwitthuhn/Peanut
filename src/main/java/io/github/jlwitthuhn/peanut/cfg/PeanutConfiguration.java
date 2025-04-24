@@ -5,20 +5,17 @@
 package io.github.jlwitthuhn.peanut.cfg;
 
 import io.github.jlwitthuhn.peanut.interceptor.DatabaseInitInterceptor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
+@RequiredArgsConstructor
 public class PeanutConfiguration implements WebMvcConfigurer
 {
 	private final DatabaseInitInterceptor databaseInitInterceptor;
-
-	public PeanutConfiguration(DatabaseInitInterceptor databaseInitInterceptor)
-	{
-		this.databaseInitInterceptor = databaseInitInterceptor;
-	}
 
 	@Override
 	public void addInterceptors(@NonNull InterceptorRegistry registry)

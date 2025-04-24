@@ -6,20 +6,17 @@ package io.github.jlwitthuhn.peanut.db;
 
 import io.github.jlwitthuhn.peanut.model.db.UserRow;
 import io.github.jlwitthuhn.peanut.model.db.UserRowMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class UserDAO
 {
 	private final JdbcTemplate jdbcTemplate;
-
-	public UserDAO(JdbcTemplate jdbcTemplate)
-	{
-		this.jdbcTemplate = jdbcTemplate;
-	}
 
 	public void createRow(String name, String password)
 	{

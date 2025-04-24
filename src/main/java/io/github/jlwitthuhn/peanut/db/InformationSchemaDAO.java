@@ -17,6 +17,11 @@ public class InformationSchemaDAO
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
+	public boolean doesTableExist(String table)
+	{
+		return doesTableExist("public", table);
+	}
+
 	public boolean doesTableExist(String schema, String table)
 	{
 		Long count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = ? AND table_name = ?", Long.class, schema, table);

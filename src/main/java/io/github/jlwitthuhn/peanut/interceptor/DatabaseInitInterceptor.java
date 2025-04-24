@@ -30,7 +30,7 @@ public class DatabaseInitInterceptor implements HandlerInterceptor
 	@Override
 	public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler)
 	{
-		boolean configExists = informationSchemaDAO.doesTableExist("public", "config_int");
+		boolean configExists = informationSchemaDAO.doesTableExist("config_int");
 		if (!configExists)
 		{
 			throw new DatabaseNotInitializedException();

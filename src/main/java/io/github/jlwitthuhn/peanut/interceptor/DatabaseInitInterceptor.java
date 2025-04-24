@@ -6,11 +6,11 @@ package io.github.jlwitthuhn.peanut.interceptor;
 
 import io.github.jlwitthuhn.peanut.cfg.ConfigKeyNames;
 import io.github.jlwitthuhn.peanut.db.ConfigDAO;
+import io.github.jlwitthuhn.peanut.db.InformationSchemaDAO;
 import io.github.jlwitthuhn.peanut.err.BadDatabaseSchemaException;
 import io.github.jlwitthuhn.peanut.err.DatabaseNotInitializedException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -19,26 +19,26 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class DatabaseInitInterceptor implements HandlerInterceptor
 {
 	ConfigDAO configDAO;
+	InformationSchemaDAO informationSchemaDAO;
 
-	public DatabaseInitInterceptor(ConfigDAO configDAO)
+	public DatabaseInitInterceptor(ConfigDAO configDAO, InformationSchemaDAO informationSchemaDAO)
 	{
 		this.configDAO = configDAO;
+		this.informationSchemaDAO = informationSchemaDAO;
 	}
 
 	@Override
 	public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler)
 	{
-		try
-		{
-			Long version = configDAO.getLong(ConfigKeyNames.SCHEMA_VERSION);
-			if (version == null || version != 1)
-			{
-				throw new BadDatabaseSchemaException();
-			}
-		}
-		catch (BadSqlGrammarException ex)
+		boolean configExists = informationSchemaDAO.doesTableExist("public", "config_int");
+		if (!configExists)
 		{
 			throw new DatabaseNotInitializedException();
+		}
+		Long version = configDAO.getLong(ConfigKeyNames.SCHEMA_VERSION);
+		if (version == null || version != 1)
+		{
+			throw new BadDatabaseSchemaException();
 		}
 
 		return true;

@@ -5,48 +5,37 @@
 package io.github.jlwitthuhn.peanut.db.setup;
 
 import io.github.jlwitthuhn.peanut.cfg.ConfigKeyNames;
+import io.github.jlwitthuhn.peanut.db.ConfigDAO;
+import io.github.jlwitthuhn.peanut.db.UserDAO;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class DatabaseInitializer
 {
-	private final JdbcTemplate jdbcTemplate;
+	private final ConfigDAO configDAO;
+	private final UserDAO userDAO;
 
 	private final Logger logger = LoggerFactory.getLogger(DatabaseInitializer.class);
 
 	public boolean doInit()
 	{
-		if (!createTables())
+		if (!createDatabaseObjects())
 		{
 			return false;
 		}
-		return insertConfig();
+		return insertDefaultConfig();
 	}
 
-	private boolean createTables()
+	private boolean createDatabaseObjects()
 	{
-		final String CREATE_TABLE_CONFIG = """
-			CREATE TABLE config_int (
-				name VARCHAR(255) PRIMARY KEY,
-				value BIGINT NOT NULL
-			);
-			""";
-		final String CREATE_TABLE_USERS = """
-			CREATE TABLE users (
-			    id BIGSERIAL PRIMARY KEY,
-			    name VARCHAR(255) UNIQUE NOT NULL,
-			    password VARCHAR(255) NOT NULL
-			);
-			""";
 		try
 		{
-			jdbcTemplate.execute(CREATE_TABLE_CONFIG);
-			jdbcTemplate.execute(CREATE_TABLE_USERS);
+			configDAO.createDatabaseObjects();
+			userDAO.createDatabaseObjects();
 		}
 		catch (Exception e)
 		{
@@ -56,14 +45,11 @@ public class DatabaseInitializer
 		return true;
 	}
 
-	private boolean insertConfig()
+	private boolean insertDefaultConfig()
 	{
-		final String INSERT_SCHEMA_VERSION = """
-			INSERT INTO config_int (name, value) VALUES (?, ?);
-			""";
 		try
 		{
-			jdbcTemplate.update(INSERT_SCHEMA_VERSION, ConfigKeyNames.SCHEMA_VERSION, 1);
+			configDAO.setLong(ConfigKeyNames.SCHEMA_VERSION, 1);
 		}
 		catch (Exception e)
 		{

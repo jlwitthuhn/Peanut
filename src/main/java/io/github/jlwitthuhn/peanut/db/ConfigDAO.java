@@ -4,6 +4,7 @@
 
 package io.github.jlwitthuhn.peanut.db;
 
+import io.github.jlwitthuhn.peanut.err.TableAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -12,10 +13,43 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ConfigDAO
 {
+	public final String TABLE_NAME_INT = "config_int";
+
 	private final JdbcTemplate jdbcTemplate;
+
+	private final InformationSchemaDAO informationSchemaDAO;
+
+	public void createDatabaseObjects() throws TableAlreadyExistsException
+	{
+		if (informationSchemaDAO.doesTableExist(TABLE_NAME_INT))
+		{
+			throw new TableAlreadyExistsException();
+		}
+		final String SQL = """
+			CREATE TABLE config_int (
+				name VARCHAR(255) PRIMARY KEY,
+				value BIGINT NOT NULL
+			);
+			""";
+		jdbcTemplate.execute(SQL);
+	}
 
 	public Long getLong(String name)
 	{
-		return jdbcTemplate.queryForObject("SELECT value FROM config_int WHERE name = ?", Long.class, name);
+		final String SQL = "SELECT value FROM config_int WHERE name = ?";
+		return jdbcTemplate.queryForObject(SQL, Long.class, name);
+	}
+
+	public void setLong(String name, long value)
+	{
+		final String SQL = """
+			INSERT INTO
+				config_int (name, value)
+			VALUES
+				(?, ?)
+			ON CONFLICT (name)
+				DO UPDATE SET value = EXCLUDED.value;
+			""";
+		jdbcTemplate.update(SQL, name, value);
 	}
 }

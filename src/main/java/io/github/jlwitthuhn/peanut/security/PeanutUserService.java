@@ -22,7 +22,7 @@ public class PeanutUserService implements UserDetailsManager
 	@Override
 	public void createUser(UserDetails user)
 	{
-		userDAO.createRow(user.getUsername(), user.getPassword());
+		userDAO.insertRow(user.getUsername(), user.getPassword());
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class PeanutUserService implements UserDetailsManager
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
 	{
-		UserRow row = userDAO.getByName(username);
+		UserRow row = userDAO.selectRowByName(username);
 		if (row == null)
 		{
 			throw new UsernameNotFoundException(username);

@@ -4,6 +4,7 @@
 
 package io.github.jlwitthuhn.peanut.db;
 
+import io.github.jlwitthuhn.peanut.err.TableAlreadyExistsException;
 import io.github.jlwitthuhn.peanut.model.db.UserRow;
 import io.github.jlwitthuhn.peanut.model.db.UserRowMapper;
 import lombok.RequiredArgsConstructor;
@@ -16,15 +17,35 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserDAO
 {
+	public final String TABLE_NAME = "users";
+
 	private final JdbcTemplate jdbcTemplate;
 
-	public void createRow(String name, String password)
+	private final InformationSchemaDAO informationSchemaDAO;
+
+	public void createDatabaseObjects() throws TableAlreadyExistsException
+	{
+		if (informationSchemaDAO.doesTableExist(TABLE_NAME))
+		{
+			throw new TableAlreadyExistsException();
+		}
+		final String SQL = """
+			CREATE TABLE users (
+			    id BIGSERIAL PRIMARY KEY,
+			    name VARCHAR(255) UNIQUE NOT NULL,
+			    password VARCHAR(255) NOT NULL
+			);
+			""";
+		jdbcTemplate.execute(SQL);
+	}
+
+	public void insertRow(String name, String password)
 	{
 		final String SQL = "INSERT INTO users (name, password) VALUES (?, ?)";
 		jdbcTemplate.update(SQL, name, password);
 	}
 
-	public UserRow getByName(String name)
+	public UserRow selectRowByName(String name)
 	{
 		final String SQL = "SELECT id, name, password FROM users WHERE name = ?";
 		final List<UserRow> results = jdbcTemplate.query(SQL, new UserRowMapper(), name);

@@ -32,23 +32,24 @@ public class UserDAO
 		final String SQL = """
 			CREATE TABLE users (
 			    id BIGSERIAL PRIMARY KEY,
-			    name VARCHAR(255) UNIQUE NOT NULL,
+			    display_name VARCHAR(255) UNIQUE NOT NULL,
+			    email VARCHAR(255) UNIQUE NOT NULL,
 			    password VARCHAR(255) NOT NULL
 			);
 			""";
 		jdbcTemplate.execute(SQL);
 	}
 
-	public void insertRow(String name, String password)
+	public void insertRow(String displayName, String email, String password)
 	{
-		final String SQL = "INSERT INTO users (name, password) VALUES (?, ?)";
-		jdbcTemplate.update(SQL, name, password);
+		final String SQL = "INSERT INTO users (display_name, email, password) VALUES (?, ?, ?)";
+		jdbcTemplate.update(SQL, displayName, email, password);
 	}
 
-	public UserRow selectRowByName(String name)
+	public UserRow selectRowByDisplayName(String displayName)
 	{
-		final String SQL = "SELECT id, name, password FROM users WHERE name = ?";
-		final List<UserRow> results = jdbcTemplate.query(SQL, new UserRowMapper(), name);
+		final String SQL = "SELECT id, display_name, email, password FROM users WHERE display_name = ?";
+		final List<UserRow> results = jdbcTemplate.query(SQL, new UserRowMapper(), displayName);
 		if (results.size() != 1)
 		{
 			return null;

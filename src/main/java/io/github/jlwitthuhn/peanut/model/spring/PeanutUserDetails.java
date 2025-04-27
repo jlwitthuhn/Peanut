@@ -5,6 +5,7 @@
 package io.github.jlwitthuhn.peanut.model.spring;
 
 import io.github.jlwitthuhn.peanut.model.db.UserRow;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -13,18 +14,23 @@ import java.util.List;
 
 public class PeanutUserDetails implements UserDetails
 {
-	private final String username;
+	private final String displayName;
 	private final String password;
+
+	@Getter
+	private final String email;
 
 	public PeanutUserDetails(UserRow user)
 	{
-		username = user.getName();
+		displayName = user.getDisplayName();
+		email = user.getEmail();
 		password = user.getPassword();
 	}
 
-	public PeanutUserDetails(String username, String password)
+	public PeanutUserDetails(String displayName, String email, String password)
 	{
-		this.username = username;
+		this.displayName = displayName;
+		this.email = email;
 		this.password = password;
 	}
 
@@ -40,6 +46,6 @@ public class PeanutUserDetails implements UserDetails
 
 	@Override
 	public String getUsername() {
-		return username;
+		return displayName;
 	}
 }

@@ -22,7 +22,16 @@ public class PeanutUserService implements UserDetailsManager
 	@Override
 	public void createUser(UserDetails user)
 	{
-		userDAO.insertRow(user.getUsername(), user.getPassword());
+		if (!(user instanceof PeanutUserDetails))
+		{
+			throw new IllegalArgumentException("User is not PeanutUserDetails");
+		}
+		PeanutUserDetails peanutUserDetails = (PeanutUserDetails) user;
+		userDAO.insertRow(
+			peanutUserDetails.getUsername(),
+			peanutUserDetails.getEmail(),
+			peanutUserDetails.getPassword()
+		);
 	}
 
 	@Override
@@ -52,7 +61,7 @@ public class PeanutUserService implements UserDetailsManager
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
 	{
-		UserRow row = userDAO.selectRowByName(username);
+		UserRow row = userDAO.selectRowByDisplayName(username);
 		if (row == null)
 		{
 			throw new UsernameNotFoundException(username);

@@ -15,6 +15,10 @@ public class SetupForm
 
 	@Getter
 	@Setter
+	private String email;
+
+	@Getter
+	@Setter
 	private String adminPass;
 
 	@Getter
@@ -23,8 +27,8 @@ public class SetupForm
 
 	public boolean isValid()
 	{
-		final boolean notNull = adminName != null && adminPass != null && adminPass2 != null;
-		final boolean goodLength = notNull && adminName.length() > 1 && adminPass.length() > 1 && adminPass2.length() > 1;
+		final boolean notNull = adminName != null && email != null && adminPass != null && adminPass2 != null;
+		final boolean goodLength = notNull && adminName.length() > 1 && email.length() > 1 && adminPass.length() > 1 && adminPass2.length() > 1;
 		final boolean passwordsMatch = adminPass != null && adminPass.equals(adminPass2);
 		return notNull && goodLength && passwordsMatch;
 	}

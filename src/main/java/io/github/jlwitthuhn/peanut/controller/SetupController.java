@@ -62,7 +62,7 @@ public class SetupController
 
 		// Create admin user
 		String hashedPassword = passwordEncoder.encode(form.getAdminPass());
-		PeanutUserDetails userDetails = new PeanutUserDetails(form.getAdminName(), hashedPassword);
+		PeanutUserDetails userDetails = new PeanutUserDetails(form.getAdminName(), form.getEmail(), hashedPassword);
 		peanutUserService.createUser(userDetails);
 
 		return ViewShortcuts.simpleMessage("Success", "Database initialized successfully.");

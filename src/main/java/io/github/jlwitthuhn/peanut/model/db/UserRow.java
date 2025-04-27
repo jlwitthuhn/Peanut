@@ -10,6 +10,7 @@ import lombok.Data;
 public class UserRow
 {
 	private final long id;
-	private final String name;
+	private final String displayName;
+	private final String email;
 	private final String password;
 }

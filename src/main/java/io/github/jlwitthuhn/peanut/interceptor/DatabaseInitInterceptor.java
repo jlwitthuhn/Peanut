@@ -20,8 +20,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @RequiredArgsConstructor
 public class DatabaseInitInterceptor implements HandlerInterceptor
 {
-	ConfigDAO configDAO;
-	InformationSchemaDAO informationSchemaDAO;
+	final ConfigDAO configDAO;
+	final InformationSchemaDAO informationSchemaDAO;
 
 	@Override
 	public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler)

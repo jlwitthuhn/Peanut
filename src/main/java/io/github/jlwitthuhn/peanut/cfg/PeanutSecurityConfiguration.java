@@ -29,14 +29,15 @@ public class PeanutSecurityConfiguration
 		http.authorizeHttpRequests(
 			(authorizeHttpRequests) ->
 				authorizeHttpRequests
-					.requestMatchers(HttpMethod.GET, "/login", "/setup", "/design").permitAll()
+					.requestMatchers(HttpMethod.GET, "/login", "/login-failure", "/setup", "/design").permitAll()
 					.requestMatchers(HttpMethod.POST, "/login", "/setup").permitAll()
 					.anyRequest().authenticated()
 		);
 		http.formLogin(
 			(formLogin) ->
 				formLogin
-					.defaultSuccessUrl("/")
+					.defaultSuccessUrl("/login/success")
+					.failureUrl("/login/failure")
 					.loginPage("/login")
 		);
 		http.csrf(

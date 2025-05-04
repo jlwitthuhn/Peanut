@@ -11,9 +11,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public class PeanutUserDetails implements UserDetails
 {
+	private final Long id;
 	private final String displayName;
 	private final String password;
 
@@ -22,6 +24,7 @@ public class PeanutUserDetails implements UserDetails
 
 	public PeanutUserDetails(UserRow user)
 	{
+		id = user.getId();
 		displayName = user.getDisplayName();
 		email = user.getEmail();
 		password = user.getPassword();
@@ -29,23 +32,32 @@ public class PeanutUserDetails implements UserDetails
 
 	public PeanutUserDetails(String displayName, String email, String password)
 	{
+		this.id = null;
 		this.displayName = displayName;
 		this.email = email;
 		this.password = password;
 	}
 
 	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
+	public Collection<? extends GrantedAuthority> getAuthorities()
+	{
 		return List.of();
 	}
 
 	@Override
-	public String getPassword() {
+	public String getPassword()
+	{
 		return password;
 	}
 
 	@Override
-	public String getUsername() {
+	public String getUsername()
+	{
 		return displayName;
+	}
+
+	public Optional<Long> getId()
+	{
+		return Optional.ofNullable(id);
 	}
 }

@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserDAO
 {
-	public final String TABLE_NAME = "users";
+	public static final String TABLE_NAME = "users";
 
 	private final JdbcTemplate jdbcTemplate;
 

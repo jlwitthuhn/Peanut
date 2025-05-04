@@ -22,11 +22,14 @@ public class PeanutUserService implements UserDetailsManager
 	@Override
 	public void createUser(UserDetails user)
 	{
-		if (!(user instanceof PeanutUserDetails))
+		if (!(user instanceof PeanutUserDetails peanutUserDetails))
 		{
 			throw new IllegalArgumentException("User is not PeanutUserDetails");
 		}
-		PeanutUserDetails peanutUserDetails = (PeanutUserDetails) user;
+		if (peanutUserDetails.getId().isPresent())
+		{
+			throw new IllegalArgumentException("User ID must not be set when creating a new user");
+		}
 		userDAO.insertRow(
 			peanutUserDetails.getUsername(),
 			peanutUserDetails.getEmail(),

@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,6 +44,14 @@ public class PeanutSecurityConfiguration
 		http.csrf(
 			(csrf) ->
 				csrf.csrfTokenRepository(new HttpSessionCsrfTokenRepository())
+		);
+
+		// Disable the 'continue' parameter being added after login
+		HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
+		requestCache.setMatchingRequestParameterName(null);
+		http.requestCache(
+			(cache) ->
+				cache.requestCache(requestCache)
 		);
 
 		return http.build();

@@ -30,7 +30,7 @@ public class PeanutSecurityConfiguration
 		http.authorizeHttpRequests(
 			(authorizeHttpRequests) ->
 				authorizeHttpRequests
-					.requestMatchers(HttpMethod.GET, "/login", "/login-failure", "/setup", "/design").permitAll()
+					.requestMatchers(HttpMethod.GET, "/login", "/login-failure", "/logout/success", "/setup", "/design").permitAll()
 					.requestMatchers(HttpMethod.POST, "/login", "/setup").permitAll()
 					.anyRequest().authenticated()
 		);
@@ -40,6 +40,12 @@ public class PeanutSecurityConfiguration
 					.defaultSuccessUrl("/login/success")
 					.failureUrl("/login/failure")
 					.loginPage("/login")
+		);
+		http.logout(
+			(logout) ->
+				logout
+					.logoutUrl("/logout")
+					.logoutSuccessUrl("/logout/success")
 		);
 		http.csrf(
 			(csrf) ->

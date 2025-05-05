@@ -5,6 +5,7 @@
 package io.github.jlwitthuhn.peanut.cfg;
 
 import io.github.jlwitthuhn.peanut.interceptor.DatabaseInitInterceptor;
+import io.github.jlwitthuhn.peanut.interceptor.LoggedInUserInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.NonNull;
@@ -16,10 +17,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class PeanutConfiguration implements WebMvcConfigurer
 {
 	private final DatabaseInitInterceptor databaseInitInterceptor;
+	private final LoggedInUserInterceptor loggedInUserInterceptor;
 
 	@Override
 	public void addInterceptors(@NonNull InterceptorRegistry registry)
 	{
 		registry.addInterceptor(databaseInitInterceptor).excludePathPatterns("/design*", "/setup*");
+		registry.addInterceptor(loggedInUserInterceptor);
 	}
 }

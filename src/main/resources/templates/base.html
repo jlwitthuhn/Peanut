@@ -10,7 +10,14 @@
 <div id="root">
 	<div id="title-bar">
 		<h1>Website</h1>
-		<p><a href="/login">Log In</a></p>
+		{% if user.logged_in %}
+			<form action="/logout" method="post">
+				<div><p>Welcome {{ user.name }} - <input type="submit" value="Log out"></p></div>
+				<input type="hidden" name="{{ _csrfParam }}" value="{{ _csrfToken }}">
+			</form>
+		{% else %}
+			<div><a href="/login">Log In</a></div>
+		{% endif %}
 	</div>
 	<nav id="top-nav">
 		<ul>

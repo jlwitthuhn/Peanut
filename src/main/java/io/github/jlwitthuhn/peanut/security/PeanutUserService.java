@@ -78,7 +78,8 @@ public class PeanutUserService implements UserDetailsManager
 	@Override
 	public boolean userExists(String username)
 	{
-		return false;
+		UserRow row = userDAO.selectRowByDisplayName(username);
+		return row != null;
 	}
 
 	@Override

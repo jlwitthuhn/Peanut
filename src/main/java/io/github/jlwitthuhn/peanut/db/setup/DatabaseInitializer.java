@@ -12,7 +12,6 @@ import io.github.jlwitthuhn.peanut.db.UserDAO;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.config.annotation.authentication.configuration.GlobalAuthenticationConfigurerAdapter;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,7 +24,6 @@ public class DatabaseInitializer
 	private final UserAuthorityDAO userAuthorityDAO;
 
 	private final Logger logger = LoggerFactory.getLogger(DatabaseInitializer.class);
-	private final GlobalAuthenticationConfigurerAdapter enableGlobalAuthenticationAutowiredConfigurer;
 
 	public boolean doInit()
 	{

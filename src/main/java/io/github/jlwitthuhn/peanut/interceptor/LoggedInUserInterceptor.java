@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -28,6 +29,7 @@ public class LoggedInUserInterceptor implements HandlerInterceptor
 
 		HashMap<String, Object> userInfo = new HashMap<>();
 		userInfo.put("logged_in", Boolean.FALSE);
+		userInfo.put("admin", Boolean.FALSE);
 		userInfo.put("name", "Anonymous");
 		modelAndView.getModel().put("user", userInfo);
 
@@ -37,7 +39,18 @@ public class LoggedInUserInterceptor implements HandlerInterceptor
 			return;
 		}
 
+		boolean isAdmin = false;
+		for (GrantedAuthority authority : auth.getAuthorities())
+		{
+			if (authority.getAuthority().equals("ROLE_ADMIN"))
+			{
+				isAdmin = true;
+				break;
+			}
+		}
+
 		userInfo.put("logged_in", Boolean.TRUE);
+		userInfo.put("admin", isAdmin);
 		userInfo.put("name", auth.getName());
 	}
 }

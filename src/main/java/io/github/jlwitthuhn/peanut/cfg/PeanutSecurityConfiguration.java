@@ -30,7 +30,15 @@ public class PeanutSecurityConfiguration
 		http.authorizeHttpRequests(
 			(authorizeHttpRequests) ->
 				authorizeHttpRequests
-					.requestMatchers(HttpMethod.GET, "/login", "/login-failure", "/logout/success", "/setup", "/design").permitAll()
+					.requestMatchers(
+						HttpMethod.GET,
+						"/favicon*",
+						"/login",
+						"/login-failure",
+						"/logout/success",
+						"/setup",
+						"/design"
+					).permitAll()
 					.requestMatchers(HttpMethod.POST, "/login", "/setup").permitAll()
 					.anyRequest().authenticated()
 		);

@@ -4,20 +4,31 @@
 
 package io.github.jlwitthuhn.peanut.security;
 
+import io.github.jlwitthuhn.peanut.db.AuthorizationDAO;
+import io.github.jlwitthuhn.peanut.db.MultiTableDAO;
+import io.github.jlwitthuhn.peanut.db.UserAuthorizationDAO;
 import io.github.jlwitthuhn.peanut.db.UserDAO;
+import io.github.jlwitthuhn.peanut.err.AuthorityNotFoundException;
 import io.github.jlwitthuhn.peanut.model.db.UserRow;
 import io.github.jlwitthuhn.peanut.model.spring.PeanutUserDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 @Component
 @RequiredArgsConstructor
 public class PeanutUserService implements UserDetailsManager
 {
+	private final AuthorizationDAO authorizationDAO;
+	private final MultiTableDAO multiTableDAO;
 	private final UserDAO userDAO;
+	private final UserAuthorizationDAO userAuthorizationDAO;
 
 	@Override
 	public void createUser(UserDetails user)
@@ -35,6 +46,15 @@ public class PeanutUserService implements UserDetailsManager
 			peanutUserDetails.getEmail(),
 			peanutUserDetails.getPassword()
 		);
+		UserRow newRow = userDAO.selectRowByDisplayName(peanutUserDetails.getUsername());
+		try
+		{
+			addRolesToUser(newRow.getId(), user.getAuthorities());
+		}
+		catch (AuthorityNotFoundException e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
@@ -69,6 +89,18 @@ public class PeanutUserService implements UserDetailsManager
 		{
 			throw new UsernameNotFoundException(username);
 		}
-		return new PeanutUserDetails(row);
+		ArrayList<GrantedAuthority> authorities = multiTableDAO.getAuthoritiesByUserId(row.getId());
+		return new PeanutUserDetails(row, authorities);
+	}
+
+	private void addRolesToUser(long userId, Collection<? extends GrantedAuthority> authorities) throws AuthorityNotFoundException
+	{
+		ArrayList<String> authorityStrings = new ArrayList<>();
+		for (GrantedAuthority authority : authorities)
+		{
+			authorityStrings.add(authority.getAuthority());
+		}
+		Collection<Long> authorityIds = authorizationDAO.getIdsFromNames(authorityStrings);
+		userAuthorizationDAO.insertAuthoritiesForUser(userId, authorityIds);
 	}
 }

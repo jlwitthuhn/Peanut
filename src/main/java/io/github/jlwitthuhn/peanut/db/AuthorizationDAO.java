@@ -4,10 +4,18 @@
 
 package io.github.jlwitthuhn.peanut.db;
 
+import io.github.jlwitthuhn.peanut.err.AuthorityNotFoundException;
 import io.github.jlwitthuhn.peanut.err.TableAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -32,6 +40,37 @@ public class AuthorizationDAO
 			);
 			""";
 		jdbcTemplate.execute(SQL);
+	}
+
+	public Collection<Long> getIdsFromNames(Collection<String> names) throws AuthorityNotFoundException
+	{
+		final String namesQuestions = String.join(",", Collections.nCopies(names.size(), "?"));
+		final String SQL = "SELECT id, name FROM authorizations WHERE name IN (" + namesQuestions + ")";
+		List<Map<String, Object>> result = jdbcTemplate.queryForList(SQL, names.toArray());
+		HashSet<String> remainingNames = new HashSet<>(names);
+		ArrayList<Long> ids = new ArrayList<Long>();
+		for (Map<String, Object> row : result)
+		{
+			boolean nameValid = row.containsKey("name") && row.get("name") instanceof String;
+			boolean idValid = row.containsKey("id") && row.get("id") instanceof Long;
+			if (nameValid && idValid)
+			{
+				String rowName = (String) row.get("name");
+				if (!remainingNames.contains(rowName))
+				{
+					throw new RuntimeException("Found an authority name that was not requested");
+				}
+				remainingNames.remove(rowName);
+
+				Long rowId = (Long) row.get("id");
+				ids.add(rowId);
+			}
+		}
+		if (!remainingNames.isEmpty())
+		{
+			throw new AuthorityNotFoundException("Could not find authorities: " + remainingNames.toString());
+		}
+		return ids;
 	}
 
 	public void insertRow(String name, boolean systemOwned)

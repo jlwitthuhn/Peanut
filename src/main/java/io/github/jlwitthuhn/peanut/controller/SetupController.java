@@ -12,6 +12,8 @@ import io.github.jlwitthuhn.peanut.security.PeanutUserService;
 import io.github.jlwitthuhn.peanut.util.ViewShortcuts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 @Controller
@@ -62,7 +65,10 @@ public class SetupController
 
 		// Create admin user
 		String hashedPassword = passwordEncoder.encode(form.getAdminPass());
-		PeanutUserDetails userDetails = new PeanutUserDetails(form.getAdminName(), form.getEmail(), hashedPassword);
+		ArrayList<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+		authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+		authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+		PeanutUserDetails userDetails = new PeanutUserDetails(form.getAdminName(), form.getEmail(), hashedPassword, authorities);
 		peanutUserService.createUser(userDetails);
 
 		return ViewShortcuts.simpleMessage("Success", "Database initialized successfully.");

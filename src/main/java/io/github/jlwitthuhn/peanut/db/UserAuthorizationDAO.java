@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
+
 @Component
 @RequiredArgsConstructor
 public class  UserAuthorizationDAO
@@ -41,5 +43,14 @@ public class  UserAuthorizationDAO
 			);
 			""";
 		jdbcTemplate.execute(SQL);
+	}
+
+	public void insertAuthoritiesForUser(long userId, Collection<Long> authorityIds)
+	{
+		final String SQL = "INSERT INTO user_authorizations (user_id, authorization_id) VALUES (?, ?)";
+		for (long authorityId : authorityIds)
+		{
+			jdbcTemplate.update(SQL, userId, authorityId);
+		}
 	}
 }

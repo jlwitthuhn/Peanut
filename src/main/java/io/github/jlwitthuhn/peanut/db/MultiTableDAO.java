@@ -24,12 +24,12 @@ public class MultiTableDAO
 	{
 		final String sql = """
 			SELECT
-				authorizations.name AS name
+				authorities.name AS name
 			FROM
-				user_authorizations INNER JOIN authorizations
-				ON user_authorizations.authorization_id = authorizations.id
+				user_authorities INNER JOIN authorities
+				ON user_authorities.authority_id = authorities.id
 			WHERE
-				user_authorizations.user_id = ?;
+				user_authorities.user_id = ?;
 			""";
 		List<Map<String, Object>> result = jdbcTemplate.queryForList(sql, userId);
 		ArrayList<GrantedAuthority> authorities = new ArrayList<>();

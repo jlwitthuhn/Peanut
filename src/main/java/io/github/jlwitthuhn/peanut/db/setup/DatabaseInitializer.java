@@ -5,9 +5,9 @@
 package io.github.jlwitthuhn.peanut.db.setup;
 
 import io.github.jlwitthuhn.peanut.cfg.ConfigKeyNames;
-import io.github.jlwitthuhn.peanut.db.AuthorizationDAO;
+import io.github.jlwitthuhn.peanut.db.AuthorityDAO;
 import io.github.jlwitthuhn.peanut.db.ConfigDAO;
-import io.github.jlwitthuhn.peanut.db.UserAuthorizationDAO;
+import io.github.jlwitthuhn.peanut.db.UserAuthorityDAO;
 import io.github.jlwitthuhn.peanut.db.UserDAO;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -19,10 +19,10 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class DatabaseInitializer
 {
-	private final AuthorizationDAO authorizationDAO;
+	private final AuthorityDAO authorityDAO;
 	private final ConfigDAO configDAO;
 	private final UserDAO userDAO;
-	private final UserAuthorizationDAO userAuthorizationDAO;
+	private final UserAuthorityDAO userAuthorityDAO;
 
 	private final Logger logger = LoggerFactory.getLogger(DatabaseInitializer.class);
 	private final GlobalAuthenticationConfigurerAdapter enableGlobalAuthenticationAutowiredConfigurer;
@@ -30,7 +30,7 @@ public class DatabaseInitializer
 	public boolean doInit()
 	{
 		boolean success = createDatabaseObjects();
-		success = success && insertDefaultAuthorizations();
+		success = success && insertDefaultAuthorities();
 		success = success && insertDefaultConfig();
 		return success;
 	}
@@ -40,10 +40,10 @@ public class DatabaseInitializer
 		try
 		{
 			// Order here matters as foreign keys create dependencies between tables
-			authorizationDAO.createDatabaseObjects();
+			authorityDAO.createDatabaseObjects();
 			configDAO.createDatabaseObjects();
 			userDAO.createDatabaseObjects();
-			userAuthorizationDAO.createDatabaseObjects();
+			userAuthorityDAO.createDatabaseObjects();
 		}
 		catch (Exception e)
 		{
@@ -53,16 +53,16 @@ public class DatabaseInitializer
 		return true;
 	}
 
-	private boolean insertDefaultAuthorizations()
+	private boolean insertDefaultAuthorities()
 	{
 		try
 		{
-			authorizationDAO.insertRow("ROLE_USER", true);
-			authorizationDAO.insertRow("ROLE_ADMIN", true);
+			authorityDAO.insertRow("ROLE_USER", true);
+			authorityDAO.insertRow("ROLE_ADMIN", true);
 		}
 		catch (Exception e)
 		{
-			logger.error("Caught exception while inserting authorizations", e);
+			logger.error("Caught exception while inserting authority", e);
 			return false;
 		}
 		return true;

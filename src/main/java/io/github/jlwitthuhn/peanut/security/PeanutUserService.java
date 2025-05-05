@@ -4,9 +4,9 @@
 
 package io.github.jlwitthuhn.peanut.security;
 
-import io.github.jlwitthuhn.peanut.db.AuthorizationDAO;
+import io.github.jlwitthuhn.peanut.db.AuthorityDAO;
 import io.github.jlwitthuhn.peanut.db.MultiTableDAO;
-import io.github.jlwitthuhn.peanut.db.UserAuthorizationDAO;
+import io.github.jlwitthuhn.peanut.db.UserAuthorityDAO;
 import io.github.jlwitthuhn.peanut.db.UserDAO;
 import io.github.jlwitthuhn.peanut.err.AuthorityNotFoundException;
 import io.github.jlwitthuhn.peanut.model.db.UserRow;
@@ -25,10 +25,10 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class PeanutUserService implements UserDetailsManager
 {
-	private final AuthorizationDAO authorizationDAO;
+	private final AuthorityDAO authorityDAO;
 	private final MultiTableDAO multiTableDAO;
 	private final UserDAO userDAO;
-	private final UserAuthorizationDAO userAuthorizationDAO;
+	private final UserAuthorityDAO userAuthorityDAO;
 
 	@Override
 	public void createUser(UserDetails user)
@@ -100,7 +100,7 @@ public class PeanutUserService implements UserDetailsManager
 		{
 			authorityStrings.add(authority.getAuthority());
 		}
-		Collection<Long> authorityIds = authorizationDAO.getIdsFromNames(authorityStrings);
-		userAuthorizationDAO.insertAuthoritiesForUser(userId, authorityIds);
+		Collection<Long> authorityIds = authorityDAO.getIdsFromNames(authorityStrings);
+		userAuthorityDAO.insertAuthoritiesForUser(userId, authorityIds);
 	}
 }

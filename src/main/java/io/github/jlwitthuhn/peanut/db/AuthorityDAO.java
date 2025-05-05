@@ -19,9 +19,9 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class AuthorizationDAO
+public class AuthorityDAO
 {
-	public static final String TABLE_NAME = "authorizations";
+	public static final String TABLE_NAME = "authorities";
 
 	private final JdbcTemplate jdbcTemplate;
 	private final InformationSchemaDAO informationSchemaDAO;
@@ -33,7 +33,7 @@ public class AuthorizationDAO
 			throw new TableAlreadyExistsException();
 		}
 		final String SQL = """
-			CREATE TABLE authorizations (
+			CREATE TABLE authorities (
 			    id BIGSERIAL PRIMARY KEY,
 			    name VARCHAR(127) UNIQUE NOT NULL,
 			    system_owned BOOLEAN NOT NULL
@@ -45,7 +45,7 @@ public class AuthorizationDAO
 	public Collection<Long> getIdsFromNames(Collection<String> names) throws AuthorityNotFoundException
 	{
 		final String namesQuestions = String.join(",", Collections.nCopies(names.size(), "?"));
-		final String SQL = "SELECT id, name FROM authorizations WHERE name IN (" + namesQuestions + ")";
+		final String SQL = "SELECT id, name FROM authorities WHERE name IN (" + namesQuestions + ")";
 		List<Map<String, Object>> result = jdbcTemplate.queryForList(SQL, names.toArray());
 		HashSet<String> remainingNames = new HashSet<>(names);
 		ArrayList<Long> ids = new ArrayList<Long>();
@@ -75,7 +75,7 @@ public class AuthorizationDAO
 
 	public void insertRow(String name, boolean systemOwned)
 	{
-		final String SQL = "INSERT INTO authorizations (name, system_owned) VALUES (?, ?)";
+		final String SQL = "INSERT INTO authorities (name, system_owned) VALUES (?, ?)";
 		jdbcTemplate.update(SQL, name, systemOwned);
 	}
 }

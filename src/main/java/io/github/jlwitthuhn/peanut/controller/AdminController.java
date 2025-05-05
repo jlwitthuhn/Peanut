@@ -4,7 +4,6 @@
 
 package io.github.jlwitthuhn.peanut.controller;
 
-import io.github.jlwitthuhn.peanut.util.ViewShortcuts;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +18,6 @@ public class AdminController
 	@GetMapping("")
 	ModelAndView adminIndex()
 	{
-		return ViewShortcuts.simpleMessage("Admin", "This is the admin page");
+		return new ModelAndView("admin/index.html");
 	}
 }

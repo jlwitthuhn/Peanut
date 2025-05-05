@@ -6,6 +6,9 @@ package io.github.jlwitthuhn.peanut.controller;
 
 import io.github.jlwitthuhn.peanut.util.ViewShortcuts;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,9 +20,18 @@ import org.springframework.web.servlet.view.RedirectView;
 public class LoginController
 {
 	@GetMapping("")
-	public String login()
+	public ModelAndView login()
 	{
-		return "login.html";
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth == null || auth instanceof AnonymousAuthenticationToken)
+		{
+			return new ModelAndView("login.html");
+		}
+
+		// Already logged in
+		RedirectView view = new RedirectView("/");
+		view.setStatusCode(HttpStatus.SEE_OTHER);
+		return new ModelAndView(view);
 	}
 
 	@GetMapping("/failure")

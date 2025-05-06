@@ -19,19 +19,19 @@ public class UserAuthorityDAO
 	public static final String TABLE_NAME = "user_authorities";
 
 	private final JdbcTemplate jdbcTemplate;
-	private final InformationSchemaDAO informationSchemaDAO;
+	private final MetaDAO metaDAO;
 
 	public void createDatabaseObjects() throws TableAlreadyExistsException, TableCreationDependencyNotSatisfiedException
 	{
-		if (informationSchemaDAO.doesTableExist(TABLE_NAME))
+		if (metaDAO.doesTableExist(TABLE_NAME))
 		{
 			throw new TableAlreadyExistsException();
 		}
-		if (!informationSchemaDAO.doesTableExist(AuthorityDAO.TABLE_NAME))
+		if (!metaDAO.doesTableExist(AuthorityDAO.TABLE_NAME))
 		{
 			throw new TableCreationDependencyNotSatisfiedException("Table 'user_authorities' requires that table 'authorities' exists");
 		}
-		if (!informationSchemaDAO.doesTableExist(UserDAO.TABLE_NAME))
+		if (!metaDAO.doesTableExist(UserDAO.TABLE_NAME))
 		{
 			throw new TableCreationDependencyNotSatisfiedException("Table 'user_authorities' requires that table 'users' exists");
 		}

@@ -24,11 +24,11 @@ public class AuthorityDAO
 	public static final String TABLE_NAME = "authorities";
 
 	private final JdbcTemplate jdbcTemplate;
-	private final InformationSchemaDAO informationSchemaDAO;
+	private final MetaDAO metaDAO;
 
 	public void createDatabaseObjects() throws TableAlreadyExistsException
 	{
-		if (informationSchemaDAO.doesTableExist(TABLE_NAME))
+		if (metaDAO.doesTableExist(TABLE_NAME))
 		{
 			throw new TableAlreadyExistsException();
 		}

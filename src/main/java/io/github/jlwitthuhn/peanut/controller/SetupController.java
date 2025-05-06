@@ -4,7 +4,7 @@
 
 package io.github.jlwitthuhn.peanut.controller;
 
-import io.github.jlwitthuhn.peanut.db.InformationSchemaDAO;
+import io.github.jlwitthuhn.peanut.db.MetaDAO;
 import io.github.jlwitthuhn.peanut.db.setup.DatabaseInitializer;
 import io.github.jlwitthuhn.peanut.model.form.SetupForm;
 import io.github.jlwitthuhn.peanut.model.spring.PeanutUserDetails;
@@ -31,14 +31,14 @@ import java.util.Map;
 public class SetupController
 {
 	private final DatabaseInitializer databaseInitializer;
-	private final InformationSchemaDAO informationSchemaDAO;
+	private final MetaDAO metaDAO;
 	private final PasswordEncoder passwordEncoder;
 	private final PeanutUserService peanutUserService;
 
 	@GetMapping("")
 	public ModelAndView index(Map<String, Object> model)
 	{
-		if (informationSchemaDAO.doesTableExist("config_int"))
+		if (metaDAO.doesTableExist("config_int"))
 		{
 			return ViewShortcuts.simpleMessage("Setup complete", "The database has already been initialized. No further setup action is needed.");
 		}
@@ -48,7 +48,7 @@ public class SetupController
 	@PostMapping("")
 	public ModelAndView post(@ModelAttribute SetupForm form)
 	{
-		if (informationSchemaDAO.doesTableExist("config_int"))
+		if (metaDAO.doesTableExist("config_int"))
 		{
 			return ViewShortcuts.simpleMessage("Error", "The database was already set up. Its existing state has not been modified.", HttpStatus.CONFLICT);
 		}

@@ -17,11 +17,11 @@ public class ConfigDAO
 
 	private final JdbcTemplate jdbcTemplate;
 
-	private final InformationSchemaDAO informationSchemaDAO;
+	private final MetaDAO metaDAO;
 
 	public void createDatabaseObjects() throws TableAlreadyExistsException
 	{
-		if (informationSchemaDAO.doesTableExist(TABLE_NAME_INT))
+		if (metaDAO.doesTableExist(TABLE_NAME_INT))
 		{
 			throw new TableAlreadyExistsException();
 		}

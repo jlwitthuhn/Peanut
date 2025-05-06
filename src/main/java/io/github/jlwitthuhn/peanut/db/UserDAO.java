@@ -21,11 +21,11 @@ public class UserDAO
 
 	private final JdbcTemplate jdbcTemplate;
 
-	private final InformationSchemaDAO informationSchemaDAO;
+	private final MetaDAO metaDAO;
 
 	public void createDatabaseObjects() throws TableAlreadyExistsException
 	{
-		if (informationSchemaDAO.doesTableExist(TABLE_NAME))
+		if (metaDAO.doesTableExist(TABLE_NAME))
 		{
 			throw new TableAlreadyExistsException();
 		}

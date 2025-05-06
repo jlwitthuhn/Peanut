@@ -6,7 +6,7 @@ package io.github.jlwitthuhn.peanut.interceptor;
 
 import io.github.jlwitthuhn.peanut.cfg.ConfigKeyNames;
 import io.github.jlwitthuhn.peanut.db.ConfigDAO;
-import io.github.jlwitthuhn.peanut.db.InformationSchemaDAO;
+import io.github.jlwitthuhn.peanut.db.MetaDAO;
 import io.github.jlwitthuhn.peanut.err.BadDatabaseSchemaException;
 import io.github.jlwitthuhn.peanut.err.DatabaseNotInitializedException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,12 +21,12 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class DatabaseInitInterceptor implements HandlerInterceptor
 {
 	final ConfigDAO configDAO;
-	final InformationSchemaDAO informationSchemaDAO;
+	final MetaDAO metaDAO;
 
 	@Override
 	public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler)
 	{
-		boolean configExists = informationSchemaDAO.doesTableExist("config_int");
+		boolean configExists = metaDAO.doesTableExist("config_int");
 		if (!configExists)
 		{
 			throw new DatabaseNotInitializedException();

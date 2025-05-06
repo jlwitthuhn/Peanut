@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class InformationSchemaDAO
+public class MetaDAO
 {
 	private final JdbcTemplate jdbcTemplate;
 

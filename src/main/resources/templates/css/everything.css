@@ -26,6 +26,15 @@ input[type="text"], input[type="password"] {
 	color: var(--text-color-alt);
 	background-color: var(--bg-color);
 }
+table, th, td {
+	border: 1px solid;
+	border-color: var(--border-color);
+	border-collapse: collapse;
+}
+th, td {
+	padding: 4px;
+}
+
 #root {
 	margin: 1rem auto;
 	min-width: 850px;

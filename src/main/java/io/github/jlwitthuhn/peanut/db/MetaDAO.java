@@ -24,4 +24,14 @@ public class MetaDAO
 		Long count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = ? AND table_name = ?", Long.class, schema, table);
 		return count != null && count > 0;
 	}
+
+	public String getDatabaseSize()
+	{
+		return jdbcTemplate.queryForObject("SELECT pg_size_pretty(pg_database_size(CURRENT_CATALOG))", String.class);
+	}
+
+	public String getServerVersion()
+	{
+		return jdbcTemplate.queryForObject("SHOW server_version", String.class);
+	}
 }

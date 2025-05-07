@@ -45,6 +45,13 @@
 			max-width: 1040px;
 		}
 
+		/* Generic styles */
+		.horizontal-space-evenly {
+			display: flex;
+			justify-content: space-evenly;
+		}
+
+		/* Title */
 		#title-bar {
 			display: flex;
 			justify-content: space-between;
@@ -498,6 +505,31 @@
 				<div class="simple-panel-header"><h1>Another Panel</h1></div>
 				<div class="simple-panel-content cp-NAME">
 					<p>This one has less lines</p>
+				</div>
+			</div>
+			<div class="simple-panel">
+				<div class="simple-panel-header"><h1>Spaced Panel</h1></div>
+				<div class="simple-panel-content horizontal-space-evenly">
+					<table>
+						<tbody>
+							<tr>
+								<td>ASDF</td>
+							</tr>
+							<tr>
+								<td>QWER</td>
+							</tr>
+						</tbody>
+					</table>
+					<table>
+						<tbody>
+							<tr>
+								<td>More</td>
+							</tr>
+							<tr>
+								<td>Content</td>
+							</tr>
+						</tbody>
+					</table>
 				</div>
 			</div>
 		</div>

@@ -42,23 +42,27 @@ public class AdminController
 
 		double loadAverage = ManagementFactory.getOperatingSystemMXBean().getSystemLoadAverage();
 
-		List<Tuple2<String, String>> environment = new ArrayList<>();
-		environment.add(new Tuple2<>("Peanut version", PeanutGlobals.PEANUT_VERSION));
-		environment.add(new Tuple2<>("Host OS", System.getProperty("os.name") + " / " + System.getProperty("os.arch")));
-		environment.add(new Tuple2<>("Java version", System.getProperty("java.version")));
-		environment.add(new Tuple2<>("Java vendor", System.getProperty("java.vendor")));
-		environment.add(new Tuple2<>("Spring version", SpringVersion.getVersion()));
-		environment.add(new Tuple2<>("Postgres version", metaDAO.getServerVersion()));
-		environment.add(new Tuple2<>("Database size", metaDAO.getDatabaseSize()));
-		environment.add(new Tuple2<>("JVM memory available", maxMemoryStr));
-		environment.add(new Tuple2<>("JVM memory used", totalMemoryStr));
+		List<Tuple2<String, String>> versionDetails = new ArrayList<>();
+		versionDetails.add(new Tuple2<>("Peanut version", PeanutGlobals.PEANUT_VERSION));
+		versionDetails.add(new Tuple2<>("Host OS", System.getProperty("os.name") + " / " + System.getProperty("os.arch")));
+		versionDetails.add(new Tuple2<>("Java version", System.getProperty("java.version")));
+		versionDetails.add(new Tuple2<>("Java vendor", System.getProperty("java.vendor")));
+		versionDetails.add(new Tuple2<>("Spring version", SpringVersion.getVersion()));
+		versionDetails.add(new Tuple2<>("Postgres version", metaDAO.getServerVersion()));
+
+		List<Tuple2<String, String>> runtimeDetails = new ArrayList<>();
+		runtimeDetails.add(new Tuple2<>("Database size", metaDAO.getDatabaseSize()));
+		runtimeDetails.add(new Tuple2<>("JVM max memory", maxMemoryStr));
+		runtimeDetails.add(new Tuple2<>("JVM total memory", totalMemoryStr));
 		if (loadAverage > 0)
 		{
 			// Value under 0 indicates that the host does not support this feature
-			environment.add(new Tuple2<>("Load average", String.valueOf(loadAverage)));
+			runtimeDetails.add(new Tuple2<>("Load average", String.valueOf(loadAverage)));
 		}
-		environment.add(new Tuple2<>("Server uptime", uptimeStr));
-		model.put("environment", environment);
+		runtimeDetails.add(new Tuple2<>("Server uptime", uptimeStr));
+
+		model.put("version_details", versionDetails);
+		model.put("runtime_details", runtimeDetails);
 		return new ModelAndView("admin/index.html", model);
 	}
 }

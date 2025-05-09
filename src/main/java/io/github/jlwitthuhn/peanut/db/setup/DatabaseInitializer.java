@@ -55,8 +55,9 @@ public class DatabaseInitializer
 	{
 		try
 		{
-			authorityDAO.insertRow("ROLE_USER", true);
+			authorityDAO.insertRow("ROLE_TURBO_ADMIN", true);
 			authorityDAO.insertRow("ROLE_ADMIN", true);
+			authorityDAO.insertRow("ROLE_USER", true);
 		}
 		catch (Exception e)
 		{

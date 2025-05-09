@@ -66,6 +66,7 @@ public class SetupController
 		// Create admin user
 		String hashedPassword = passwordEncoder.encode(form.getAdminPass());
 		ArrayList<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+		authorities.add(new SimpleGrantedAuthority("ROLE_TURBO_ADMIN"));
 		authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
 		authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 		PeanutUserDetails userDetails = new PeanutUserDetails(form.getAdminName(), form.getEmail(), hashedPassword, authorities);

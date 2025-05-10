@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="cp-container">
+	<div>
+		<nav>
+			<p>Configuration</p>
+			<p><a href="/admin">Index</a></p>
+		</nav>
+	</div>
+	{% block admin-content %}
+		Admin page. You should never see this text.
+	{% endblock %}
+</div>
+{% endblock %}

@@ -4,8 +4,8 @@
 
 package io.github.jlwitthuhn.peanut.db;
 
-import io.github.jlwitthuhn.peanut.err.TableAlreadyExistsException;
-import io.github.jlwitthuhn.peanut.err.TableCreationDependencyNotSatisfiedException;
+import io.github.jlwitthuhn.peanut.err.DBCreationDependencyNotSatisfiedException;
+import io.github.jlwitthuhn.peanut.err.DBObjectAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -21,19 +21,19 @@ public class UserAuthorityDAO
 	private final JdbcTemplate jdbcTemplate;
 	private final MetaDAO metaDAO;
 
-	public void createDatabaseObjects() throws TableAlreadyExistsException, TableCreationDependencyNotSatisfiedException
+	public void createDatabaseObjects() throws DBObjectAlreadyExistsException, DBCreationDependencyNotSatisfiedException
 	{
 		if (metaDAO.doesTableExist(TABLE_NAME))
 		{
-			throw new TableAlreadyExistsException();
+			throw new DBObjectAlreadyExistsException();
 		}
 		if (!metaDAO.doesTableExist(AuthorityDAO.TABLE_NAME))
 		{
-			throw new TableCreationDependencyNotSatisfiedException("Table 'user_authorities' requires that table 'authorities' exists");
+			throw new DBCreationDependencyNotSatisfiedException("Table 'user_authorities' requires that table 'authorities' exists");
 		}
 		if (!metaDAO.doesTableExist(UserDAO.TABLE_NAME))
 		{
-			throw new TableCreationDependencyNotSatisfiedException("Table 'user_authorities' requires that table 'users' exists");
+			throw new DBCreationDependencyNotSatisfiedException("Table 'user_authorities' requires that table 'users' exists");
 		}
 		final String SQL = """
 			CREATE TABLE user_authorities (

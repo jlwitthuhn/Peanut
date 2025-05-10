@@ -4,6 +4,10 @@
 
 package io.github.jlwitthuhn.peanut.err;
 
-public class TableAlreadyExistsException extends Exception
+public class DBCreationDependencyNotSatisfiedException extends Exception
 {
+	public DBCreationDependencyNotSatisfiedException(String message)
+	{
+		super(message);
+	}
 }

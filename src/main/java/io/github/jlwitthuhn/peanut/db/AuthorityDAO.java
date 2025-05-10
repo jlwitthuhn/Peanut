@@ -5,7 +5,7 @@
 package io.github.jlwitthuhn.peanut.db;
 
 import io.github.jlwitthuhn.peanut.err.AuthorityNotFoundException;
-import io.github.jlwitthuhn.peanut.err.TableAlreadyExistsException;
+import io.github.jlwitthuhn.peanut.err.DBObjectAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -26,11 +26,11 @@ public class AuthorityDAO
 	private final JdbcTemplate jdbcTemplate;
 	private final MetaDAO metaDAO;
 
-	public void createDatabaseObjects() throws TableAlreadyExistsException
+	public void createDatabaseObjects() throws DBObjectAlreadyExistsException
 	{
 		if (metaDAO.doesTableExist(TABLE_NAME))
 		{
-			throw new TableAlreadyExistsException();
+			throw new DBObjectAlreadyExistsException();
 		}
 		final String SQL = """
 			CREATE TABLE authorities (

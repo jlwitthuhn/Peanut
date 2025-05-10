@@ -4,7 +4,7 @@
 
 package io.github.jlwitthuhn.peanut.controller;
 
-import io.github.jlwitthuhn.peanut.err.DatabaseNotInitializedException;
+import io.github.jlwitthuhn.peanut.err.DBNotInitializedException;
 import io.github.jlwitthuhn.peanut.util.ViewShortcuts;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,7 +35,7 @@ public class ExceptionResolver extends AbstractHandlerExceptionResolver
 			{
 				return ViewShortcuts.simpleMessage("DB Error", "Unable to connect to the database.", HttpStatus.INTERNAL_SERVER_ERROR);
 			}
-			case DatabaseNotInitializedException databaseNotInitializedException ->
+			case DBNotInitializedException DBNotInitializedException ->
 			{
 				return ViewShortcuts.simpleMessage("DB Error", "Database has not been initialized.", HttpStatus.INTERNAL_SERVER_ERROR);
 			}

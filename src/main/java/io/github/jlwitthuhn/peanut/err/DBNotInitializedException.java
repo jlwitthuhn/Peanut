@@ -4,6 +4,6 @@
 
 package io.github.jlwitthuhn.peanut.err;
 
-public class BadDatabaseSchemaException extends RuntimeException
+public class DBNotInitializedException extends RuntimeException
 {
 }

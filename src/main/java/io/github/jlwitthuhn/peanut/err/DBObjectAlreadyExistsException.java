@@ -4,6 +4,6 @@
 
 package io.github.jlwitthuhn.peanut.err;
 
-public class DatabaseNotInitializedException extends RuntimeException
+public class DBObjectAlreadyExistsException extends Exception
 {
 }

@@ -4,10 +4,6 @@
 
 package io.github.jlwitthuhn.peanut.err;
 
-public class TableCreationDependencyNotSatisfiedException extends Exception
+public class DBBadSchemaException extends RuntimeException
 {
-	public TableCreationDependencyNotSatisfiedException(String message)
-	{
-		super(message);
-	}
 }

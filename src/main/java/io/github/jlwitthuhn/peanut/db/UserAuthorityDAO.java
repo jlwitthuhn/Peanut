@@ -35,14 +35,34 @@ public class UserAuthorityDAO
 		{
 			throw new DBCreationDependencyNotSatisfiedException("Table 'user_authorities' requires that table 'users' exists");
 		}
-		final String SQL = """
+		final String SQL_TABLE = """
 			CREATE TABLE user_authorities (
 			    user_id BIGINT REFERENCES users(id),
 			    authority_id BIGINT REFERENCES authorities(id),
+			    _created TIMESTAMP WITH TIME ZONE NOT NULL,
+			    _updated TIMESTAMP WITH TIME ZONE NOT NULL,
 			    PRIMARY KEY (user_id, authority_id)
 			);
 			""";
-		jdbcTemplate.execute(SQL);
+		jdbcTemplate.execute(SQL_TABLE);
+		final String SQL_TRIGGER_BEFORE_INSERT = """
+			CREATE TRIGGER
+				user_authorities_trigger_created_updated_before_insert
+			BEFORE INSERT ON
+				user_authorities
+			FOR EACH ROW EXECUTE FUNCTION
+				fn_created_updated_before_insert();
+			""";
+		jdbcTemplate.execute(SQL_TRIGGER_BEFORE_INSERT);
+		final String SQL_TRIGGER_BEFORE_UPDATE = """
+			CREATE TRIGGER
+				user_authorities_trigger_created_updated_before_update
+			BEFORE UPDATE ON
+				user_authorities
+			FOR EACH ROW EXECUTE FUNCTION
+				fn_created_updated_before_update();
+			""";
+		jdbcTemplate.execute(SQL_TRIGGER_BEFORE_UPDATE);
 	}
 
 	public void insertAuthoritiesForUser(long userId, Collection<Long> authorityIds)

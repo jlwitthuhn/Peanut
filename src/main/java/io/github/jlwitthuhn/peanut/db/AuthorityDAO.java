@@ -32,14 +32,34 @@ public class AuthorityDAO
 		{
 			throw new DBObjectAlreadyExistsException();
 		}
-		final String SQL = """
+		final String SQL_TABLE = """
 			CREATE TABLE authorities (
 			    id BIGSERIAL PRIMARY KEY,
 			    name VARCHAR(127) UNIQUE NOT NULL,
-			    system_owned BOOLEAN NOT NULL
+			    system_owned BOOLEAN NOT NULL,
+			    _created TIMESTAMP WITH TIME ZONE NOT NULL,
+			    _updated TIMESTAMP WITH TIME ZONE NOT NULL
 			);
 			""";
-		jdbcTemplate.execute(SQL);
+		jdbcTemplate.execute(SQL_TABLE);
+		final String SQL_TRIGGER_BEFORE_INSERT = """
+			CREATE TRIGGER
+				authorities_trigger_created_updated_before_insert
+			BEFORE INSERT ON
+				authorities
+			FOR EACH ROW EXECUTE FUNCTION
+				fn_created_updated_before_insert();
+			""";
+		jdbcTemplate.execute(SQL_TRIGGER_BEFORE_INSERT);
+		final String SQL_TRIGGER_BEFORE_UPDATE = """
+			CREATE TRIGGER
+				authorities_trigger_created_updated_before_update
+			BEFORE UPDATE ON
+				authorities
+			FOR EACH ROW EXECUTE FUNCTION
+				fn_created_updated_before_update();
+			""";
+		jdbcTemplate.execute(SQL_TRIGGER_BEFORE_UPDATE);
 	}
 
 	public Collection<Long> getIdsFromNames(Collection<String> names) throws AuthorityNotFoundException

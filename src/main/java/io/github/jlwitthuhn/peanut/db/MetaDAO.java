@@ -14,6 +14,32 @@ public class MetaDAO
 {
 	private final JdbcTemplate jdbcTemplate;
 
+	public void createDatabaseObjects()
+	{
+		final String SQL_FN_CREATED_UPDATED_BEFORE_INSERT = """
+			CREATE FUNCTION fn_created_updated_before_insert()
+			RETURNS TRIGGER AS $$
+			BEGIN
+				NEW._created := now();
+				NEW._updated := NEW._created;
+				RETURN NEW;
+			END;
+			$$ LANGUAGE plpgsql;
+			""";
+		jdbcTemplate.execute(SQL_FN_CREATED_UPDATED_BEFORE_INSERT);
+		final String SQL_FN_CREATED_UPDATED_BEFORE_UPDATE = """
+			CREATE FUNCTION fn_created_updated_before_update()
+			RETURNS TRIGGER AS $$
+			BEGIN
+				NEW._created := OLD._created;
+				NEW._updated := now();
+				RETURN NEW;
+			END;
+			$$ LANGUAGE plpgsql;
+			""";
+		jdbcTemplate.execute(SQL_FN_CREATED_UPDATED_BEFORE_UPDATE);
+	}
+
 	public boolean doesTableExist(String table)
 	{
 		return doesTableExist("public", table);

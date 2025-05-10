@@ -25,13 +25,33 @@ public class ConfigDAO
 		{
 			throw new DBObjectAlreadyExistsException();
 		}
-		final String SQL = """
+		final String SQL_TABLE = """
 			CREATE TABLE config_int (
 				name VARCHAR(255) PRIMARY KEY,
-				value BIGINT NOT NULL
+				value BIGINT NOT NULL,
+			    _created TIMESTAMP WITH TIME ZONE NOT NULL,
+			    _updated TIMESTAMP WITH TIME ZONE NOT NULL
 			);
 			""";
-		jdbcTemplate.execute(SQL);
+		jdbcTemplate.execute(SQL_TABLE);
+		final String SQL_TRIGGER_BEFORE_INSERT = """
+			CREATE TRIGGER
+				config_int_trigger_created_updated_before_insert
+			BEFORE INSERT ON
+				config_int
+			FOR EACH ROW EXECUTE FUNCTION
+				fn_created_updated_before_insert();
+			""";
+		jdbcTemplate.execute(SQL_TRIGGER_BEFORE_INSERT);
+		final String SQL_TRIGGER_BEFORE_UPDATE = """
+			CREATE TRIGGER
+				config_int_trigger_created_updated_before_update
+			BEFORE UPDATE ON
+				config_int
+			FOR EACH ROW EXECUTE FUNCTION
+				fn_created_updated_before_update();
+			""";
+		jdbcTemplate.execute(SQL_TRIGGER_BEFORE_UPDATE);
 	}
 
 	public Long getLong(String name)

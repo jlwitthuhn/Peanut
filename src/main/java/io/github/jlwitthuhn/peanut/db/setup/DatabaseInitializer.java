@@ -7,6 +7,7 @@ package io.github.jlwitthuhn.peanut.db.setup;
 import io.github.jlwitthuhn.peanut.cfg.ConfigKeyNames;
 import io.github.jlwitthuhn.peanut.db.AuthorityDAO;
 import io.github.jlwitthuhn.peanut.db.ConfigDAO;
+import io.github.jlwitthuhn.peanut.db.MetaDAO;
 import io.github.jlwitthuhn.peanut.db.UserAuthorityDAO;
 import io.github.jlwitthuhn.peanut.db.UserDAO;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class DatabaseInitializer
 {
 	private final AuthorityDAO authorityDAO;
 	private final ConfigDAO configDAO;
+	private final MetaDAO metaDAO;
 	private final UserDAO userDAO;
 	private final UserAuthorityDAO userAuthorityDAO;
 
@@ -38,6 +40,7 @@ public class DatabaseInitializer
 		try
 		{
 			// Order here matters as foreign keys create dependencies between tables
+			metaDAO.createDatabaseObjects();
 			authorityDAO.createDatabaseObjects();
 			configDAO.createDatabaseObjects();
 			userDAO.createDatabaseObjects();

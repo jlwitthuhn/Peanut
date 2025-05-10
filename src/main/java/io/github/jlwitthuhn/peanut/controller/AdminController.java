@@ -4,7 +4,9 @@
 
 package io.github.jlwitthuhn.peanut.controller;
 
+import io.github.jlwitthuhn.peanut.cfg.ConfigKeyNames;
 import io.github.jlwitthuhn.peanut.cfg.PeanutGlobals;
+import io.github.jlwitthuhn.peanut.db.ConfigDAO;
 import io.github.jlwitthuhn.peanut.db.MetaDAO;
 import io.github.jlwitthuhn.peanut.util.TimeUtil;
 import io.github.jlwitthuhn.peanut.util.Tuple2;
@@ -17,7 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.lang.management.ManagementFactory;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -27,11 +31,16 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AdminController
 {
+	private final ConfigDAO configDAO;
 	private final MetaDAO metaDAO;
 
 	@GetMapping("")
 	ModelAndView adminIndex(Map<String, Object> model)
 	{
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+		Long initTime = configDAO.getLong(ConfigKeyNames.INITIALIZED_TIME);
+		String initTimeStr = sdf.format(initTime * 1000);
+
 		long uptimeMs = ManagementFactory.getRuntimeMXBean().getUptime();
 		String uptimeStr = TimeUtil.formatMillisecondsAsDDHHMMSS(uptimeMs);
 
@@ -51,6 +60,7 @@ public class AdminController
 		versionDetails.add(new Tuple2<>("Postgres version", metaDAO.getServerVersion()));
 
 		List<Tuple2<String, String>> runtimeDetails = new ArrayList<>();
+		runtimeDetails.add(new Tuple2<>("DB initialized", initTimeStr));
 		runtimeDetails.add(new Tuple2<>("Database size", metaDAO.getDatabaseSize()));
 		runtimeDetails.add(new Tuple2<>("JVM max memory", maxMemoryStr));
 		runtimeDetails.add(new Tuple2<>("JVM total memory", totalMemoryStr));

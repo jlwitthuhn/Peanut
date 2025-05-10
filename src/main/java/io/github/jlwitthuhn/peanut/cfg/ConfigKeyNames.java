@@ -6,5 +6,6 @@ package io.github.jlwitthuhn.peanut.cfg;
 
 public class ConfigKeyNames
 {
+	public static final String INITIALIZED_TIME = "initializedTime";
 	public static final String SCHEMA_VERSION = "schemaVersion";
 }

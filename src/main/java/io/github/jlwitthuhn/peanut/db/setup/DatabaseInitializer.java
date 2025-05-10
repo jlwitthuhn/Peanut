@@ -15,6 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
+
 @Component
 @RequiredArgsConstructor
 public class DatabaseInitializer
@@ -74,6 +76,7 @@ public class DatabaseInitializer
 	{
 		try
 		{
+			configDAO.setLong(ConfigKeyNames.INITIALIZED_TIME, Instant.now().getEpochSecond());
 			configDAO.setLong(ConfigKeyNames.SCHEMA_VERSION, 1);
 		}
 		catch (Exception e)

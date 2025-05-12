@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.OffsetDateTime;
 
 public class UserRowMapper implements RowMapper<UserRow>
 {
@@ -17,6 +18,8 @@ public class UserRowMapper implements RowMapper<UserRow>
 		String displayName = rs.getString("display_name");
 		String email = rs.getString("email");
 		String password = rs.getString("password");
-		return new UserRow(id, displayName, email, password);
+		OffsetDateTime created = rs.getObject("_created", OffsetDateTime.class);
+		OffsetDateTime updated = rs.getObject("_updated", OffsetDateTime.class);
+		return new UserRow(id, displayName, email, password, created, updated);
 	}
 }

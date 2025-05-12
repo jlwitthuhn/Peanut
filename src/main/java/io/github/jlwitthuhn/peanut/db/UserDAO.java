@@ -68,7 +68,7 @@ public class UserDAO
 
 	public UserRow selectRowByDisplayName(String displayName)
 	{
-		final String SQL = "SELECT id, display_name, email, password FROM users WHERE display_name = ?";
+		final String SQL = "SELECT id, display_name, email, password, _created, _updated FROM users WHERE display_name = ?";
 		final List<UserRow> results = jdbcTemplate.query(SQL, new UserRowMapper(), displayName);
 		if (results.size() != 1)
 		{
@@ -79,7 +79,7 @@ public class UserDAO
 
 	public UserRow selectRowById(long id)
 	{
-		final String SQL = "SELECT id, display_name, email, password FROM users WHERE id = ?";
+		final String SQL = "SELECT id, display_name, email, password, _created, _updated FROM users WHERE id = ?";
 		final List<UserRow> results = jdbcTemplate.query(SQL, new UserRowMapper(), id);
 		if (results.size() != 1)
 		{

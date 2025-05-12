@@ -6,6 +6,8 @@ package io.github.jlwitthuhn.peanut.model.db;
 
 import lombok.Data;
 
+import java.time.OffsetDateTime;
+
 @Data
 public class UserRow
 {
@@ -13,4 +15,6 @@ public class UserRow
 	private final String displayName;
 	private final String email;
 	private final String password;
+	private final OffsetDateTime createdTimestamp;
+	private final OffsetDateTime updatedTimestamp;
 }

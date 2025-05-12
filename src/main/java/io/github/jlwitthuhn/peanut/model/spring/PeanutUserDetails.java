@@ -9,9 +9,9 @@ import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 public class PeanutUserDetails implements UserDetails
@@ -20,6 +20,8 @@ public class PeanutUserDetails implements UserDetails
 	private final String displayName;
 	private final String password;
 	private final ArrayList<GrantedAuthority> authorities;
+	private final OffsetDateTime createdTimestamp;
+	private final OffsetDateTime updatedTimestamp;
 
 	@Getter
 	private final String email;
@@ -30,6 +32,8 @@ public class PeanutUserDetails implements UserDetails
 		displayName = user.getDisplayName();
 		email = user.getEmail();
 		password = user.getPassword();
+		this.createdTimestamp = user.getCreatedTimestamp();
+		this.updatedTimestamp = user.getUpdatedTimestamp();
 		this.authorities = authorities;
 	}
 
@@ -40,6 +44,8 @@ public class PeanutUserDetails implements UserDetails
 		this.email = email;
 		this.password = password;
 		this.authorities = authorities;
+		this.createdTimestamp = null;
+		this.updatedTimestamp = null;
 	}
 
 	@Override
@@ -63,5 +69,15 @@ public class PeanutUserDetails implements UserDetails
 	public Optional<Long> getId()
 	{
 		return Optional.ofNullable(id);
+	}
+
+	public Optional<OffsetDateTime> getCreatedTimestamp()
+	{
+		return Optional.ofNullable(createdTimestamp);
+	}
+
+	public Optional<OffsetDateTime> getUpdatedTimestamp()
+	{
+		return Optional.ofNullable(updatedTimestamp);
 	}
 }

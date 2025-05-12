@@ -36,6 +36,7 @@ public class PeanutSecurityConfiguration
 						"/login",
 						"/login-failure",
 						"/logout/success",
+						"/register",
 						"/setup",
 						"/design"
 					).permitAll()

@@ -50,6 +50,10 @@
 			justify-content: space-evenly;
 			align-items: baseline;
 		}
+		.vertical-flex-container {
+			display: flex;
+			flex-direction: column;
+		}
 
 		/* Title */
 		#title-bar {
@@ -81,10 +85,6 @@
 		}
 
 		/* Generic panel */
-		.simple-panel-container {
-			display: flex;
-			flex-direction: column;
-		}
 		.simple-panel {
 			display: flex;
 			flex-direction: column;
@@ -491,7 +491,7 @@
 				<p><a href="#">Screen 4</a></p>
 			</nav>
 		</div>
-		<div class="simple-panel-container">
+		<div class="vertical-flex-container">
 			<div class="simple-panel">
 				<div class="simple-panel-header"><h1>Control Panel Panel</h1></div>
 				<div class="simple-panel-content cp-NAME">

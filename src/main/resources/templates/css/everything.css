@@ -45,6 +45,10 @@ th, td {
 	justify-content: space-evenly;
 	align-items: baseline;
 }
+.vertical-flex-container {
+	display: flex;
+	flex-direction: column;
+}
 
 /* Title */
 #title-bar {
@@ -76,10 +80,6 @@ th, td {
 }
 
 /* Generic panel */
-.simple-panel-container {
-	display: flex;
-	flex-direction: column;
-}
 .simple-panel {
 	display: flex;
 	flex-direction: column;

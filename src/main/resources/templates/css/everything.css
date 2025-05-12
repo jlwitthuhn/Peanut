@@ -164,8 +164,8 @@ th, td {
 	margin-bottom: 0.5rem;
 }
 
-/* Main index page */
-.index-container {
+/* Forum index */
+.forum-index-container {
 	display: grid;
 	grid-template-columns: 6fr 1.5fr 1.5fr 2fr;
 
@@ -175,31 +175,31 @@ th, td {
 
 	margin-bottom: 1rem;
 }
-.index-container h1 {
+.forum-index-container h1 {
 	font-size: 1.2rem;
 	font-weight: normal;
 }
-.index-cell {
+.forum-index-cell {
 	align-content: center;
 	padding: 0.3rem 0.5rem;
 	border-bottom: solid;
 	border-color: var(--border-color);
 	border-width: 1px;
 }
-.index-cell:nth-last-child(-n + 4) {
+.forum-index-cell:nth-last-child(-n + 4) {
 	border-bottom: hidden;
 }
-.index-header {
+.forum-index-header {
 	background-color: var(--header-color);
 }
-.index-segment {
+.forum-index-segment {
 	background-color: var(--alt-color);
 }
-.index-segment:nth-child(8n), .index-segment:nth-child(8n - 1), .index-segment:nth-child(8n - 2), .index-segment:nth-child(8n - 3){
+.forum-index-segment:nth-child(8n), .forum-index-segment:nth-child(8n - 1), .forum-index-segment:nth-child(8n - 2), .forum-index-segment:nth-child(8n - 3){
 	background-color: var(--bg-color);
 }
 
-/* Forum index */
+/* Thread index */
 .thread-index-breadcrumb p {
 	margin-bottom: 0.5rem;
 }

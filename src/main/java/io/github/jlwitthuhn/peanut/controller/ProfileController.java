@@ -6,6 +6,7 @@ package io.github.jlwitthuhn.peanut.controller;
 
 import io.github.jlwitthuhn.peanut.db.UserDAO;
 import io.github.jlwitthuhn.peanut.model.db.UserRow;
+import io.github.jlwitthuhn.peanut.util.TimeUtil;
 import io.github.jlwitthuhn.peanut.util.ViewShortcuts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -38,6 +39,7 @@ public class ProfileController
 		Map<String, String> profileData = new HashMap<>();
 		profileData.put("displayName", userRow.getDisplayName());
 		profileData.put("id", Long.toString(userRow.getId()));
+		profileData.put("created", TimeUtil.formatOffsetDateTime(userRow.getCreatedTimestamp()));
 
 		model.put("profile", profileData);
 		return new ModelAndView("profile.html", model);

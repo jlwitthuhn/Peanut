@@ -4,10 +4,19 @@
 
 package io.github.jlwitthuhn.peanut.util;
 
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 
 public class TimeUtil
 {
+	private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+	public static String formatOffsetDateTime(OffsetDateTime dateTime)
+	{
+		return dateTime.format(formatter);
+	}
+
 	public static String formatMillisecondsAsDDHHMMSS(long milliseconds)
 	{
 		long day = TimeUnit.MILLISECONDS.toDays(milliseconds);

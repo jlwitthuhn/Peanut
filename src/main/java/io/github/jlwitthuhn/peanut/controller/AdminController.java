@@ -20,6 +20,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.lang.management.ManagementFactory;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -37,9 +40,10 @@ public class AdminController
 	@GetMapping("")
 	ModelAndView adminIndex(Map<String, Object> model)
 	{
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-		Long initTime = configDAO.getLong(ConfigKeyNames.INITIALIZED_TIME);
-		String initTimeStr = sdf.format(initTime * 1000);
+		Long initCount = configDAO.getLong(ConfigKeyNames.INITIALIZED_TIME);
+		Instant initInstant = Instant.ofEpochSecond(initCount);
+		OffsetDateTime initDateTime = OffsetDateTime.ofInstant(initInstant, ZoneId.of("UTC"));
+		String initTimeStr = TimeUtil.formatOffsetDateTime(initDateTime);
 
 		long uptimeMs = ManagementFactory.getRuntimeMXBean().getUptime();
 		String uptimeStr = TimeUtil.formatMillisecondsAsDDHHMMSS(uptimeMs);

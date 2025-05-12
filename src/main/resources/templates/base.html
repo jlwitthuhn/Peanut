@@ -9,9 +9,11 @@
 <body>
 	<div id="title-bar">
 		<h1>Website</h1>
-		{% if user.logged_in %}
+		{% if user.loggedIn %}
 			<form action="/logout" method="post">
-				<div><p>Welcome {{ user.name }} - <input type="submit" value="Log out"></p></div>
+				<div><p>
+					Welcome <a href="/profile/view/{{ user.id }}">{{ user.name }}</a> - <input type="submit" value="Log out">
+				</p></div>
 				<input type="hidden" name="{{ _csrfParam }}" value="{{ _csrfToken }}">
 			</form>
 		{% else %}

@@ -4,8 +4,11 @@
 
 package io.github.jlwitthuhn.peanut.interceptor;
 
+import io.github.jlwitthuhn.peanut.model.spring.PeanutUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,6 +22,8 @@ import java.util.HashMap;
 @Component
 public class LoggedInUserInterceptor implements HandlerInterceptor
 {
+	private final Logger logger = LoggerFactory.getLogger(LoggedInUserInterceptor.class);
+
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception
 	{
@@ -28,13 +33,18 @@ public class LoggedInUserInterceptor implements HandlerInterceptor
 		}
 
 		HashMap<String, Object> userInfo = new HashMap<>();
-		userInfo.put("logged_in", Boolean.FALSE);
+		userInfo.put("loggedIn", Boolean.FALSE);
 		userInfo.put("admin", Boolean.FALSE);
 		userInfo.put("name", "Anonymous");
 		modelAndView.getModel().put("user", userInfo);
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth == null || auth instanceof AnonymousAuthenticationToken)
+		{
+			return;
+		}
+
+		if (!(auth.getPrincipal() instanceof PeanutUserDetails userDetails))
 		{
 			return;
 		}
@@ -49,8 +59,15 @@ public class LoggedInUserInterceptor implements HandlerInterceptor
 			}
 		}
 
-		userInfo.put("logged_in", Boolean.TRUE);
+		if (userDetails.getId().isEmpty())
+		{
+			logger.error("Found user with no id, name: {}", userDetails.getUsername());
+			return;
+		}
+
+		userInfo.put("loggedIn", Boolean.TRUE);
 		userInfo.put("admin", isAdmin);
-		userInfo.put("name", auth.getName());
+		userInfo.put("name", userDetails.getUsername());
+		userInfo.put("id", userDetails.getId().get());
 	}
 }

@@ -9,6 +9,10 @@
 
 /* Base styles */
 body {
+	margin: 1rem auto;
+	min-width: 850px;
+	max-width: 1040px;
+
 	background-color: var(--bg-color);
 	color: var(--text-color);
 	font-family: sans-serif;
@@ -33,11 +37,6 @@ table, th, td {
 }
 th, td {
 	padding: 4px;
-}
-#root {
-	margin: 1rem auto;
-	min-width: 850px;
-	max-width: 1040px;
 }
 
 /* Generic styles */

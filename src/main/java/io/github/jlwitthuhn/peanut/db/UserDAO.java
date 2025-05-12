@@ -76,4 +76,15 @@ public class UserDAO
 		}
 		return results.getFirst();
 	}
+
+	public UserRow selectRowById(long id)
+	{
+		final String SQL = "SELECT id, display_name, email, password FROM users WHERE id = ?";
+		final List<UserRow> results = jdbcTemplate.query(SQL, new UserRowMapper(), id);
+		if (results.size() != 1)
+		{
+			return null;
+		}
+		return results.getFirst();
+	}
 }

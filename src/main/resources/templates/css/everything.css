@@ -118,7 +118,7 @@ th, td {
 }
 
 /* Login page */
-.login-container {
+.login-panel {
 	display: flex;
 	flex-direction: column;
 
@@ -130,11 +130,11 @@ th, td {
 	margin-right: auto;
 	max-width: 500px;
 }
-.login-container h1 {
+.login-panel h1 {
 	font-size: 1.2rem;
 	font-weight: normal;
 }
-.login-header {
+.login-panel-header {
 	background-color: var(--header-color);
 	padding: 0.3rem 0.5rem;
 

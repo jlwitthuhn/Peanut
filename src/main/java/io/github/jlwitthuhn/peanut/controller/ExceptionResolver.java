@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.AbstractHandlerExceptionResolver;
@@ -41,9 +42,13 @@ public class ExceptionResolver extends AbstractHandlerExceptionResolver
 			{
 				result = ViewShortcuts.simpleMessage("DB Error", "Unable to connect to the database.", HttpStatus.INTERNAL_SERVER_ERROR);
 			}
-			case DBNotInitializedException DBNotInitializedException ->
+			case DBNotInitializedException dbNotInitializedException ->
 			{
 				result = ViewShortcuts.simpleMessage("DB Error", "Database has not been initialized.", HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+			case AuthorizationDeniedException authorizationDeniedException ->
+			{
+				result = ViewShortcuts.simpleMessage("Error - HTTP 403", "Forbidden", HttpStatus.FORBIDDEN);
 			}
 			default ->
 			{

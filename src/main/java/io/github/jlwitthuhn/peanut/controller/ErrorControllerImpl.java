@@ -26,16 +26,19 @@ public class ErrorControllerImpl implements ErrorController
 	public ModelAndView error(HttpServletRequest request)
 	{
 		Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
-		if (!(status instanceof Integer statusInt))
+		if (status instanceof Integer statusInt)
 		{
-			logger.error("Caught error with non-Integer status: {}", status);
-			if (status != null)
-			{
-				logger.error("Status class is {}", status.getClass());
-			}
-			return ViewShortcuts.simpleMessage("Error", "An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+			final String title = String.format("Error - HTTP %d", statusInt);
+			return ViewShortcuts.simpleMessage(title, "An error occurred", HttpStatus.valueOf(statusInt));
 		}
-		final String title = String.format("Error - HTTP %d", statusInt);
-		return ViewShortcuts.simpleMessage(title, "An error occurred", HttpStatus.valueOf(statusInt));
+
+		logger.error("Caught error in ErrorControllerImpl");
+		Object exception = request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+		if (exception instanceof Exception ex)
+		{
+			logger.error(ex.getMessage(), ex);
+		}
+
+		return ViewShortcuts.simpleMessage("Error", "An error occurred, please try again.", HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }

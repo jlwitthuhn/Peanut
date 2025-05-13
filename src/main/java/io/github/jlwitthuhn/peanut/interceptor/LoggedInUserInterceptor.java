@@ -22,7 +22,7 @@ import java.util.HashMap;
 @Component
 public class LoggedInUserInterceptor implements HandlerInterceptor
 {
-	private final Logger logger = LoggerFactory.getLogger(LoggedInUserInterceptor.class);
+	private static final Logger logger = LoggerFactory.getLogger(LoggedInUserInterceptor.class);
 
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception

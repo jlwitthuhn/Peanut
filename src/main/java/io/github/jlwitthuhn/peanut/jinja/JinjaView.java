@@ -23,7 +23,7 @@ public class JinjaView extends AbstractTemplateView
 	@Setter
 	private Jinjava jinjava;
 
-	private final Logger logger = LoggerFactory.getLogger(JinjaView.class);
+	private static final Logger logger = LoggerFactory.getLogger(JinjaView.class);
 
 	@Override
 	protected void renderMergedTemplateModel(@NonNull Map<String, Object> model, @NonNull HttpServletRequest request, @NonNull HttpServletResponse response) throws Exception

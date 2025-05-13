@@ -27,7 +27,7 @@ public class DatabaseInitializer
 	private final UserDAO userDAO;
 	private final UserAuthorityDAO userAuthorityDAO;
 
-	private final Logger logger = LoggerFactory.getLogger(DatabaseInitializer.class);
+	private static final Logger logger = LoggerFactory.getLogger(DatabaseInitializer.class);
 
 	public boolean doInit()
 	{

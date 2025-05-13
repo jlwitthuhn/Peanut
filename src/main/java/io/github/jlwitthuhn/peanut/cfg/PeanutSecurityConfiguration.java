@@ -40,7 +40,7 @@ public class PeanutSecurityConfiguration
 						"/setup",
 						"/design"
 					).permitAll()
-					.requestMatchers(HttpMethod.POST, "/login", "/setup").permitAll()
+					.requestMatchers(HttpMethod.POST, "/login", "/register", "/setup").permitAll()
 					.anyRequest().authenticated()
 		);
 		http.formLogin(

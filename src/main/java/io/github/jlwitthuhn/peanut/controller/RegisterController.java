@@ -4,17 +4,59 @@
 
 package io.github.jlwitthuhn.peanut.controller;
 
+import io.github.jlwitthuhn.peanut.err.UserDetailsConflictException;
+import io.github.jlwitthuhn.peanut.model.form.RegisterForm;
+import io.github.jlwitthuhn.peanut.model.spring.PeanutUserDetails;
+import io.github.jlwitthuhn.peanut.security.PeanutUserService;
+import io.github.jlwitthuhn.peanut.util.ViewShortcuts;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import java.util.ArrayList;
 
 @Controller
 @RequestMapping("/register")
+@RequiredArgsConstructor
 public class RegisterController
 {
+	private final PasswordEncoder passwordEncoder;
+	private final PeanutUserService userService;
+
 	@GetMapping("")
 	public String getIndex()
 	{
 		return "register.html";
+	}
+
+	@PostMapping("")
+	public ModelAndView postIndex(@ModelAttribute RegisterForm form)
+	{
+		if (form == null || !form.isValid())
+		{
+			return ViewShortcuts.simpleMessage("Error", "Form is invalid.", HttpStatus.BAD_REQUEST);
+		}
+
+		ArrayList<GrantedAuthority> authorities = new ArrayList<>();
+		authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+		PeanutUserDetails newUser = new PeanutUserDetails(form.getUsername(), form.getEmail(), passwordEncoder.encode(form.getPassword()), authorities);
+		try
+		{
+			userService.createUser(newUser);
+		}
+		catch (UserDetailsConflictException ex)
+		{
+			return ViewShortcuts.simpleMessage("Failed to create user", ex.getMessage(), HttpStatus.CONFLICT);
+		}
+
+		return ViewShortcuts.simpleMessage("Success", "Your account has been created. You may now log in.");
 	}
 }

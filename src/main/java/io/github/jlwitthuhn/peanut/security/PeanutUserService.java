@@ -9,6 +9,7 @@ import io.github.jlwitthuhn.peanut.db.MultiTableDAO;
 import io.github.jlwitthuhn.peanut.db.UserAuthorityDAO;
 import io.github.jlwitthuhn.peanut.db.UserDAO;
 import io.github.jlwitthuhn.peanut.err.AuthorityNotFoundException;
+import io.github.jlwitthuhn.peanut.err.UserDetailsConflictException;
 import io.github.jlwitthuhn.peanut.model.db.UserRow;
 import io.github.jlwitthuhn.peanut.model.spring.PeanutUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,14 @@ public class PeanutUserService implements UserDetailsManager
 		if (peanutUserDetails.getId().isPresent())
 		{
 			throw new IllegalArgumentException("User ID must not be set when creating a new user");
+		}
+		if (userDAO.selectRowByDisplayName(peanutUserDetails.getUsername()) != null)
+		{
+			throw new UserDetailsConflictException("Username is already in use");
+		}
+		if (userDAO.selectRowByEmail(peanutUserDetails.getEmail()) != null)
+		{
+			throw new UserDetailsConflictException("Email address is already in use");
 		}
 		userDAO.insertRow(
 			peanutUserDetails.getUsername(),

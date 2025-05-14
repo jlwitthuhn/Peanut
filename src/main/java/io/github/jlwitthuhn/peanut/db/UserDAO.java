@@ -77,6 +77,17 @@ public class UserDAO
 		return results.getFirst();
 	}
 
+	public UserRow selectRowByEmail(String email)
+	{
+		final String SQL = "SELECT id, display_name, email, password, _created, _updated FROM users WHERE email = ?";
+		final List<UserRow> results = jdbcTemplate.query(SQL, new UserRowMapper(), email);
+		if (results.size() != 1)
+		{
+			return null;
+		}
+		return results.getFirst();
+	}
+
 	public UserRow selectRowById(long id)
 	{
 		final String SQL = "SELECT id, display_name, email, password, _created, _updated FROM users WHERE id = ?";

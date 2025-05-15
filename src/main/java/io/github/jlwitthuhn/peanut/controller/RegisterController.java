@@ -8,6 +8,7 @@ import io.github.jlwitthuhn.peanut.err.UserDetailsConflictException;
 import io.github.jlwitthuhn.peanut.model.form.RegisterForm;
 import io.github.jlwitthuhn.peanut.model.spring.PeanutUserDetails;
 import io.github.jlwitthuhn.peanut.security.PeanutUserService;
+import io.github.jlwitthuhn.peanut.util.AuthorizationUtil;
 import io.github.jlwitthuhn.peanut.util.ViewShortcuts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.ArrayList;
 
@@ -32,14 +34,27 @@ public class RegisterController
 	private final PeanutUserService userService;
 
 	@GetMapping("")
-	public String getIndex()
+	public ModelAndView getIndex()
 	{
-		return "register.html";
+		if (AuthorizationUtil.currentUserIsLoggedIn())
+		{
+			RedirectView view = new RedirectView("/");
+			view.setStatusCode(HttpStatus.SEE_OTHER);
+			return new ModelAndView(view);
+		}
+		return new ModelAndView("register.html");
 	}
 
 	@PostMapping("")
 	public ModelAndView postIndex(@ModelAttribute RegisterForm form)
 	{
+		if (AuthorizationUtil.currentUserIsLoggedIn())
+		{
+			RedirectView view = new RedirectView("/");
+			view.setStatusCode(HttpStatus.SEE_OTHER);
+			return new ModelAndView(view);
+		}
+
 		if (form == null || !form.isValid())
 		{
 			return ViewShortcuts.simpleMessage("Error", "Form is invalid.", HttpStatus.BAD_REQUEST);

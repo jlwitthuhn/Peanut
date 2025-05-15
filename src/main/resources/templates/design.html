@@ -85,6 +85,27 @@
 		}
 
 		/* Generic panel */
+		.simple-form {
+			display: flex;
+			flex-direction: column;
+
+			background-color: var(--alt-color);
+			padding: 0.3rem 0.5rem;
+		}
+		.simple-form p {
+			margin-left: auto;
+			margin-right: auto;
+		}
+		.simple-form-form form {
+			display: flex;
+			flex-direction: column;
+
+			margin-left: 20%;
+			margin-right: 20%;
+		}
+		.simple-form form input {
+			margin-bottom: 0.5rem;
+		}
 		.simple-panel {
 			display: flex;
 			flex-direction: column;
@@ -146,27 +167,6 @@
 			border-bottom: solid;
 			border-color: var(--border-color);
 			border-width: 1px;
-		}
-		.login-form {
-			display: flex;
-			flex-direction: column;
-
-			background-color: var(--alt-color);
-			padding: 0.3rem 0.5rem;
-		}
-		.login-form p {
-			margin-left: auto;
-			margin-right: auto;
-		}
-		.login-form form {
-			display: flex;
-			flex-direction: column;
-
-			margin-left: 20%;
-			margin-right: 20%;
-		}
-		.login-form form input {
-			margin-bottom: 0.5rem;
 		}
 
 		/* Forum index */
@@ -289,6 +289,7 @@
 		.cp-container nav p:last-child {
 			border-bottom: hidden;
 		}
+
 	</style>
 </head>
 <body>
@@ -321,7 +322,7 @@
 		<div class="login-panel-header">
 			<h1>Log in</h1>
 		</div>
-		<div class="login-form">
+		<div class="simple-form">
 			<form action="#" method="post">
 				<label for="input_username">Username:</label>
 				<input type="text" id="input_username" name="username">

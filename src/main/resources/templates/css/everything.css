@@ -80,6 +80,27 @@ th, td {
 }
 
 /* Generic panel */
+.simple-form {
+	display: flex;
+	flex-direction: column;
+
+	background-color: var(--alt-color);
+	padding: 0.3rem 0.5rem;
+}
+.simple-form p {
+	margin-left: auto;
+	margin-right: auto;
+}
+.simple-form-form form {
+	display: flex;
+	flex-direction: column;
+
+	margin-left: 20%;
+	margin-right: 20%;
+}
+.simple-form form input {
+	margin-bottom: 0.5rem;
+}
 .simple-panel {
 	display: flex;
 	flex-direction: column;
@@ -141,27 +162,6 @@ th, td {
 	border-bottom: solid;
 	border-color: var(--border-color);
 	border-width: 1px;
-}
-.login-form {
-	display: flex;
-	flex-direction: column;
-
-	background-color: var(--alt-color);
-	padding: 0.3rem 0.5rem;
-}
-.login-form p {
-	margin-left: auto;
-	margin-right: auto;
-}
-.login-form form {
-	display: flex;
-	flex-direction: column;
-
-	margin-left: 20%;
-	margin-right: 20%;
-}
-.login-form form input {
-	margin-bottom: 0.5rem;
 }
 
 /* Forum index */

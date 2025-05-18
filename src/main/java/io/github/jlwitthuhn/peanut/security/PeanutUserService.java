@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,6 +33,7 @@ public class PeanutUserService implements UserDetailsManager
 	private final UserAuthorityDAO userAuthorityDAO;
 
 	@Override
+	@Transactional
 	public void createUser(UserDetails user)
 	{
 		if (!(user instanceof PeanutUserDetails peanutUserDetails))

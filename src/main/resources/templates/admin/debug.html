@@ -5,7 +5,20 @@
 	<div class="simple-panel">
 		<div class="simple-panel-header"><h1>Create Users</h1></div>
 		<div class="simple-panel-content horizontal-space-evenly">
-			<p>Debug stuff will go here, soon.</p>
+			<div class="simple-form">
+				<form action="/admin/debug/create_users" method="post">
+					<label for="user-count">Quantity:</label>
+					<input type="text" id="user-count" name="count">
+					<label for="prefix">Prefix:</label>
+					<input type="text" id="prefix" name="prefix">
+					<label for="input_password">Password:</label>
+					<input type="password" id="input_password" name="password">
+					<input type="hidden" name="{{ _csrfParam }}" value="{{ _csrfToken }}">
+					<input type="submit" value="Log in">
+				</form>
+				<p>or</p>
+				<p><a href="/register">Register a new account</a></p>
+			</div>
 		</div>
 	</div>
 </div>

@@ -8,14 +8,22 @@ import io.github.jlwitthuhn.peanut.cfg.ConfigKeyNames;
 import io.github.jlwitthuhn.peanut.cfg.PeanutGlobals;
 import io.github.jlwitthuhn.peanut.db.ConfigDAO;
 import io.github.jlwitthuhn.peanut.db.MetaDAO;
+import io.github.jlwitthuhn.peanut.model.form.AdminDebugCreateUsersForm;
+import io.github.jlwitthuhn.peanut.model.spring.PeanutUserDetails;
+import io.github.jlwitthuhn.peanut.security.PeanutUserService;
 import io.github.jlwitthuhn.peanut.util.TimeUtil;
 import io.github.jlwitthuhn.peanut.util.Tuple2;
+import io.github.jlwitthuhn.peanut.util.ViewShortcuts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.SpringVersion;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -37,6 +45,8 @@ public class AdminController
 {
 	private final ConfigDAO configDAO;
 	private final MetaDAO metaDAO;
+	private final PasswordEncoder passwordEncoder;
+	private final PeanutUserService userService;
 
 	@GetMapping("")
 	ModelAndView adminIndex(Map<String, Object> model)
@@ -85,5 +95,32 @@ public class AdminController
 	ModelAndView debugIndex()
 	{
 		return new ModelAndView("admin/debug.html");
+	}
+
+	@PostMapping("/debug/create_users")
+	ModelAndView debugCreateUsers(@ModelAttribute AdminDebugCreateUsersForm form)
+	{
+		if (form == null)
+		{
+			return ViewShortcuts.simpleMessage("Error", "Form is invalid.", HttpStatus.BAD_REQUEST);
+		}
+
+		if (!form.getValidationErrors().isEmpty())
+		{
+			return ViewShortcuts.simpleMessage("Error", form.getValidationErrors().getFirst(), HttpStatus.BAD_REQUEST);
+		}
+
+		Integer count = form.getCountInt();
+		for (int i = 0; i < count; i++)
+		{
+			String suffix = String.format("%04d", i);
+			String accountName = form.getPrefix() + suffix;
+			String email = accountName + "@peanut";
+			String hashedPassword = passwordEncoder.encode(form.getPassword());
+			PeanutUserDetails thisUser = new PeanutUserDetails(accountName, email, hashedPassword);
+			userService.createUser(thisUser);
+		}
+
+		return ViewShortcuts.simpleMessage("Success", "Successfully created " + count + " test accounts.");
 	}
 }

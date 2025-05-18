@@ -7,6 +7,7 @@ package io.github.jlwitthuhn.peanut.model.spring;
 import io.github.jlwitthuhn.peanut.model.db.UserRow;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.OffsetDateTime;
@@ -18,7 +19,7 @@ public class PeanutUserDetails implements UserDetails
 {
 	private final Long id;
 	private final String displayName;
-	private final String password;
+	private final String hashedPassword;
 	private final ArrayList<GrantedAuthority> authorities;
 	private final OffsetDateTime createdTimestamp;
 	private final OffsetDateTime updatedTimestamp;
@@ -31,18 +32,32 @@ public class PeanutUserDetails implements UserDetails
 		id = user.getId();
 		displayName = user.getDisplayName();
 		email = user.getEmail();
-		password = user.getPassword();
+		hashedPassword = user.getPassword();
 		this.createdTimestamp = user.getCreatedTimestamp();
 		this.updatedTimestamp = user.getUpdatedTimestamp();
 		this.authorities = authorities;
 	}
 
-	public PeanutUserDetails(String displayName, String email, String password, ArrayList<GrantedAuthority> authorities)
+	public PeanutUserDetails(String displayName, String email, String hashedPassword)
+	{
+		ArrayList<GrantedAuthority> authorities = new ArrayList<>();
+		authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+
+		this.id = null;
+		this.displayName = displayName;
+		this.email = email;
+		this.hashedPassword = hashedPassword;
+		this.authorities = authorities;
+		this.createdTimestamp = null;
+		this.updatedTimestamp = null;
+	}
+
+	public PeanutUserDetails(String displayName, String email, String hashedPassword, ArrayList<GrantedAuthority> authorities)
 	{
 		this.id = null;
 		this.displayName = displayName;
 		this.email = email;
-		this.password = password;
+		this.hashedPassword = hashedPassword;
 		this.authorities = authorities;
 		this.createdTimestamp = null;
 		this.updatedTimestamp = null;
@@ -57,7 +72,7 @@ public class PeanutUserDetails implements UserDetails
 	@Override
 	public String getPassword()
 	{
-		return password;
+		return hashedPassword;
 	}
 
 	@Override

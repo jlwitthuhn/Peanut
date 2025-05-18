@@ -5,16 +5,12 @@
 package io.github.jlwitthuhn.peanut.controller;
 
 import io.github.jlwitthuhn.peanut.db.MetaDAO;
-import io.github.jlwitthuhn.peanut.db.setup.DatabaseInitializer;
+import io.github.jlwitthuhn.peanut.err.DBCreationDependencyNotSatisfiedException;
 import io.github.jlwitthuhn.peanut.model.form.SetupForm;
-import io.github.jlwitthuhn.peanut.model.spring.PeanutUserDetails;
-import io.github.jlwitthuhn.peanut.security.PeanutUserService;
+import io.github.jlwitthuhn.peanut.service.SetupService;
 import io.github.jlwitthuhn.peanut.util.ViewShortcuts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -22,7 +18,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 @Controller
@@ -30,10 +25,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SetupController
 {
-	private final DatabaseInitializer databaseInitializer;
+	private final SetupService setupService;
+
 	private final MetaDAO metaDAO;
-	private final PasswordEncoder passwordEncoder;
-	private final PeanutUserService peanutUserService;
 
 	@GetMapping("")
 	public ModelAndView index(Map<String, Object> model)
@@ -48,29 +42,19 @@ public class SetupController
 	@PostMapping("")
 	public ModelAndView post(@ModelAttribute SetupForm form)
 	{
-		if (metaDAO.doesTableExist("config_int"))
-		{
-			return ViewShortcuts.simpleMessage("Error", "The database was already set up. Its existing state has not been modified.", HttpStatus.CONFLICT);
-		}
-
 		if (form == null || !form.isValid())
 		{
 			return ViewShortcuts.simpleMessage("Error", "Form is invalid.", HttpStatus.BAD_REQUEST);
 		}
 
-		if (!databaseInitializer.doInit())
+		try
 		{
-			return ViewShortcuts.simpleMessage("Error", "Encountered error while initializing database.", HttpStatus.INTERNAL_SERVER_ERROR);
+			setupService.initializeDatabase(form.getAdminName(), form.getAdminPass(), form.getEmail());
 		}
-
-		// Create admin user
-		String hashedPassword = passwordEncoder.encode(form.getAdminPass());
-		ArrayList<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-		authorities.add(new SimpleGrantedAuthority("ROLE_TURBO_ADMIN"));
-		authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
-		authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-		PeanutUserDetails userDetails = new PeanutUserDetails(form.getAdminName(), form.getEmail(), hashedPassword, authorities);
-		peanutUserService.createUser(userDetails);
+		catch (DBCreationDependencyNotSatisfiedException ex)
+		{
+			return ViewShortcuts.simpleMessage("Init Error", "Failed to initialize database: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 
 		return ViewShortcuts.simpleMessage("Success", "Database initialized successfully.");
 	}

@@ -4,7 +4,7 @@
 
 package io.github.jlwitthuhn.peanut.db;
 
-import io.github.jlwitthuhn.peanut.err.DBObjectAlreadyExistsException;
+import io.github.jlwitthuhn.peanut.err.DBCreationDependencyNotSatisfiedException;
 import io.github.jlwitthuhn.peanut.model.db.UserRow;
 import io.github.jlwitthuhn.peanut.model.db.UserRowMapper;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +23,11 @@ public class UserDAO
 
 	private final MetaDAO metaDAO;
 
-	public void createDatabaseObjects() throws DBObjectAlreadyExistsException
+	public void createDatabaseObjects() throws DBCreationDependencyNotSatisfiedException
 	{
 		if (metaDAO.doesTableExist(TABLE_NAME))
 		{
-			throw new DBObjectAlreadyExistsException();
+			throw new DBCreationDependencyNotSatisfiedException("Table '" + TABLE_NAME + "' cannot be created because it already exists");
 		}
 		final String SQL_TABLE = """
 			CREATE TABLE users (

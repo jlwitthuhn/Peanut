@@ -5,7 +5,6 @@
 package io.github.jlwitthuhn.peanut.db;
 
 import io.github.jlwitthuhn.peanut.err.DBCreationDependencyNotSatisfiedException;
-import io.github.jlwitthuhn.peanut.err.DBObjectAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -21,11 +20,11 @@ public class UserAuthorityDAO
 	private final JdbcTemplate jdbcTemplate;
 	private final MetaDAO metaDAO;
 
-	public void createDatabaseObjects() throws DBObjectAlreadyExistsException, DBCreationDependencyNotSatisfiedException
+	public void createDatabaseObjects() throws DBCreationDependencyNotSatisfiedException
 	{
 		if (metaDAO.doesTableExist(TABLE_NAME))
 		{
-			throw new DBObjectAlreadyExistsException();
+			throw new DBCreationDependencyNotSatisfiedException("Table '" + TABLE_NAME + "' cannot be created because it already exists");
 		}
 		if (!metaDAO.doesTableExist(AuthorityDAO.TABLE_NAME))
 		{

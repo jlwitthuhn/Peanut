@@ -4,7 +4,7 @@
 
 package io.github.jlwitthuhn.peanut.db;
 
-import io.github.jlwitthuhn.peanut.err.DBObjectAlreadyExistsException;
+import io.github.jlwitthuhn.peanut.err.DBCreationDependencyNotSatisfiedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -19,11 +19,11 @@ public class ConfigDAO
 
 	private final MetaDAO metaDAO;
 
-	public void createDatabaseObjects() throws DBObjectAlreadyExistsException
+	public void createDatabaseObjects() throws DBCreationDependencyNotSatisfiedException
 	{
 		if (metaDAO.doesTableExist(TABLE_NAME_INT))
 		{
-			throw new DBObjectAlreadyExistsException();
+			throw new DBCreationDependencyNotSatisfiedException("Table '" + TABLE_NAME_INT + "' cannot be created because it already exists");
 		}
 		final String SQL_TABLE = """
 			CREATE TABLE config_int (

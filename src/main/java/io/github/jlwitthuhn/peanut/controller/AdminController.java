@@ -11,6 +11,7 @@ import io.github.jlwitthuhn.peanut.db.MetaDAO;
 import io.github.jlwitthuhn.peanut.model.form.AdminDebugCreateUsersForm;
 import io.github.jlwitthuhn.peanut.model.spring.PeanutUserDetails;
 import io.github.jlwitthuhn.peanut.security.PeanutUserService;
+import io.github.jlwitthuhn.peanut.service.AdminService;
 import io.github.jlwitthuhn.peanut.util.TimeUtil;
 import io.github.jlwitthuhn.peanut.util.Tuple2;
 import io.github.jlwitthuhn.peanut.util.ViewShortcuts;
@@ -43,10 +44,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AdminController
 {
+	private final AdminService adminService;
+
 	private final ConfigDAO configDAO;
 	private final MetaDAO metaDAO;
-	private final PasswordEncoder passwordEncoder;
-	private final PeanutUserService userService;
 
 	@GetMapping("")
 	ModelAndView adminIndex(Map<String, Object> model)
@@ -111,15 +112,7 @@ public class AdminController
 		}
 
 		Integer count = form.getCountInt();
-		for (int i = 0; i < count; i++)
-		{
-			String suffix = String.format("%04d", i);
-			String accountName = form.getPrefix() + suffix;
-			String email = accountName + "@peanut";
-			String hashedPassword = passwordEncoder.encode(form.getPassword());
-			PeanutUserDetails thisUser = new PeanutUserDetails(accountName, email, hashedPassword);
-			userService.createUser(thisUser);
-		}
+		adminService.createDebugUsers(count, form.getPrefix(), form.getPassword());
 
 		return ViewShortcuts.simpleMessage("Success", "Successfully created " + count + " test accounts.");
 	}

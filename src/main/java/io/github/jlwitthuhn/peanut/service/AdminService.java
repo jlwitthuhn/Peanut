@@ -25,7 +25,7 @@ public class AdminService
 		{
 			String suffix = String.format("%04d", i);
 			String accountName = prefix + suffix;
-			String email = "test"; //accountName + "@peanut";
+			String email = accountName + "@peanut";
 			String hashedPassword = passwordEncoder.encode(plainPassword);
 			PeanutUserDetails thisUser = new PeanutUserDetails(accountName, email, hashedPassword);
 			userService.createUser(thisUser);

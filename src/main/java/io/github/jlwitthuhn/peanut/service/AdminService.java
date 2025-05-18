@@ -9,6 +9,7 @@ import io.github.jlwitthuhn.peanut.security.PeanutUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,13 +18,14 @@ public class AdminService
 	private final PasswordEncoder passwordEncoder;
 	private final PeanutUserService userService;
 
+	@Transactional
 	public void createDebugUsers(int count, String prefix, String plainPassword)
 	{
 		for (int i = 0; i < count; i++)
 		{
 			String suffix = String.format("%04d", i);
 			String accountName = prefix + suffix;
-			String email = accountName + "@peanut";
+			String email = "test"; //accountName + "@peanut";
 			String hashedPassword = passwordEncoder.encode(plainPassword);
 			PeanutUserDetails thisUser = new PeanutUserDetails(accountName, email, hashedPassword);
 			userService.createUser(thisUser);

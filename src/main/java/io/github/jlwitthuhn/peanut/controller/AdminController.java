@@ -116,4 +116,10 @@ public class AdminController
 
 		return ViewShortcuts.simpleMessage("Success", "Successfully created " + count + " test accounts.");
 	}
+
+	@GetMapping("/users")
+	ModelAndView usersIndex()
+	{
+		return new ModelAndView("admin/users.html");
+	}
 }

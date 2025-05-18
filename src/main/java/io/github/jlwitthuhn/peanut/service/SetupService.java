@@ -14,6 +14,8 @@ import io.github.jlwitthuhn.peanut.err.DBCreationDependencyNotSatisfiedException
 import io.github.jlwitthuhn.peanut.model.spring.PeanutUserDetails;
 import io.github.jlwitthuhn.peanut.security.PeanutUserService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,6 +38,8 @@ public class SetupService
 	private final UserDAO userDAO;
 	private final UserAuthorityDAO userAuthorityDAO;
 
+	private static final Logger logger = LoggerFactory.getLogger(SetupService.class);
+
 	@Transactional
 	public void initializeDatabase(String adminName, String plainAdminPassword, String adminEmail) throws DBCreationDependencyNotSatisfiedException
 	{
@@ -43,6 +47,8 @@ public class SetupService
 		{
 			throw new DBCreationDependencyNotSatisfiedException("The database is already set up. No changes have been made.");
 		}
+
+		logger.info("Initializing database...");
 
 		initDatabaseObjects();
 		initAuthorities();
@@ -52,6 +58,8 @@ public class SetupService
 
 	private void initAdminUser(String username, String plainPassword, String email)
 	{
+		logger.info("Initializing admin user...");
+
 		String hashedPassword = passwordEncoder.encode(plainPassword);
 		ArrayList<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
 		authorities.add(new SimpleGrantedAuthority("ROLE_TURBO_ADMIN"));
@@ -63,6 +71,8 @@ public class SetupService
 
 	private void initAuthorities()
 	{
+		logger.info("Initializing authorities...");
+
 		authorityDAO.insertRow("ROLE_TURBO_ADMIN", true);
 		authorityDAO.insertRow("ROLE_ADMIN", true);
 		authorityDAO.insertRow("ROLE_USER", true);
@@ -70,12 +80,14 @@ public class SetupService
 
 	private void initConfig()
 	{
+		logger.info("Initializing config...");
 		configDAO.setLong(ConfigKeyNames.INITIALIZED_TIME, Instant.now().getEpochSecond());
 		configDAO.setLong(ConfigKeyNames.SCHEMA_VERSION, 1);
 	}
 
 	private void initDatabaseObjects() throws DBCreationDependencyNotSatisfiedException
 	{
+		logger.info("Initializing database objects...");
 		metaDAO.createDatabaseObjects();
 		authorityDAO.createDatabaseObjects();
 		configDAO.createDatabaseObjects();

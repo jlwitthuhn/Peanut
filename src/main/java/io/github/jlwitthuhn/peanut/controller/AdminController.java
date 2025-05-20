@@ -8,9 +8,9 @@ import io.github.jlwitthuhn.peanut.cfg.ConfigKeyNames;
 import io.github.jlwitthuhn.peanut.cfg.PeanutGlobals;
 import io.github.jlwitthuhn.peanut.db.ConfigDAO;
 import io.github.jlwitthuhn.peanut.db.MetaDAO;
+import io.github.jlwitthuhn.peanut.db.UserDAO;
+import io.github.jlwitthuhn.peanut.model.db.UserRow;
 import io.github.jlwitthuhn.peanut.model.form.AdminDebugCreateUsersForm;
-import io.github.jlwitthuhn.peanut.model.spring.PeanutUserDetails;
-import io.github.jlwitthuhn.peanut.security.PeanutUserService;
 import io.github.jlwitthuhn.peanut.service.AdminService;
 import io.github.jlwitthuhn.peanut.util.TimeUtil;
 import io.github.jlwitthuhn.peanut.util.Tuple2;
@@ -19,22 +19,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.SpringVersion;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.lang.management.ManagementFactory;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +46,7 @@ public class AdminController
 
 	private final ConfigDAO configDAO;
 	private final MetaDAO metaDAO;
+	private final UserDAO userDAO;
 
 	@GetMapping("")
 	ModelAndView adminIndex(Map<String, Object> model)
@@ -121,5 +120,31 @@ public class AdminController
 	ModelAndView usersIndex()
 	{
 		return new ModelAndView("admin/users.html");
+	}
+
+	@GetMapping("/users/list")
+	ModelAndView usersListGet()
+	{
+		RedirectView view = new RedirectView("/admin/users");
+		view.setStatusCode(HttpStatus.SEE_OTHER);
+		return new ModelAndView(view);
+	}
+
+	@PostMapping("/users/list")
+	ModelAndView usersList(Map<String, Object> model)
+	{
+		List<UserRow> userRows = userDAO.selectAll();
+		List<Map<String, String>> users = new ArrayList<>();
+		for (UserRow userRow : userRows)
+		{
+			String createdTimestamp = TimeUtil.formatOffsetDateTime(userRow.getCreatedTimestamp());
+			Map<String, String> thisUser = new HashMap<>();
+			thisUser.put("id", String.valueOf(userRow.getId()));
+			thisUser.put("name", userRow.getDisplayName());
+			thisUser.put("created", createdTimestamp);
+			users.add(thisUser);
+		}
+		model.put("users", users);
+		return new ModelAndView("admin/users_list.html", model);
 	}
 }

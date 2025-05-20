@@ -66,6 +66,12 @@ public class UserDAO
 		jdbcTemplate.update(SQL, displayName, email, password);
 	}
 
+	public List<UserRow> selectAll()
+	{
+		final String SQL = "SELECT id, display_name, email, password, _created, _updated FROM users ORDER BY id";
+		return jdbcTemplate.query(SQL, new UserRowMapper());
+	}
+
 	public UserRow selectRowByDisplayName(String displayName)
 	{
 		final String SQL = "SELECT id, display_name, email, password, _created, _updated FROM users WHERE display_name = ?";

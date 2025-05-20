@@ -32,7 +32,12 @@ public class ErrorControllerImpl implements ErrorController
 			return ViewShortcuts.simpleMessage(title, "An error occurred", HttpStatus.valueOf(statusInt));
 		}
 
-		logger.error("Caught error in ErrorControllerImpl");
+		logger.error("Caught non-http error in ErrorControllerImpl");
+		Object message = request.getAttribute(RequestDispatcher.ERROR_MESSAGE);
+		if (message instanceof String messageStr)
+		{
+			logger.error(messageStr);
+		}
 		Object exception = request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 		if (exception instanceof Exception ex)
 		{

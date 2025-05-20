@@ -10,6 +10,15 @@
 					<input type="hidden" name="{{ _csrfParam }}" value="{{ _csrfToken }}">
 					<input type="submit" value="List all users">
 				</form>
+				<p>Or</p>
+			</div>
+			<div class="simple-form">
+				<form action="/admin/users/list" method="post">
+					<label for="input_pattern">Display name (% for wildcard):</label>
+					<input type="text" id="input_pattern" name="pattern">
+					<input type="hidden" name="{{ _csrfParam }}" value="{{ _csrfToken }}">
+					<input type="submit" value="Search by username">
+				</form>
 			</div>
 		</div>
 	</div>

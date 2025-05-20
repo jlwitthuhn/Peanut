@@ -104,4 +104,10 @@ public class UserDAO
 		}
 		return results.getFirst();
 	}
+
+	public List<UserRow> selectRowsByDisplayNameLike(String pattern)
+	{
+		final String SQL = "SELECT id, display_name, email, password, _created, _updated FROM users WHERE display_name LIKE ?";
+		return jdbcTemplate.query(SQL, new UserRowMapper(), pattern);
+	}
 }

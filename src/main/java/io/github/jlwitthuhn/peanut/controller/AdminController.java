@@ -11,6 +11,7 @@ import io.github.jlwitthuhn.peanut.db.MetaDAO;
 import io.github.jlwitthuhn.peanut.db.UserDAO;
 import io.github.jlwitthuhn.peanut.model.db.UserRow;
 import io.github.jlwitthuhn.peanut.model.form.AdminDebugCreateUsersForm;
+import io.github.jlwitthuhn.peanut.model.form.AdminUsersSearchByNamePatternForm;
 import io.github.jlwitthuhn.peanut.service.AdminService;
 import io.github.jlwitthuhn.peanut.util.TimeUtil;
 import io.github.jlwitthuhn.peanut.util.Tuple2;
@@ -131,9 +132,18 @@ public class AdminController
 	}
 
 	@PostMapping("/users/list")
-	ModelAndView usersList(Map<String, Object> model)
+	ModelAndView usersList(Map<String, Object> model, @ModelAttribute AdminUsersSearchByNamePatternForm form)
 	{
-		List<UserRow> userRows = userDAO.selectAll();
+		boolean useSearch = form != null && form.getPattern() != null && !form.getPattern().isEmpty();
+		List<UserRow> userRows = null;
+		if (useSearch)
+		{
+			userRows = userDAO.selectRowsByDisplayNameLike(form.getPattern());
+		}
+		else
+		{
+			userRows = userDAO.selectAll();
+		}
 		List<Map<String, String>> users = new ArrayList<>();
 		for (UserRow userRow : userRows)
 		{

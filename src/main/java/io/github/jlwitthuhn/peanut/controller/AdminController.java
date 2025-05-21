@@ -6,9 +6,11 @@ package io.github.jlwitthuhn.peanut.controller;
 
 import io.github.jlwitthuhn.peanut.cfg.ConfigKeyNames;
 import io.github.jlwitthuhn.peanut.cfg.PeanutGlobals;
+import io.github.jlwitthuhn.peanut.db.AuthorityDAO;
 import io.github.jlwitthuhn.peanut.db.ConfigDAO;
 import io.github.jlwitthuhn.peanut.db.MetaDAO;
 import io.github.jlwitthuhn.peanut.db.UserDAO;
+import io.github.jlwitthuhn.peanut.model.db.AuthorityRow;
 import io.github.jlwitthuhn.peanut.model.db.UserRow;
 import io.github.jlwitthuhn.peanut.model.form.AdminDebugCreateUsersForm;
 import io.github.jlwitthuhn.peanut.model.form.AdminUsersSearchByNamePatternForm;
@@ -45,6 +47,7 @@ public class AdminController
 {
 	private final AdminService adminService;
 
+	private final AuthorityDAO authorityDAO;
 	private final ConfigDAO configDAO;
 	private final MetaDAO metaDAO;
 	private final UserDAO userDAO;
@@ -123,6 +126,33 @@ public class AdminController
 		return new ModelAndView("admin/groups.html");
 	}
 
+	@GetMapping("/groups/list")
+	ModelAndView groupsListGet()
+	{
+		RedirectView view = new RedirectView("/admin/groups");
+		view.setStatusCode(HttpStatus.SEE_OTHER);
+		return new ModelAndView(view);
+	}
+
+	@GetMapping("/groups/list/all")
+	ModelAndView groupsListPost(Map<String, Object> model)
+	{
+		List<AuthorityRow> authorityRows = authorityDAO.selectAll();
+		List<Map<String, String>> groups = new ArrayList<>();
+		for (AuthorityRow authorityRow : authorityRows)
+		{
+			String createdTimestamp = TimeUtil.formatOffsetDateTime(authorityRow.getCreated());
+			Map<String, String> thisGroup = new HashMap<>();
+			thisGroup.put("id", String.valueOf(authorityRow.getId()));
+			thisGroup.put("name", authorityRow.getName());
+			thisGroup.put("system_owned", String.valueOf(authorityRow.getSystemOwned()));
+			thisGroup.put("created", createdTimestamp);
+			groups.add(thisGroup);
+		}
+		model.put("groups", groups);
+		return new ModelAndView("admin/groups_list.html", model);
+	}
+
 	@GetMapping("/users")
 	ModelAndView usersIndex()
 	{
@@ -138,10 +168,10 @@ public class AdminController
 	}
 
 	@PostMapping("/users/list")
-	ModelAndView usersList(Map<String, Object> model, @ModelAttribute AdminUsersSearchByNamePatternForm form)
+	ModelAndView usersListPost(Map<String, Object> model, @ModelAttribute AdminUsersSearchByNamePatternForm form)
 	{
 		boolean useSearch = form != null && form.getPattern() != null && !form.getPattern().isEmpty();
-		List<UserRow> userRows = null;
+		List<UserRow> userRows;
 		if (useSearch)
 		{
 			userRows = userDAO.selectRowsByDisplayNameLike(form.getPattern());

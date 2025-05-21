@@ -6,6 +6,8 @@ package io.github.jlwitthuhn.peanut.db;
 
 import io.github.jlwitthuhn.peanut.err.AuthorityNotFoundException;
 import io.github.jlwitthuhn.peanut.err.DBCreationDependencyNotSatisfiedException;
+import io.github.jlwitthuhn.peanut.model.db.AuthorityRow;
+import io.github.jlwitthuhn.peanut.model.db.AuthorityRowMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -91,6 +93,12 @@ public class AuthorityDAO
 			throw new AuthorityNotFoundException("Could not find authorities: " + remainingNames.toString());
 		}
 		return ids;
+	}
+
+	public List<AuthorityRow> selectAll()
+	{
+		final String SQL = "SELECT id, name, system_owned, _created, _updated FROM authorities ORDER BY id";
+		return jdbcTemplate.query(SQL, new AuthorityRowMapper());
 	}
 
 	public void insertRow(String name, boolean systemOwned)

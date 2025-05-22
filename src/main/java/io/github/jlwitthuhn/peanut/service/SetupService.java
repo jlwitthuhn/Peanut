@@ -16,14 +16,13 @@ import io.github.jlwitthuhn.peanut.security.PeanutUserService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -61,10 +60,10 @@ public class SetupService
 		logger.info("Initializing admin user...");
 
 		String hashedPassword = passwordEncoder.encode(plainPassword);
-		ArrayList<GrantedAuthority> groups = new ArrayList<GrantedAuthority>();
-		groups.add(new SimpleGrantedAuthority("TURBO_ADMIN"));
-		groups.add(new SimpleGrantedAuthority("ADMIN"));
-		groups.add(new SimpleGrantedAuthority("USER"));
+		List<String> groups = new ArrayList<>();
+		groups.add("TURBO_ADMIN");
+		groups.add("ADMIN");
+		groups.add("USER");
 		PeanutUserDetails userDetails = new PeanutUserDetails(username, email, hashedPassword, groups);
 		peanutUserService.createUser(userDetails);
 	}

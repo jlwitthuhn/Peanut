@@ -12,8 +12,6 @@ import io.github.jlwitthuhn.peanut.util.AuthorizationUtil;
 import io.github.jlwitthuhn.peanut.util.ViewShortcuts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +22,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequestMapping("/register")
@@ -60,8 +59,8 @@ public class RegisterController
 			return ViewShortcuts.simpleMessage("Error", "Form is invalid.", HttpStatus.BAD_REQUEST);
 		}
 
-		ArrayList<GrantedAuthority> groups = new ArrayList<>();
-		groups.add(new SimpleGrantedAuthority("USER"));
+		List<String> groups = new ArrayList<>();
+		groups.add("USER");
 		PeanutUserDetails newUser = new PeanutUserDetails(form.getUsername(), form.getEmail(), passwordEncoder.encode(form.getPassword()), groups);
 		try
 		{

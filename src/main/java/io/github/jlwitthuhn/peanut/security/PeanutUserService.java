@@ -13,15 +13,14 @@ import io.github.jlwitthuhn.peanut.err.UserDetailsConflictException;
 import io.github.jlwitthuhn.peanut.model.db.UserRow;
 import io.github.jlwitthuhn.peanut.model.spring.PeanutUserDetails;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -60,7 +59,7 @@ public class PeanutUserService implements UserDetailsManager
 		UserRow newRow = userDAO.selectRowByDisplayName(peanutUserDetails.getUsername());
 		try
 		{
-			addRolesToUser(newRow.getId(), user.getAuthorities());
+			addRolesToUser(newRow.getId(), peanutUserDetails.getGroups());
 		}
 		catch (GroupNotFoundException e)
 		{
@@ -101,18 +100,13 @@ public class PeanutUserService implements UserDetailsManager
 		{
 			throw new UsernameNotFoundException(username);
 		}
-		ArrayList<GrantedAuthority> groups = multiTableDAO.getGroupsByUserId(row.getId());
+		List<String> groups = multiTableDAO.getGroupsByUserId(row.getId());
 		return new PeanutUserDetails(row, groups);
 	}
 
-	private void addRolesToUser(long userId, Collection<? extends GrantedAuthority> groups) throws GroupNotFoundException
+	private void addRolesToUser(long userId, List<String> groups) throws GroupNotFoundException
 	{
-		ArrayList<String> authorityStrings = new ArrayList<>();
-		for (GrantedAuthority authority : groups)
-		{
-			authorityStrings.add(authority.getAuthority());
-		}
-		Collection<Long> authorityIds = groupDAO.getIdsFromNames(authorityStrings);
+		Collection<Long> authorityIds = groupDAO.getIdsFromNames(groups);
 		groupMembershipDAO.insertGroupsForUser(userId, authorityIds);
 	}
 }

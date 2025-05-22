@@ -6,8 +6,6 @@ package io.github.jlwitthuhn.peanut.db;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -20,7 +18,7 @@ public class MultiTableDAO
 {
 	private final JdbcTemplate jdbcTemplate;
 
-	public ArrayList<GrantedAuthority> getGroupsByUserId(long userId)
+	public List<String> getGroupsByUserId(long userId)
 	{
 		final String sql = """
 			SELECT
@@ -32,14 +30,14 @@ public class MultiTableDAO
 				group_membership.user_id = ?;
 			""";
 		List<Map<String, Object>> result = jdbcTemplate.queryForList(sql, userId);
-		ArrayList<GrantedAuthority> groups = new ArrayList<>();
+		ArrayList<String> groups = new ArrayList<>();
 		for (Map<String, Object> row : result)
 		{
 			if (row.containsKey("name"))
 			{
 				if (row.get("name") instanceof String nameString)
 				{
-					groups.add(new SimpleGrantedAuthority(nameString));
+					groups.add(nameString);
 				}
 			}
 		}

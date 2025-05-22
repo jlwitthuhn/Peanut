@@ -13,9 +13,9 @@ import java.util.Collection;
 
 @Component
 @RequiredArgsConstructor
-public class UserAuthorityDAO
+public class GroupMembershipDAO
 {
-	public static final String TABLE_NAME = "user_authorities";
+	public static final String TABLE_NAME = "group_membership";
 
 	private final JdbcTemplate jdbcTemplate;
 	private final MetaDAO metaDAO;
@@ -26,50 +26,50 @@ public class UserAuthorityDAO
 		{
 			throw new DBCreationDependencyNotSatisfiedException("Table '" + TABLE_NAME + "' cannot be created because it already exists");
 		}
-		if (!metaDAO.doesTableExist(AuthorityDAO.TABLE_NAME))
+		if (!metaDAO.doesTableExist(GroupDAO.TABLE_NAME))
 		{
-			throw new DBCreationDependencyNotSatisfiedException("Table 'user_authorities' requires that table 'authorities' exists");
+			throw new DBCreationDependencyNotSatisfiedException("Table '" + TABLE_NAME + "' requires that table '" + GroupDAO.TABLE_NAME + "' exists");
 		}
 		if (!metaDAO.doesTableExist(UserDAO.TABLE_NAME))
 		{
-			throw new DBCreationDependencyNotSatisfiedException("Table 'user_authorities' requires that table 'users' exists");
+			throw new DBCreationDependencyNotSatisfiedException("Table '" + TABLE_NAME + "' requires that table '" + UserDAO.TABLE_NAME + "' exists");
 		}
 		final String SQL_TABLE = """
-			CREATE TABLE user_authorities (
+			CREATE TABLE group_membership (
 			    user_id BIGINT REFERENCES users(id),
-			    authority_id BIGINT REFERENCES authorities(id),
+			    group_id BIGINT REFERENCES groups(id),
 			    _created TIMESTAMP WITH TIME ZONE NOT NULL,
 			    _updated TIMESTAMP WITH TIME ZONE NOT NULL,
-			    PRIMARY KEY (user_id, authority_id)
+			    PRIMARY KEY (user_id, group_id)
 			);
 			""";
 		jdbcTemplate.execute(SQL_TABLE);
 		final String SQL_TRIGGER_BEFORE_INSERT = """
 			CREATE TRIGGER
-				user_authorities_trigger_created_updated_before_insert
+				group_membership_trigger_created_updated_before_insert
 			BEFORE INSERT ON
-				user_authorities
+				group_membership
 			FOR EACH ROW EXECUTE FUNCTION
 				fn_created_updated_before_insert();
 			""";
 		jdbcTemplate.execute(SQL_TRIGGER_BEFORE_INSERT);
 		final String SQL_TRIGGER_BEFORE_UPDATE = """
 			CREATE TRIGGER
-				user_authorities_trigger_created_updated_before_update
+				group_membership_trigger_created_updated_before_update
 			BEFORE UPDATE ON
-				user_authorities
+				group_membership
 			FOR EACH ROW EXECUTE FUNCTION
 				fn_created_updated_before_update();
 			""";
 		jdbcTemplate.execute(SQL_TRIGGER_BEFORE_UPDATE);
 	}
 
-	public void insertAuthoritiesForUser(long userId, Collection<Long> authorityIds)
+	public void insertGroupsForUser(long userId, Collection<Long> groupIds)
 	{
-		final String SQL = "INSERT INTO user_authorities (user_id, authority_id) VALUES (?, ?)";
-		for (long authorityId : authorityIds)
+		final String SQL = "INSERT INTO group_membership (user_id, group_id) VALUES (?, ?)";
+		for (long groupId : groupIds)
 		{
-			jdbcTemplate.update(SQL, userId, authorityId);
+			jdbcTemplate.update(SQL, userId, groupId);
 		}
 	}
 }

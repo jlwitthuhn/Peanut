@@ -4,9 +4,9 @@
 
 package io.github.jlwitthuhn.peanut.err;
 
-public class AuthorityNotFoundException extends Exception
+public class GroupNotFoundException extends Exception
 {
-	public AuthorityNotFoundException(String message)
+	public GroupNotFoundException(String message)
 	{
 		super(message);
 	}

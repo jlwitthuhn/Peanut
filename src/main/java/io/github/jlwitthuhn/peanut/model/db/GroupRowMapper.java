@@ -10,10 +10,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
 
-public class AuthorityRowMapper implements RowMapper<AuthorityRow>
+public class GroupRowMapper implements RowMapper<GroupRow>
 {
 	@Override
-	public AuthorityRow mapRow(ResultSet rs, int rowNum) throws SQLException
+	public GroupRow mapRow(ResultSet rs, int rowNum) throws SQLException
 	{
 		long id = rs.getLong("id");
 		String displayName = rs.getString("name");
@@ -21,6 +21,6 @@ public class AuthorityRowMapper implements RowMapper<AuthorityRow>
 		boolean systemOwned = rs.getBoolean("system_owned");
 		OffsetDateTime created = rs.getObject("_created", OffsetDateTime.class);
 		OffsetDateTime updated = rs.getObject("_updated", OffsetDateTime.class);
-		return new AuthorityRow(id, displayName, description, systemOwned, created, updated);
+		return new GroupRow(id, displayName, description, systemOwned, created, updated);
 	}
 }

@@ -20,29 +20,29 @@ public class MultiTableDAO
 {
 	private final JdbcTemplate jdbcTemplate;
 
-	public ArrayList<GrantedAuthority> getAuthoritiesByUserId(long userId)
+	public ArrayList<GrantedAuthority> getGroupsByUserId(long userId)
 	{
 		final String sql = """
 			SELECT
-				authorities.name AS name
+				groups.name AS name
 			FROM
-				user_authorities INNER JOIN authorities
-				ON user_authorities.authority_id = authorities.id
+				group_membership INNER JOIN groups
+				ON group_membership.group_id = groups.id
 			WHERE
-				user_authorities.user_id = ?;
+				group_membership.user_id = ?;
 			""";
 		List<Map<String, Object>> result = jdbcTemplate.queryForList(sql, userId);
-		ArrayList<GrantedAuthority> authorities = new ArrayList<>();
+		ArrayList<GrantedAuthority> groups = new ArrayList<>();
 		for (Map<String, Object> row : result)
 		{
 			if (row.containsKey("name"))
 			{
 				if (row.get("name") instanceof String nameString)
 				{
-					authorities.add(new SimpleGrantedAuthority(nameString));
+					groups.add(new SimpleGrantedAuthority(nameString));
 				}
 			}
 		}
-		return authorities;
+		return groups;
 	}
 }

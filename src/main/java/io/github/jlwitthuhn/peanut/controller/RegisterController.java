@@ -60,9 +60,9 @@ public class RegisterController
 			return ViewShortcuts.simpleMessage("Error", "Form is invalid.", HttpStatus.BAD_REQUEST);
 		}
 
-		ArrayList<GrantedAuthority> authorities = new ArrayList<>();
-		authorities.add(new SimpleGrantedAuthority("USER"));
-		PeanutUserDetails newUser = new PeanutUserDetails(form.getUsername(), form.getEmail(), passwordEncoder.encode(form.getPassword()), authorities);
+		ArrayList<GrantedAuthority> groups = new ArrayList<>();
+		groups.add(new SimpleGrantedAuthority("USER"));
+		PeanutUserDetails newUser = new PeanutUserDetails(form.getUsername(), form.getEmail(), passwordEncoder.encode(form.getPassword()), groups);
 		try
 		{
 			userService.createUser(newUser);

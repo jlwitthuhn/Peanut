@@ -6,11 +6,11 @@ package io.github.jlwitthuhn.peanut.controller;
 
 import io.github.jlwitthuhn.peanut.cfg.ConfigKeyNames;
 import io.github.jlwitthuhn.peanut.cfg.PeanutGlobals;
-import io.github.jlwitthuhn.peanut.db.AuthorityDAO;
 import io.github.jlwitthuhn.peanut.db.ConfigDAO;
+import io.github.jlwitthuhn.peanut.db.GroupDAO;
 import io.github.jlwitthuhn.peanut.db.MetaDAO;
 import io.github.jlwitthuhn.peanut.db.UserDAO;
-import io.github.jlwitthuhn.peanut.model.db.AuthorityRow;
+import io.github.jlwitthuhn.peanut.model.db.GroupRow;
 import io.github.jlwitthuhn.peanut.model.db.UserRow;
 import io.github.jlwitthuhn.peanut.model.form.AdminDebugCreateUsersForm;
 import io.github.jlwitthuhn.peanut.model.form.AdminUsersSearchByNamePatternForm;
@@ -50,8 +50,8 @@ public class AdminController
 {
 	private final AdminService adminService;
 
-	private final AuthorityDAO authorityDAO;
 	private final ConfigDAO configDAO;
+	private final GroupDAO groupDAO;
 	private final MetaDAO metaDAO;
 	private final UserDAO userDAO;
 
@@ -140,16 +140,16 @@ public class AdminController
 	@GetMapping("/groups/list/all")
 	ModelAndView groupsListPost(Map<String, Object> model)
 	{
-		List<AuthorityRow> authorityRows = authorityDAO.selectAll();
+		List<GroupRow> groupRows = groupDAO.selectAll();
 		List<Map<String, String>> groups = new ArrayList<>();
-		for (AuthorityRow authorityRow : authorityRows)
+		for (GroupRow groupRow : groupRows)
 		{
-			String createdTimestamp = TimeUtil.formatOffsetDateTime(authorityRow.getCreated());
+			String createdTimestamp = TimeUtil.formatOffsetDateTime(groupRow.getCreated());
 			Map<String, String> thisGroup = new HashMap<>();
-			thisGroup.put("id", String.valueOf(authorityRow.getId()));
-			thisGroup.put("name", authorityRow.getName());
-			thisGroup.put("description", authorityRow.getDescription());
-			thisGroup.put("system_owned", String.valueOf(authorityRow.getSystemOwned()));
+			thisGroup.put("id", String.valueOf(groupRow.getId()));
+			thisGroup.put("name", groupRow.getName());
+			thisGroup.put("description", groupRow.getDescription());
+			thisGroup.put("system_owned", String.valueOf(groupRow.getSystemOwned()));
 			thisGroup.put("created", createdTimestamp);
 			groups.add(thisGroup);
 		}

@@ -5,10 +5,10 @@
 package io.github.jlwitthuhn.peanut.service;
 
 import io.github.jlwitthuhn.peanut.cfg.ConfigKeyNames;
-import io.github.jlwitthuhn.peanut.db.AuthorityDAO;
 import io.github.jlwitthuhn.peanut.db.ConfigDAO;
+import io.github.jlwitthuhn.peanut.db.GroupDAO;
+import io.github.jlwitthuhn.peanut.db.GroupMembershipDAO;
 import io.github.jlwitthuhn.peanut.db.MetaDAO;
-import io.github.jlwitthuhn.peanut.db.UserAuthorityDAO;
 import io.github.jlwitthuhn.peanut.db.UserDAO;
 import io.github.jlwitthuhn.peanut.err.DBCreationDependencyNotSatisfiedException;
 import io.github.jlwitthuhn.peanut.model.spring.PeanutUserDetails;
@@ -32,11 +32,11 @@ public class SetupService
 	private final PasswordEncoder passwordEncoder;
 	private final PeanutUserService peanutUserService;
 
-	private final AuthorityDAO authorityDAO;
 	private final ConfigDAO configDAO;
+	private final GroupDAO groupDAO;
 	private final MetaDAO metaDAO;
 	private final UserDAO userDAO;
-	private final UserAuthorityDAO userAuthorityDAO;
+	private final GroupMembershipDAO groupMembershipDAO;
 
 	private static final Logger logger = LoggerFactory.getLogger(SetupService.class);
 
@@ -51,7 +51,7 @@ public class SetupService
 		logger.info("Initializing database...");
 
 		initDatabaseObjects();
-		initAuthorities();
+		initGroups();
 		initConfig();
 		initAdminUser(adminName, plainAdminPassword, adminEmail);
 	}
@@ -61,21 +61,21 @@ public class SetupService
 		logger.info("Initializing admin user...");
 
 		String hashedPassword = passwordEncoder.encode(plainPassword);
-		ArrayList<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-		authorities.add(new SimpleGrantedAuthority("TURBO_ADMIN"));
-		authorities.add(new SimpleGrantedAuthority("ADMIN"));
-		authorities.add(new SimpleGrantedAuthority("USER"));
-		PeanutUserDetails userDetails = new PeanutUserDetails(username, email, hashedPassword, authorities);
+		ArrayList<GrantedAuthority> groups = new ArrayList<GrantedAuthority>();
+		groups.add(new SimpleGrantedAuthority("TURBO_ADMIN"));
+		groups.add(new SimpleGrantedAuthority("ADMIN"));
+		groups.add(new SimpleGrantedAuthority("USER"));
+		PeanutUserDetails userDetails = new PeanutUserDetails(username, email, hashedPassword, groups);
 		peanutUserService.createUser(userDetails);
 	}
 
-	private void initAuthorities()
+	private void initGroups()
 	{
-		logger.info("Initializing authorities...");
+		logger.info("Initializing groups...");
 
-		authorityDAO.insertRow("TURBO_ADMIN", "Full control over everything, access cannot be limited.", true);
-		authorityDAO.insertRow("ADMIN", "Full control over everything by default, access can be limited with permissions.", true);
-		authorityDAO.insertRow("USER", "Standard role given to all users. This carries no special permissions.", true);
+		groupDAO.insertRow("TURBO_ADMIN", "Full control over everything, access cannot be limited.", true);
+		groupDAO.insertRow("ADMIN", "Full control over everything by default, access can be limited with permissions.", true);
+		groupDAO.insertRow("USER", "Standard role given to all users. This carries no special permissions.", true);
 	}
 
 	private void initConfig()
@@ -89,9 +89,9 @@ public class SetupService
 	{
 		logger.info("Initializing database objects...");
 		metaDAO.createDatabaseObjects();
-		authorityDAO.createDatabaseObjects();
+		groupDAO.createDatabaseObjects();
 		configDAO.createDatabaseObjects();
 		userDAO.createDatabaseObjects();
-		userAuthorityDAO.createDatabaseObjects();
+		groupMembershipDAO.createDatabaseObjects();
 	}
 }

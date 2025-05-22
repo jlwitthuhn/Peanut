@@ -9,7 +9,7 @@ import lombok.Data;
 import java.time.OffsetDateTime;
 
 @Data
-public class AuthorityRow
+public class GroupRow
 {
 	private final long id;
 	private final String name;

@@ -4,11 +4,11 @@
 
 package io.github.jlwitthuhn.peanut.security;
 
-import io.github.jlwitthuhn.peanut.db.AuthorityDAO;
+import io.github.jlwitthuhn.peanut.db.GroupDAO;
+import io.github.jlwitthuhn.peanut.db.GroupMembershipDAO;
 import io.github.jlwitthuhn.peanut.db.MultiTableDAO;
-import io.github.jlwitthuhn.peanut.db.UserAuthorityDAO;
 import io.github.jlwitthuhn.peanut.db.UserDAO;
-import io.github.jlwitthuhn.peanut.err.AuthorityNotFoundException;
+import io.github.jlwitthuhn.peanut.err.GroupNotFoundException;
 import io.github.jlwitthuhn.peanut.err.UserDetailsConflictException;
 import io.github.jlwitthuhn.peanut.model.db.UserRow;
 import io.github.jlwitthuhn.peanut.model.spring.PeanutUserDetails;
@@ -27,10 +27,10 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class PeanutUserService implements UserDetailsManager
 {
-	private final AuthorityDAO authorityDAO;
+	private final GroupDAO groupDAO;
 	private final MultiTableDAO multiTableDAO;
 	private final UserDAO userDAO;
-	private final UserAuthorityDAO userAuthorityDAO;
+	private final GroupMembershipDAO groupMembershipDAO;
 
 	@Override
 	@Transactional
@@ -62,7 +62,7 @@ public class PeanutUserService implements UserDetailsManager
 		{
 			addRolesToUser(newRow.getId(), user.getAuthorities());
 		}
-		catch (AuthorityNotFoundException e)
+		catch (GroupNotFoundException e)
 		{
 			throw new RuntimeException(e);
 		}
@@ -101,18 +101,18 @@ public class PeanutUserService implements UserDetailsManager
 		{
 			throw new UsernameNotFoundException(username);
 		}
-		ArrayList<GrantedAuthority> authorities = multiTableDAO.getAuthoritiesByUserId(row.getId());
-		return new PeanutUserDetails(row, authorities);
+		ArrayList<GrantedAuthority> groups = multiTableDAO.getGroupsByUserId(row.getId());
+		return new PeanutUserDetails(row, groups);
 	}
 
-	private void addRolesToUser(long userId, Collection<? extends GrantedAuthority> authorities) throws AuthorityNotFoundException
+	private void addRolesToUser(long userId, Collection<? extends GrantedAuthority> groups) throws GroupNotFoundException
 	{
 		ArrayList<String> authorityStrings = new ArrayList<>();
-		for (GrantedAuthority authority : authorities)
+		for (GrantedAuthority authority : groups)
 		{
 			authorityStrings.add(authority.getAuthority());
 		}
-		Collection<Long> authorityIds = authorityDAO.getIdsFromNames(authorityStrings);
-		userAuthorityDAO.insertAuthoritiesForUser(userId, authorityIds);
+		Collection<Long> authorityIds = groupDAO.getIdsFromNames(authorityStrings);
+		groupMembershipDAO.insertGroupsForUser(userId, authorityIds);
 	}
 }

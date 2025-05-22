@@ -4,10 +4,10 @@
 
 package io.github.jlwitthuhn.peanut.db;
 
-import io.github.jlwitthuhn.peanut.err.AuthorityNotFoundException;
 import io.github.jlwitthuhn.peanut.err.DBCreationDependencyNotSatisfiedException;
-import io.github.jlwitthuhn.peanut.model.db.AuthorityRow;
-import io.github.jlwitthuhn.peanut.model.db.AuthorityRowMapper;
+import io.github.jlwitthuhn.peanut.err.GroupNotFoundException;
+import io.github.jlwitthuhn.peanut.model.db.GroupRow;
+import io.github.jlwitthuhn.peanut.model.db.GroupRowMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -21,9 +21,9 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class AuthorityDAO
+public class GroupDAO
 {
-	public static final String TABLE_NAME = "authorities";
+	public static final String TABLE_NAME = "groups";
 
 	private final JdbcTemplate jdbcTemplate;
 	private final MetaDAO metaDAO;
@@ -35,7 +35,7 @@ public class AuthorityDAO
 			throw new DBCreationDependencyNotSatisfiedException("Table '" + TABLE_NAME + "' cannot be created because it already exists");
 		}
 		final String SQL_TABLE = """
-			CREATE TABLE authorities (
+			CREATE TABLE groups (
 			    id BIGSERIAL PRIMARY KEY,
 			    name VARCHAR(127) UNIQUE NOT NULL,
 			    description VARCHAR(255) NOT NULL,
@@ -47,28 +47,28 @@ public class AuthorityDAO
 		jdbcTemplate.execute(SQL_TABLE);
 		final String SQL_TRIGGER_BEFORE_INSERT = """
 			CREATE TRIGGER
-				authorities_trigger_created_updated_before_insert
+				groups_trigger_created_updated_before_insert
 			BEFORE INSERT ON
-				authorities
+				groups
 			FOR EACH ROW EXECUTE FUNCTION
 				fn_created_updated_before_insert();
 			""";
 		jdbcTemplate.execute(SQL_TRIGGER_BEFORE_INSERT);
 		final String SQL_TRIGGER_BEFORE_UPDATE = """
 			CREATE TRIGGER
-				authorities_trigger_created_updated_before_update
+				groups_trigger_created_updated_before_update
 			BEFORE UPDATE ON
-				authorities
+				groups
 			FOR EACH ROW EXECUTE FUNCTION
 				fn_created_updated_before_update();
 			""";
 		jdbcTemplate.execute(SQL_TRIGGER_BEFORE_UPDATE);
 	}
 
-	public Collection<Long> getIdsFromNames(Collection<String> names) throws AuthorityNotFoundException
+	public Collection<Long> getIdsFromNames(Collection<String> names) throws GroupNotFoundException
 	{
 		final String namesQuestions = String.join(",", Collections.nCopies(names.size(), "?"));
-		final String SQL = "SELECT id, name FROM authorities WHERE name IN (" + namesQuestions + ")";
+		final String SQL = "SELECT id, name FROM groups WHERE name IN (" + namesQuestions + ")";
 		List<Map<String, Object>> result = jdbcTemplate.queryForList(SQL, names.toArray());
 		HashSet<String> remainingNames = new HashSet<>(names);
 		ArrayList<Long> ids = new ArrayList<Long>();
@@ -81,7 +81,7 @@ public class AuthorityDAO
 				String rowName = (String) row.get("name");
 				if (!remainingNames.contains(rowName))
 				{
-					throw new RuntimeException("Found an authority name that was not requested");
+					throw new RuntimeException("Found a group name that was not requested");
 				}
 				remainingNames.remove(rowName);
 
@@ -91,20 +91,20 @@ public class AuthorityDAO
 		}
 		if (!remainingNames.isEmpty())
 		{
-			throw new AuthorityNotFoundException("Could not find authorities: " + remainingNames.toString());
+			throw new GroupNotFoundException("Could not find groups: " + remainingNames.toString());
 		}
 		return ids;
 	}
 
-	public List<AuthorityRow> selectAll()
+	public List<GroupRow> selectAll()
 	{
-		final String SQL = "SELECT id, name, description, system_owned, _created, _updated FROM authorities ORDER BY id";
-		return jdbcTemplate.query(SQL, new AuthorityRowMapper());
+		final String SQL = "SELECT id, name, description, system_owned, _created, _updated FROM groups ORDER BY id";
+		return jdbcTemplate.query(SQL, new GroupRowMapper());
 	}
 
 	public void insertRow(String name, String description, boolean systemOwned)
 	{
-		final String SQL = "INSERT INTO authorities (name, description, system_owned) VALUES (?, ?, ?)";
+		final String SQL = "INSERT INTO groups(name, description, system_owned) VALUES (?, ?, ?)";
 		jdbcTemplate.update(SQL, name, description, systemOwned);
 	}
 }

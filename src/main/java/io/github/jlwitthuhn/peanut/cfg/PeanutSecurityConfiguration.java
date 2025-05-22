@@ -16,6 +16,8 @@ import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
+import org.springframework.security.web.firewall.HttpFirewall;
+import org.springframework.security.web.firewall.StrictHttpFirewall;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 
 import java.util.HashMap;
@@ -72,6 +74,15 @@ public class PeanutSecurityConfiguration
 		);
 
 		return http.build();
+	}
+
+	@Bean
+	public HttpFirewall httpFirewall()
+	{
+		StrictHttpFirewall httpFirewall = new StrictHttpFirewall();
+		httpFirewall.setAllowUrlEncodedPercent(true);
+		httpFirewall.setAllowUrlEncodedSlash(true);
+		return httpFirewall;
 	}
 
 	@Bean

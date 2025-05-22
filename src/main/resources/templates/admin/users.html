@@ -5,14 +5,10 @@
 	<div class="simple-panel">
 		<div class="simple-panel-header"><h1>List Users</h1></div>
 		<div class="simple-panel-content">
+			<p><a href="/admin/users/list/all">List all users</a></p>
 			<div class="simple-form">
-				<form action="/admin/users/list" method="post">
-					<input type="hidden" name="{{ _csrfParam }}" value="{{ _csrfToken }}">
-					<input type="submit" value="List all users">
-				</form>
 				<p>Or</p>
-			</div>
-			<div class="simple-form">
+				<br>
 				<form action="/admin/users/list" method="post">
 					<label for="input_pattern">Display name (% for wildcard):</label>
 					<input type="text" id="input_pattern" name="pattern">

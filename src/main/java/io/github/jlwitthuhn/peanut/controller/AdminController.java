@@ -171,16 +171,25 @@ public class AdminController
 	@PostMapping("/users/list")
 	ModelAndView usersListPost(Map<String, Object> model, @ModelAttribute AdminUsersSearchByNamePatternForm form)
 	{
-		boolean useSearch = form != null && form.getPattern() != null && !form.getPattern().isEmpty();
-		List<UserRow> userRows;
-		if (useSearch)
+		boolean valid = form != null && form.getPattern() != null && !form.getPattern().isEmpty();
+		if (!valid)
 		{
-			userRows = userDAO.selectRowsByDisplayNameLike(form.getPattern());
+			return ViewShortcuts.simpleMessage("Error", "Username pattern is invalid.", HttpStatus.BAD_REQUEST);
 		}
-		else
-		{
-			userRows = userDAO.selectAll();
-		}
+
+		List<UserRow> userRows = userDAO.selectRowsByDisplayNameLike(form.getPattern());
+		return renderUserList(userRows, model);
+	}
+
+	@GetMapping("/users/list/all")
+	ModelAndView usersListAll(Map<String, Object> model)
+	{
+		List<UserRow> userRows = userDAO.selectAll();
+		return renderUserList(userRows, model);
+	}
+
+	private ModelAndView renderUserList(List<UserRow> userRows, Map<String, Object> model)
+	{
 		List<Map<String, String>> users = new ArrayList<>();
 		for (UserRow userRow : userRows)
 		{

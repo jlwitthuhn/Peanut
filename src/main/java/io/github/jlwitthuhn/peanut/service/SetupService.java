@@ -73,9 +73,9 @@ public class SetupService
 	{
 		logger.info("Initializing authorities...");
 
-		authorityDAO.insertRow("ROLE_TURBO_ADMIN", true);
-		authorityDAO.insertRow("ROLE_ADMIN", true);
-		authorityDAO.insertRow("ROLE_USER", true);
+		authorityDAO.insertRow("ROLE_TURBO_ADMIN", "Full control over everything, access cannot be limited.", true);
+		authorityDAO.insertRow("ROLE_ADMIN", "Full control over everything by default, access can be limited with permissions.", true);
+		authorityDAO.insertRow("ROLE_USER", "Standard role given to all users. This carries no special permissions.", true);
 	}
 
 	private void initConfig()

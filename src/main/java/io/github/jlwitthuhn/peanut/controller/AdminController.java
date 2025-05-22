@@ -145,6 +145,7 @@ public class AdminController
 			Map<String, String> thisGroup = new HashMap<>();
 			thisGroup.put("id", String.valueOf(authorityRow.getId()));
 			thisGroup.put("name", authorityRow.getName());
+			thisGroup.put("description", authorityRow.getDescription());
 			thisGroup.put("system_owned", String.valueOf(authorityRow.getSystemOwned()));
 			thisGroup.put("created", createdTimestamp);
 			groups.add(thisGroup);

@@ -38,6 +38,7 @@ public class AuthorityDAO
 			CREATE TABLE authorities (
 			    id BIGSERIAL PRIMARY KEY,
 			    name VARCHAR(127) UNIQUE NOT NULL,
+			    description VARCHAR(255) NOT NULL,
 			    system_owned BOOLEAN NOT NULL,
 			    _created TIMESTAMP WITH TIME ZONE NOT NULL,
 			    _updated TIMESTAMP WITH TIME ZONE NOT NULL
@@ -97,13 +98,13 @@ public class AuthorityDAO
 
 	public List<AuthorityRow> selectAll()
 	{
-		final String SQL = "SELECT id, name, system_owned, _created, _updated FROM authorities ORDER BY id";
+		final String SQL = "SELECT id, name, description, system_owned, _created, _updated FROM authorities ORDER BY id";
 		return jdbcTemplate.query(SQL, new AuthorityRowMapper());
 	}
 
-	public void insertRow(String name, boolean systemOwned)
+	public void insertRow(String name, String description, boolean systemOwned)
 	{
-		final String SQL = "INSERT INTO authorities (name, system_owned) VALUES (?, ?)";
-		jdbcTemplate.update(SQL, name, systemOwned);
+		final String SQL = "INSERT INTO authorities (name, description, system_owned) VALUES (?, ?, ?)";
+		jdbcTemplate.update(SQL, name, description, systemOwned);
 	}
 }

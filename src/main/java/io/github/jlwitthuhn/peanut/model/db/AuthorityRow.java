@@ -13,6 +13,7 @@ public class AuthorityRow
 {
 	private final long id;
 	private final String name;
+	private final String description;
 	private final Boolean systemOwned;
 	private final OffsetDateTime created;
 	private final OffsetDateTime updated;

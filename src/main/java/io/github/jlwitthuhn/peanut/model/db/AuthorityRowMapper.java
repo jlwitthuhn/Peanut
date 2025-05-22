@@ -13,12 +13,14 @@ import java.time.OffsetDateTime;
 public class AuthorityRowMapper implements RowMapper<AuthorityRow>
 {
 	@Override
-	public AuthorityRow mapRow(ResultSet rs, int rowNum) throws SQLException {
+	public AuthorityRow mapRow(ResultSet rs, int rowNum) throws SQLException
+	{
 		long id = rs.getLong("id");
 		String displayName = rs.getString("name");
+		String description = rs.getString("description");
 		boolean systemOwned = rs.getBoolean("system_owned");
 		OffsetDateTime created = rs.getObject("_created", OffsetDateTime.class);
 		OffsetDateTime updated = rs.getObject("_updated", OffsetDateTime.class);
-		return new AuthorityRow(id, displayName, systemOwned, created, updated);
+		return new AuthorityRow(id, displayName, description, systemOwned, created, updated);
 	}
 }

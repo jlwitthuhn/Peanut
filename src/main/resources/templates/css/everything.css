@@ -79,6 +79,19 @@ th, td {
 	padding: 0;
 }
 
+/* Generic */
+.simple-center-50 {
+	align-items: center;
+	margin: auto;
+}
+.simple-column {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+
+	background-color: var(--alt-color);
+}
+
 /* Generic panel */
 .simple-form {
 	display: flex;
@@ -125,7 +138,7 @@ th, td {
 }
 .simple-panel-content {
 	background-color: var(--alt-color);
-	padding: 0.3rem 0.5rem;
+	padding: 0.5rem 0.5rem;
 }
 
 /* Info panel */

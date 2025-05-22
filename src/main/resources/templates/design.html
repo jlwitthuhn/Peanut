@@ -84,6 +84,19 @@
 			padding: 0;
 		}
 
+		/* Generic */
+		.simple-center-50 {
+			align-items: center;
+			margin: auto;
+		}
+		.simple-column {
+			display: flex;
+			flex-direction: column;
+			gap: 0.5rem;
+
+			background-color: var(--alt-color);
+		}
+
 		/* Generic panel */
 		.simple-form {
 			display: flex;
@@ -130,7 +143,7 @@
 		}
 		.simple-panel-content {
 			background-color: var(--alt-color);
-			padding: 0.3rem 0.5rem;
+			padding: 0.5rem 0.5rem;
 		}
 
 		/* Info panel */
@@ -289,7 +302,6 @@
 		.cp-container nav p:last-child {
 			border-bottom: hidden;
 		}
-
 	</style>
 </head>
 <body>
@@ -505,6 +517,15 @@
 				<div class="simple-panel-header"><h1>Another Panel</h1></div>
 				<div class="simple-panel-content cp-NAME">
 					<p>This one has less lines</p>
+				</div>
+			</div>
+			<div class="simple-panel">
+				<div class="simple-panel-header"><h1>Centered Panel</h1></div>
+				<div class="simple-panel-content ">
+					<div class="simple-column simple-center-50">
+						<p>Lines in this one should be centered</p>
+						<p>Ayyyyyyy lmao</p>
+					</div>
 				</div>
 			</div>
 			<div class="simple-panel">

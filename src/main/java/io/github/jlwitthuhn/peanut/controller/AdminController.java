@@ -25,12 +25,15 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.lang.management.ManagementFactory;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -177,14 +180,23 @@ public class AdminController
 			return ViewShortcuts.simpleMessage("Error", "Username pattern is invalid.", HttpStatus.BAD_REQUEST);
 		}
 
-		List<UserRow> userRows = userDAO.selectRowsByDisplayNameLike(form.getPattern());
-		return renderUserList(userRows, model);
+		String encodedPattern = URLEncoder.encode(form.getPattern(), StandardCharsets.UTF_8);
+		RedirectView view = new RedirectView("/admin/users/list/by_name/" + encodedPattern);
+		view.setStatusCode(HttpStatus.SEE_OTHER);
+		return new ModelAndView(view);
 	}
 
 	@GetMapping("/users/list/all")
 	ModelAndView usersListAll(Map<String, Object> model)
 	{
 		List<UserRow> userRows = userDAO.selectAll();
+		return renderUserList(userRows, model);
+	}
+
+	@GetMapping("/users/list/by_name/{pattern}")
+	ModelAndView usersListByName(@PathVariable String pattern, Map<String, Object> model)
+	{
+		List<UserRow> userRows = userDAO.selectRowsByDisplayNameLike(pattern);
 		return renderUserList(userRows, model);
 	}
 

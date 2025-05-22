@@ -10,6 +10,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
@@ -74,6 +75,12 @@ public class PeanutSecurityConfiguration
 		);
 
 		return http.build();
+	}
+
+	@Bean
+	public GrantedAuthorityDefaults grantedAuthorityDefaults() {
+		// This is the role prefix, default is 'ROLE_'
+		return new GrantedAuthorityDefaults("");
 	}
 
 	@Bean

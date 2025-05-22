@@ -44,7 +44,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/admin")
-@Secured({"ROLE_ADMIN"})
+@Secured({"ADMIN"})
 @RequiredArgsConstructor
 public class AdminController
 {

@@ -41,7 +41,7 @@ public class PeanutUserDetails implements UserDetails
 	public PeanutUserDetails(String displayName, String email, String hashedPassword)
 	{
 		ArrayList<GrantedAuthority> authorities = new ArrayList<>();
-		authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+		authorities.add(new SimpleGrantedAuthority("USER"));
 
 		this.id = null;
 		this.displayName = displayName;

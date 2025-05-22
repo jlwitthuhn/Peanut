@@ -61,7 +61,7 @@ public class RegisterController
 		}
 
 		ArrayList<GrantedAuthority> authorities = new ArrayList<>();
-		authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+		authorities.add(new SimpleGrantedAuthority("USER"));
 		PeanutUserDetails newUser = new PeanutUserDetails(form.getUsername(), form.getEmail(), passwordEncoder.encode(form.getPassword()), authorities);
 		try
 		{

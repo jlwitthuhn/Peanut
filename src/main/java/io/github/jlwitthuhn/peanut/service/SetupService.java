@@ -62,9 +62,9 @@ public class SetupService
 
 		String hashedPassword = passwordEncoder.encode(plainPassword);
 		ArrayList<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-		authorities.add(new SimpleGrantedAuthority("ROLE_TURBO_ADMIN"));
-		authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
-		authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+		authorities.add(new SimpleGrantedAuthority("TURBO_ADMIN"));
+		authorities.add(new SimpleGrantedAuthority("ADMIN"));
+		authorities.add(new SimpleGrantedAuthority("USER"));
 		PeanutUserDetails userDetails = new PeanutUserDetails(username, email, hashedPassword, authorities);
 		peanutUserService.createUser(userDetails);
 	}
@@ -73,9 +73,9 @@ public class SetupService
 	{
 		logger.info("Initializing authorities...");
 
-		authorityDAO.insertRow("ROLE_TURBO_ADMIN", "Full control over everything, access cannot be limited.", true);
-		authorityDAO.insertRow("ROLE_ADMIN", "Full control over everything by default, access can be limited with permissions.", true);
-		authorityDAO.insertRow("ROLE_USER", "Standard role given to all users. This carries no special permissions.", true);
+		authorityDAO.insertRow("TURBO_ADMIN", "Full control over everything, access cannot be limited.", true);
+		authorityDAO.insertRow("ADMIN", "Full control over everything by default, access can be limited with permissions.", true);
+		authorityDAO.insertRow("USER", "Standard role given to all users. This carries no special permissions.", true);
 	}
 
 	private void initConfig()

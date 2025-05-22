@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -52,7 +53,7 @@ public class LoggedInUserInterceptor implements HandlerInterceptor
 		boolean isAdmin = false;
 		for (GrantedAuthority authority : auth.getAuthorities())
 		{
-			if (authority.getAuthority().equals("ROLE_ADMIN"))
+			if (authority.getAuthority().equals("ADMIN"))
 			{
 				isAdmin = true;
 				break;

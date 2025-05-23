@@ -54,6 +54,9 @@
 			display: flex;
 			flex-direction: column;
 		}
+		.fullwidth {
+			width: 100%;
+		}
 
 		/* Title */
 		#title-bar {
@@ -85,9 +88,14 @@
 		}
 
 		/* Generic */
-		.simple-center-50 {
-			align-items: center;
-			margin: auto;
+		.simple-center-60 {
+			align-items: stretch;
+			margin-left: 20%;
+			margin-right: 20%;
+		}
+		.simple-center-60  p {
+			margin-left: auto;
+			margin-right: auto;
 		}
 		.simple-column {
 			display: flex;
@@ -95,12 +103,14 @@
 			gap: 0.5rem;
 
 			background-color: var(--alt-color);
+			width: 60%;
 		}
 
 		/* Generic panel */
 		.simple-form {
 			display: flex;
 			flex-direction: column;
+			align-items: stretch;
 
 			background-color: var(--alt-color);
 			padding: 0.3rem 0.5rem;
@@ -522,7 +532,7 @@
 			<div class="simple-panel">
 				<div class="simple-panel-header"><h1>Centered Panel</h1></div>
 				<div class="simple-panel-content ">
-					<div class="simple-column simple-center-50">
+					<div class="simple-column simple-center-60">
 						<p>Lines in this one should be centered</p>
 						<p>Ayyyyyyy lmao</p>
 					</div>

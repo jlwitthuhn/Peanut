@@ -49,6 +49,9 @@ th, td {
 	display: flex;
 	flex-direction: column;
 }
+.fullwidth {
+	width: 100%;
+}
 
 /* Title */
 #title-bar {
@@ -80,9 +83,14 @@ th, td {
 }
 
 /* Generic */
-.simple-center-50 {
-	align-items: center;
-	margin: auto;
+.simple-center-60 {
+	align-items: stretch;
+	margin-left: 20%;
+	margin-right: 20%;
+}
+.simple-center-60  p {
+	margin-left: auto;
+	margin-right: auto;
 }
 .simple-column {
 	display: flex;
@@ -90,12 +98,14 @@ th, td {
 	gap: 0.5rem;
 
 	background-color: var(--alt-color);
+	width: 60%;
 }
 
 /* Generic panel */
 .simple-form {
 	display: flex;
 	flex-direction: column;
+	align-items: stretch;
 
 	background-color: var(--alt-color);
 	padding: 0.3rem 0.5rem;

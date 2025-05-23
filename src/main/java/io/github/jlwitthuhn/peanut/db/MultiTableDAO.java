@@ -4,6 +4,8 @@
 
 package io.github.jlwitthuhn.peanut.db;
 
+import io.github.jlwitthuhn.peanut.model.db.UserRow;
+import io.github.jlwitthuhn.peanut.model.db.UserRowMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -42,5 +44,27 @@ public class MultiTableDAO
 			}
 		}
 		return groups;
+	}
+
+	public List<UserRow> getUsersByGroupName(String groupName)
+	{
+		final String sql = """
+			WITH
+			group_id AS (
+				SELECT id FROM groups WHERE name = ?
+			),
+			user_ids_in_group AS (
+				SELECT user_id FROM group_membership WHERE group_id IN (SELECT * FROM group_id)
+			)
+			SELECT
+				*
+			FROM
+				users
+			WHERE
+				id IN (SELECT * FROM user_ids_in_group)
+			ORDER BY
+			    id
+			""";
+		return jdbcTemplate.query(sql, new UserRowMapper(), groupName);
 	}
 }

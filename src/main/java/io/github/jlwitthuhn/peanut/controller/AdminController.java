@@ -9,10 +9,12 @@ import io.github.jlwitthuhn.peanut.cfg.PeanutGlobals;
 import io.github.jlwitthuhn.peanut.db.ConfigDAO;
 import io.github.jlwitthuhn.peanut.db.GroupDAO;
 import io.github.jlwitthuhn.peanut.db.MetaDAO;
+import io.github.jlwitthuhn.peanut.db.MultiTableDAO;
 import io.github.jlwitthuhn.peanut.db.UserDAO;
 import io.github.jlwitthuhn.peanut.model.db.GroupRow;
 import io.github.jlwitthuhn.peanut.model.db.UserRow;
 import io.github.jlwitthuhn.peanut.model.form.AdminDebugCreateUsersForm;
+import io.github.jlwitthuhn.peanut.model.form.AdminUsersListByGroupForm;
 import io.github.jlwitthuhn.peanut.model.form.AdminUsersSearchByNamePatternForm;
 import io.github.jlwitthuhn.peanut.service.AdminService;
 import io.github.jlwitthuhn.peanut.util.TimeUtil;
@@ -53,6 +55,7 @@ public class AdminController
 	private final ConfigDAO configDAO;
 	private final GroupDAO groupDAO;
 	private final MetaDAO metaDAO;
+	private final MultiTableDAO multiTableDAO;
 	private final UserDAO userDAO;
 
 	@GetMapping("")
@@ -158,9 +161,12 @@ public class AdminController
 	}
 
 	@GetMapping("/users")
-	ModelAndView usersIndex()
+	ModelAndView usersIndex(Map<String, Object> model)
 	{
-		return new ModelAndView("admin/users.html");
+		List<GroupRow> allGroupRows = groupDAO.selectAll();
+		List<String> groups = allGroupRows.stream().map(GroupRow::getName).toList();
+		model.put("groups", groups);
+		return new ModelAndView("admin/users.html", model);
 	}
 
 	@GetMapping("/users/list")
@@ -172,24 +178,46 @@ public class AdminController
 	}
 
 	@PostMapping("/users/list")
-	ModelAndView usersListPost(Map<String, Object> model, @ModelAttribute AdminUsersSearchByNamePatternForm form)
+	ModelAndView usersListPost(
+		@ModelAttribute AdminUsersListByGroupForm listByGroupForm,
+		@ModelAttribute AdminUsersSearchByNamePatternForm listByNameForm
+	)
 	{
-		boolean valid = form != null && form.getPattern() != null && !form.getPattern().isEmpty();
-		if (!valid)
+		boolean listByGroupValid = listByGroupForm != null && listByGroupForm.getGroupName() != null && !listByGroupForm.getGroupName().isEmpty();
+		if (listByGroupValid)
 		{
-			return ViewShortcuts.simpleMessage("Error", "Username pattern is invalid.", HttpStatus.BAD_REQUEST);
+			String encodedPattern = URLEncoder.encode(listByGroupForm.getGroupName(), StandardCharsets.UTF_8);
+			RedirectView view = new RedirectView("/admin/users/list/by_group/" + encodedPattern);
+			view.setStatusCode(HttpStatus.SEE_OTHER);
+			return new ModelAndView(view);
+		}
+		boolean listByNameValid = listByNameForm != null && listByNameForm.getPattern() != null && !listByNameForm.getPattern().isEmpty();
+		if (listByNameValid)
+		{
+			String encodedPattern = URLEncoder.encode(listByNameForm.getPattern(), StandardCharsets.UTF_8);
+			RedirectView view = new RedirectView("/admin/users/list/by_name/" + encodedPattern);
+			view.setStatusCode(HttpStatus.SEE_OTHER);
+			return new ModelAndView(view);
 		}
 
-		String encodedPattern = URLEncoder.encode(form.getPattern(), StandardCharsets.UTF_8);
-		RedirectView view = new RedirectView("/admin/users/list/by_name/" + encodedPattern);
-		view.setStatusCode(HttpStatus.SEE_OTHER);
-		return new ModelAndView(view);
+		return ViewShortcuts.simpleMessage("Error", "Invalid search parameters.", HttpStatus.BAD_REQUEST);
 	}
 
 	@GetMapping("/users/list/all")
 	ModelAndView usersListAll(Map<String, Object> model)
 	{
 		List<UserRow> userRows = userDAO.selectAll();
+		return renderUserList(userRows, model);
+	}
+
+	@GetMapping("/users/list/by_group/{groupName}")
+	ModelAndView usersListByGroup(@PathVariable String groupName, Map<String, Object> model)
+	{
+		if (!groupDAO.doesGroupExist(groupName))
+		{
+			return ViewShortcuts.simpleMessage("Error", "Selected group does not exist.", HttpStatus.BAD_REQUEST);
+		}
+		List<UserRow> userRows = multiTableDAO.getUsersByGroupName(groupName);
 		return renderUserList(userRows, model);
 	}
 

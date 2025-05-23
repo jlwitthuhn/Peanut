@@ -65,6 +65,13 @@ public class GroupDAO
 		jdbcTemplate.execute(SQL_TRIGGER_BEFORE_UPDATE);
 	}
 
+	public boolean doesGroupExist(String groupName)
+	{
+		final String SQL = "SELECT count(*) FROM groups WHERE name = ?";
+		Long count = jdbcTemplate.queryForObject(SQL, Long.class, groupName);
+		return count != null && count > 0;
+	}
+
 	public Collection<Long> getIdsFromNames(Collection<String> names) throws GroupNotFoundException
 	{
 		final String namesQuestions = String.join(",", Collections.nCopies(names.size(), "?"));

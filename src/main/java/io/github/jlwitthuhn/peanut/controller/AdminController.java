@@ -21,6 +21,7 @@ import io.github.jlwitthuhn.peanut.util.TimeUtil;
 import io.github.jlwitthuhn.peanut.util.Tuple2;
 import io.github.jlwitthuhn.peanut.util.ViewShortcuts;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.SpringBootVersion;
 import org.springframework.core.SpringVersion;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
@@ -78,9 +79,10 @@ public class AdminController
 
 		List<Tuple2<String, String>> versionDetails = new ArrayList<>();
 		versionDetails.add(new Tuple2<>("Peanut version", PeanutGlobals.PEANUT_VERSION));
-		versionDetails.add(new Tuple2<>("Host OS", System.getProperty("os.name") + " / " + System.getProperty("os.arch")));
 		versionDetails.add(new Tuple2<>("Java version", System.getProperty("java.version")));
 		versionDetails.add(new Tuple2<>("Java vendor", System.getProperty("java.vendor")));
+		versionDetails.add(new Tuple2<>("Host OS", System.getProperty("os.name") + " / " + System.getProperty("os.arch")));
+		versionDetails.add(new Tuple2<>("Spring Boot version", SpringBootVersion.getVersion()));
 		versionDetails.add(new Tuple2<>("Spring version", SpringVersion.getVersion()));
 		versionDetails.add(new Tuple2<>("Postgres version", metaDAO.getServerVersion()));
 

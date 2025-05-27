@@ -4,16 +4,27 @@
 
 package io.github.jlwitthuhn.peanut.controller;
 
+import io.github.jlwitthuhn.peanut.cfg.ConfigKeyNames;
+import io.github.jlwitthuhn.peanut.db.ConfigDAO;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import java.util.Map;
 
 @Controller
+@RequiredArgsConstructor
 public class RootController
 {
+	private final ConfigDAO configDAO;
+
 	@GetMapping("/")
-	public String index()
+	public ModelAndView index(Map<String, Object> model)
 	{
-		return "index.html";
+		String welcomeMessage = configDAO.getString(ConfigKeyNames.WELCOME_MESSAGE_STR);
+		model.put("welcomeMessage", welcomeMessage);
+		return new ModelAndView("index.html", model);
 	}
 
 	@GetMapping("/design")

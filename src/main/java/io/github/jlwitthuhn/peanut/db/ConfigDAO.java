@@ -96,11 +96,30 @@ public class ConfigDAO
 		return jdbcTemplate.queryForObject(SQL, Long.class, name);
 	}
 
+	public String getString(String name)
+	{
+		final String SQL = "SELECT value FROM config_string WHERE name = ?";
+		return jdbcTemplate.queryForObject(SQL, String.class, name);
+	}
+
 	public void setLong(String name, long value)
 	{
 		final String SQL = """
 			INSERT INTO
 				config_int (name, value)
+			VALUES
+				(?, ?)
+			ON CONFLICT (name)
+				DO UPDATE SET value = EXCLUDED.value;
+			""";
+		jdbcTemplate.update(SQL, name, value);
+	}
+
+	public void setString(String name, String value)
+	{
+		final String SQL = """
+			INSERT INTO
+				config_string (name, value)
 			VALUES
 				(?, ?)
 			ON CONFLICT (name)

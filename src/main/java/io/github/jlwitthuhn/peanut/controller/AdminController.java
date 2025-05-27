@@ -61,7 +61,7 @@ public class AdminController
 	@GetMapping("")
 	ModelAndView adminIndex(Map<String, Object> model)
 	{
-		Long initCount = configDAO.getLong(ConfigKeyNames.INITIALIZED_TIME);
+		Long initCount = configDAO.getLong(ConfigKeyNames.INITIALIZED_TIME_INT);
 		Instant initInstant = Instant.ofEpochSecond(initCount);
 		OffsetDateTime initDateTime = OffsetDateTime.ofInstant(initInstant, ZoneId.of("UTC"));
 		String initTimeStr = TimeUtil.formatOffsetDateTime(initDateTime);

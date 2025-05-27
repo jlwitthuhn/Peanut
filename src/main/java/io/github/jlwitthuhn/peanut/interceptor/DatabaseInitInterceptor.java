@@ -31,7 +31,7 @@ public class DatabaseInitInterceptor implements HandlerInterceptor
 		{
 			throw new DBNotInitializedException();
 		}
-		Long version = configDAO.getLong(ConfigKeyNames.SCHEMA_VERSION);
+		Long version = configDAO.getLong(ConfigKeyNames.SCHEMA_VERSION_INT);
 		if (version == null || version != 1)
 		{
 			throw new DBBadSchemaException();

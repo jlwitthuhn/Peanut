@@ -75,7 +75,8 @@ public class AdminController
 		long totalMemory = Runtime.getRuntime().totalMemory();
 		String totalMemoryStr = totalMemory / 1024 / 1024 + " MB";
 
-		double loadAverage = ManagementFactory.getOperatingSystemMXBean().getSystemLoadAverage();
+		int cpuCount = ManagementFactory.getOperatingSystemMXBean().getAvailableProcessors();
+		double systemLoad = ManagementFactory.getOperatingSystemMXBean().getSystemLoadAverage();
 
 		List<Tuple2<String, String>> versionDetails = new ArrayList<>();
 		versionDetails.add(new Tuple2<>("Peanut version", PeanutGlobals.PEANUT_VERSION));
@@ -91,10 +92,11 @@ public class AdminController
 		runtimeDetails.add(new Tuple2<>("Database size", metaDAO.getDatabaseSize()));
 		runtimeDetails.add(new Tuple2<>("JVM max memory", maxMemoryStr));
 		runtimeDetails.add(new Tuple2<>("JVM total memory", totalMemoryStr));
-		if (loadAverage > 0)
+		runtimeDetails.add(new Tuple2<>("CPU cores", String.valueOf(cpuCount)));
+		if (systemLoad > 0)
 		{
 			// Value under 0 indicates that the host does not support this feature
-			runtimeDetails.add(new Tuple2<>("Load average", String.valueOf(loadAverage)));
+			runtimeDetails.add(new Tuple2<>("System load", String.valueOf(systemLoad)));
 		}
 		runtimeDetails.add(new Tuple2<>("Server uptime", uptimeStr));
 

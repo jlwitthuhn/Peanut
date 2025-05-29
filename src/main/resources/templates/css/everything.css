@@ -307,3 +307,7 @@ th, td {
 .cp-container nav p:last-child {
 	border-bottom: hidden;
 }
+
+.footer {
+	text-align: center;
+}

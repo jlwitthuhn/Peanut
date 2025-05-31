@@ -1,5 +1,9 @@
 package io.github.jlwitthuhn.peanut;
 
+import io.github.jlwitthuhn.peanut.controller.AdminController;
+import io.github.jlwitthuhn.peanut.controller.LoginController;
+import io.github.jlwitthuhn.peanut.controller.LogoutController;
+import io.github.jlwitthuhn.peanut.controller.RegisterController;
 import io.github.jlwitthuhn.peanut.controller.RootController;
 import io.github.jlwitthuhn.peanut.controller.SetupController;
 import org.junit.jupiter.api.Test;
@@ -12,6 +16,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 class PeanutApplicationTests
 {
 	@Autowired
+	private AdminController adminController;
+
+	@Autowired
+	private LoginController loginController;
+
+	@Autowired
+	private LogoutController logoutController;
+
+	@Autowired
+	private RegisterController registerController;
+
+	@Autowired
 	private RootController rootController;
 
 	@Autowired
@@ -20,6 +36,10 @@ class PeanutApplicationTests
 	@Test
 	void controllersLoad()
 	{
+		assertThat(adminController).isNotNull();
+		assertThat(loginController).isNotNull();
+		assertThat(logoutController).isNotNull();
+		assertThat(registerController).isNotNull();
 		assertThat(rootController).isNotNull();
 		assertThat(setupController).isNotNull();
 	}

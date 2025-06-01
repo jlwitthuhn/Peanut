@@ -5,10 +5,10 @@
 package io.github.jlwitthuhn.peanut.interceptor;
 
 import io.github.jlwitthuhn.peanut.cfg.ConfigKeyNames;
-import io.github.jlwitthuhn.peanut.db.ConfigDAO;
 import io.github.jlwitthuhn.peanut.db.MetaDAO;
 import io.github.jlwitthuhn.peanut.err.DBBadSchemaException;
 import io.github.jlwitthuhn.peanut.err.DBNotInitializedException;
+import io.github.jlwitthuhn.peanut.service.ConfigService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +20,9 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @RequiredArgsConstructor
 public class DatabaseInitInterceptor implements HandlerInterceptor
 {
-	final ConfigDAO configDAO;
-	final MetaDAO metaDAO;
+	private final ConfigService configService;
+
+	private final MetaDAO metaDAO;
 
 	@Override
 	public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler)
@@ -31,7 +32,7 @@ public class DatabaseInitInterceptor implements HandlerInterceptor
 		{
 			throw new DBNotInitializedException();
 		}
-		Long version = configDAO.getLong(ConfigKeyNames.SCHEMA_VERSION_INT);
+		Long version = configService.getLong(ConfigKeyNames.SCHEMA_VERSION_INT);
 		if (version == null || version != 1)
 		{
 			throw new DBBadSchemaException();

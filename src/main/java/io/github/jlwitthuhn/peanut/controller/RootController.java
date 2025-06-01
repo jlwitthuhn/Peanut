@@ -5,7 +5,7 @@
 package io.github.jlwitthuhn.peanut.controller;
 
 import io.github.jlwitthuhn.peanut.cfg.ConfigKeyNames;
-import io.github.jlwitthuhn.peanut.db.ConfigDAO;
+import io.github.jlwitthuhn.peanut.service.ConfigService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,12 +17,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class RootController
 {
-	private final ConfigDAO configDAO;
+	private final ConfigService configService;
 
 	@GetMapping("/")
 	public ModelAndView index(Map<String, Object> model)
 	{
-		String welcomeMessage = configDAO.getString(ConfigKeyNames.WELCOME_MESSAGE_STR);
+		String welcomeMessage = configService.getString(ConfigKeyNames.WELCOME_MESSAGE_STR);
 		model.put("welcomeMessage", welcomeMessage);
 		return new ModelAndView("index.html", model);
 	}

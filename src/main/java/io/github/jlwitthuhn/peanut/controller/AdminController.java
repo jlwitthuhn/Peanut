@@ -6,7 +6,6 @@ package io.github.jlwitthuhn.peanut.controller;
 
 import io.github.jlwitthuhn.peanut.cfg.ConfigKeyNames;
 import io.github.jlwitthuhn.peanut.cfg.PeanutGlobals;
-import io.github.jlwitthuhn.peanut.db.ConfigDAO;
 import io.github.jlwitthuhn.peanut.db.GroupDAO;
 import io.github.jlwitthuhn.peanut.db.MetaDAO;
 import io.github.jlwitthuhn.peanut.db.MultiTableDAO;
@@ -17,6 +16,7 @@ import io.github.jlwitthuhn.peanut.model.form.AdminDebugCreateUsersForm;
 import io.github.jlwitthuhn.peanut.model.form.AdminUsersListByGroupForm;
 import io.github.jlwitthuhn.peanut.model.form.AdminUsersSearchByNamePatternForm;
 import io.github.jlwitthuhn.peanut.service.AdminService;
+import io.github.jlwitthuhn.peanut.service.ConfigService;
 import io.github.jlwitthuhn.peanut.util.TimeUtil;
 import io.github.jlwitthuhn.peanut.util.Tuple2;
 import io.github.jlwitthuhn.peanut.util.ViewShortcuts;
@@ -52,8 +52,8 @@ import java.util.Map;
 public class AdminController
 {
 	private final AdminService adminService;
+	private final ConfigService configService;
 
-	private final ConfigDAO configDAO;
 	private final GroupDAO groupDAO;
 	private final MetaDAO metaDAO;
 	private final MultiTableDAO multiTableDAO;
@@ -62,7 +62,7 @@ public class AdminController
 	@GetMapping("")
 	ModelAndView adminIndex(Map<String, Object> model)
 	{
-		Long initCount = configDAO.getLong(ConfigKeyNames.INITIALIZED_TIME_INT);
+		Long initCount = configService.getLong(ConfigKeyNames.INITIALIZED_TIME_INT);
 		Instant initInstant = Instant.ofEpochSecond(initCount);
 		OffsetDateTime initDateTime = OffsetDateTime.ofInstant(initInstant, ZoneId.of("UTC"));
 		String initTimeStr = TimeUtil.formatOffsetDateTime(initDateTime);

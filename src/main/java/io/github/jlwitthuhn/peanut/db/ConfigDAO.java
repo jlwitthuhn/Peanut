@@ -90,19 +90,19 @@ public class ConfigDAO
 		}
 	}
 
-	public Long getLong(String name)
+	public Long selectLongByName(String name)
 	{
 		final String SQL = "SELECT value FROM config_int WHERE name = ?";
 		return jdbcTemplate.queryForObject(SQL, Long.class, name);
 	}
 
-	public String getString(String name)
+	public String selectStringByName(String name)
 	{
 		final String SQL = "SELECT value FROM config_string WHERE name = ?";
 		return jdbcTemplate.queryForObject(SQL, String.class, name);
 	}
 
-	public void setLong(String name, long value)
+	public void upsertLongByName(String name, long value)
 	{
 		final String SQL = """
 			INSERT INTO
@@ -115,7 +115,7 @@ public class ConfigDAO
 		jdbcTemplate.update(SQL, name, value);
 	}
 
-	public void setString(String name, String value)
+	public void upsertStringByName(String name, String value)
 	{
 		final String SQL = """
 			INSERT INTO

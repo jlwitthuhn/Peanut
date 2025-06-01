@@ -28,8 +28,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SetupService
 {
-	private final PasswordEncoder passwordEncoder;
 	private final PeanutUserService peanutUserService;
+	private final PasswordEncoder passwordEncoder;
 
 	private final ConfigDAO configDAO;
 	private final GroupDAO groupDAO;
@@ -80,9 +80,9 @@ public class SetupService
 	private void initConfig()
 	{
 		logger.info("Initializing config...");
-		configDAO.setLong(ConfigKeyNames.INITIALIZED_TIME_INT, Instant.now().getEpochSecond());
-		configDAO.setLong(ConfigKeyNames.SCHEMA_VERSION_INT, 1);
-		configDAO.setString(ConfigKeyNames.WELCOME_MESSAGE_STR, "Welcome to my underground lair.");
+		configDAO.upsertLongByName(ConfigKeyNames.INITIALIZED_TIME_INT, Instant.now().getEpochSecond());
+		configDAO.upsertLongByName(ConfigKeyNames.SCHEMA_VERSION_INT, 1);
+		configDAO.upsertStringByName(ConfigKeyNames.WELCOME_MESSAGE_STR, "Welcome to my underground lair.");
 	}
 
 	private void initDatabaseObjects() throws DBCreationDependencyNotSatisfiedException

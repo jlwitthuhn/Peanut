@@ -40,14 +40,9 @@ public class MetaDAO
 		jdbcTemplate.execute(SQL_FN_CREATED_UPDATED_BEFORE_UPDATE);
 	}
 
-	public boolean doesTableExist(String table)
+	public boolean doesTableExist(String tableName)
 	{
-		return doesTableExist("public", table);
-	}
-
-	public boolean doesTableExist(String schema, String table)
-	{
-		Long count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = ? AND table_name = ?", Long.class, schema, table);
+		Long count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = ?", Long.class, tableName);
 		return count != null && count > 0;
 	}
 

@@ -8,6 +8,7 @@ import io.github.jlwitthuhn.peanut.err.DBCreationDependencyNotSatisfiedException
 import io.github.jlwitthuhn.peanut.err.GroupNotFoundException;
 import io.github.jlwitthuhn.peanut.model.db.GroupRow;
 import io.github.jlwitthuhn.peanut.model.db.GroupRowMapper;
+import io.github.jlwitthuhn.peanut.service.DatabaseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -25,12 +26,13 @@ public class GroupDAO
 {
 	public static final String TABLE_NAME = "groups";
 
+	private final DatabaseService dbService;
+
 	private final JdbcTemplate jdbcTemplate;
-	private final MetaDAO metaDAO;
 
 	public void createDatabaseObjects() throws DBCreationDependencyNotSatisfiedException
 	{
-		if (metaDAO.doesTableExist(TABLE_NAME))
+		if (dbService.doesTableExist(TABLE_NAME))
 		{
 			throw new DBCreationDependencyNotSatisfiedException("Table '" + TABLE_NAME + "' cannot be created because it already exists");
 		}

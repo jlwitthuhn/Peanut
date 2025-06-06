@@ -7,7 +7,6 @@ package io.github.jlwitthuhn.peanut.controller;
 import io.github.jlwitthuhn.peanut.cfg.ConfigKeyNames;
 import io.github.jlwitthuhn.peanut.cfg.PeanutGlobals;
 import io.github.jlwitthuhn.peanut.db.GroupDAO;
-import io.github.jlwitthuhn.peanut.db.MetaDAO;
 import io.github.jlwitthuhn.peanut.db.MultiTableDAO;
 import io.github.jlwitthuhn.peanut.db.UserDAO;
 import io.github.jlwitthuhn.peanut.model.db.GroupRow;
@@ -17,6 +16,7 @@ import io.github.jlwitthuhn.peanut.model.form.AdminUsersListByGroupForm;
 import io.github.jlwitthuhn.peanut.model.form.AdminUsersSearchByNamePatternForm;
 import io.github.jlwitthuhn.peanut.service.AdminService;
 import io.github.jlwitthuhn.peanut.service.ConfigService;
+import io.github.jlwitthuhn.peanut.service.DatabaseService;
 import io.github.jlwitthuhn.peanut.util.TimeUtil;
 import io.github.jlwitthuhn.peanut.util.Tuple2;
 import io.github.jlwitthuhn.peanut.util.ViewShortcuts;
@@ -53,9 +53,9 @@ public class AdminController
 {
 	private final AdminService adminService;
 	private final ConfigService configService;
+	private final DatabaseService dbService;
 
 	private final GroupDAO groupDAO;
-	private final MetaDAO metaDAO;
 	private final MultiTableDAO multiTableDAO;
 	private final UserDAO userDAO;
 
@@ -85,11 +85,11 @@ public class AdminController
 		versionDetails.add(new Tuple2<>("Host OS", System.getProperty("os.name") + " / " + System.getProperty("os.arch")));
 		versionDetails.add(new Tuple2<>("Spring Boot version", SpringBootVersion.getVersion()));
 		versionDetails.add(new Tuple2<>("Spring version", SpringVersion.getVersion()));
-		versionDetails.add(new Tuple2<>("Postgres version", metaDAO.getServerVersion()));
+		versionDetails.add(new Tuple2<>("Postgres version", dbService.getServerVersion()));
 
 		List<Tuple2<String, String>> runtimeDetails = new ArrayList<>();
 		runtimeDetails.add(new Tuple2<>("DB initialized", initTimeStr));
-		runtimeDetails.add(new Tuple2<>("Database size", metaDAO.getDatabaseSize()));
+		runtimeDetails.add(new Tuple2<>("Database size", dbService.getDatabaseSize()));
 		runtimeDetails.add(new Tuple2<>("JVM max memory", maxMemoryStr));
 		runtimeDetails.add(new Tuple2<>("JVM total memory", totalMemoryStr));
 		runtimeDetails.add(new Tuple2<>("CPU cores", String.valueOf(cpuCount)));

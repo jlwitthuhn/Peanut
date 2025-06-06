@@ -5,6 +5,7 @@
 package io.github.jlwitthuhn.peanut.db;
 
 import io.github.jlwitthuhn.peanut.err.DBCreationDependencyNotSatisfiedException;
+import io.github.jlwitthuhn.peanut.service.DatabaseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -16,17 +17,17 @@ public class ConfigDAO
 	public final String TABLE_NAME_INT = "config_int";
 	public final String TABLE_NAME_STRING = "config_string";
 
-	private final JdbcTemplate jdbcTemplate;
+	private final DatabaseService dbService;
 
-	private final MetaDAO metaDAO;
+	private final JdbcTemplate jdbcTemplate;
 
 	public void createDatabaseObjects() throws DBCreationDependencyNotSatisfiedException
 	{
-		if (metaDAO.doesTableExist(TABLE_NAME_INT))
+		if (dbService.doesTableExist(TABLE_NAME_INT))
 		{
 			throw new DBCreationDependencyNotSatisfiedException("Table '" + TABLE_NAME_INT + "' cannot be created because it already exists");
 		}
-		if (metaDAO.doesTableExist(TABLE_NAME_STRING))
+		if (dbService.doesTableExist(TABLE_NAME_STRING))
 		{
 			throw new DBCreationDependencyNotSatisfiedException("Table '" + TABLE_NAME_STRING + "' cannot be created because it already exists");
 		}

@@ -4,9 +4,9 @@
 
 package io.github.jlwitthuhn.peanut.controller;
 
-import io.github.jlwitthuhn.peanut.db.MetaDAO;
 import io.github.jlwitthuhn.peanut.err.DBCreationDependencyNotSatisfiedException;
 import io.github.jlwitthuhn.peanut.model.form.SetupForm;
+import io.github.jlwitthuhn.peanut.service.DatabaseService;
 import io.github.jlwitthuhn.peanut.service.SetupService;
 import io.github.jlwitthuhn.peanut.util.ViewShortcuts;
 import lombok.RequiredArgsConstructor;
@@ -25,14 +25,13 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SetupController
 {
+	private final DatabaseService dbService;
 	private final SetupService setupService;
-
-	private final MetaDAO metaDAO;
 
 	@GetMapping("")
 	public ModelAndView index(Map<String, Object> model)
 	{
-		if (metaDAO.doesTableExist("config_int"))
+		if (dbService.doesTableExist("config_int"))
 		{
 			return ViewShortcuts.simpleMessage("Setup complete", "The database has already been initialized. No further setup action is needed.");
 		}

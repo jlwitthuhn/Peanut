@@ -28,6 +28,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SetupService
 {
+	private final DatabaseService dbService;
 	private final PeanutUserService peanutUserService;
 	private final PasswordEncoder passwordEncoder;
 
@@ -42,7 +43,7 @@ public class SetupService
 	@Transactional
 	public void initializeDatabase(String adminName, String plainAdminPassword, String adminEmail) throws DBCreationDependencyNotSatisfiedException
 	{
-		if (metaDAO.doesTableExist("config_int"))
+		if (dbService.doesTableExist("config_int"))
 		{
 			throw new DBCreationDependencyNotSatisfiedException("The database is already set up. No changes have been made.");
 		}

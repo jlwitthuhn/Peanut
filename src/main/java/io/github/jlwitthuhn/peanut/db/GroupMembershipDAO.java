@@ -5,6 +5,7 @@
 package io.github.jlwitthuhn.peanut.db;
 
 import io.github.jlwitthuhn.peanut.err.DBCreationDependencyNotSatisfiedException;
+import io.github.jlwitthuhn.peanut.service.DatabaseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -17,20 +18,21 @@ public class GroupMembershipDAO
 {
 	public static final String TABLE_NAME = "group_membership";
 
+	private final DatabaseService dbService;
+
 	private final JdbcTemplate jdbcTemplate;
-	private final MetaDAO metaDAO;
 
 	public void createDatabaseObjects() throws DBCreationDependencyNotSatisfiedException
 	{
-		if (metaDAO.doesTableExist(TABLE_NAME))
+		if (dbService.doesTableExist(TABLE_NAME))
 		{
 			throw new DBCreationDependencyNotSatisfiedException("Table '" + TABLE_NAME + "' cannot be created because it already exists");
 		}
-		if (!metaDAO.doesTableExist(GroupDAO.TABLE_NAME))
+		if (!dbService.doesTableExist(GroupDAO.TABLE_NAME))
 		{
 			throw new DBCreationDependencyNotSatisfiedException("Table '" + TABLE_NAME + "' requires that table '" + GroupDAO.TABLE_NAME + "' exists");
 		}
-		if (!metaDAO.doesTableExist(UserDAO.TABLE_NAME))
+		if (!dbService.doesTableExist(UserDAO.TABLE_NAME))
 		{
 			throw new DBCreationDependencyNotSatisfiedException("Table '" + TABLE_NAME + "' requires that table '" + UserDAO.TABLE_NAME + "' exists");
 		}

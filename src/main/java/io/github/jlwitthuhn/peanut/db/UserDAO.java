@@ -7,6 +7,7 @@ package io.github.jlwitthuhn.peanut.db;
 import io.github.jlwitthuhn.peanut.err.DBCreationDependencyNotSatisfiedException;
 import io.github.jlwitthuhn.peanut.model.db.UserRow;
 import io.github.jlwitthuhn.peanut.model.db.UserRowMapper;
+import io.github.jlwitthuhn.peanut.service.DatabaseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -19,13 +20,13 @@ public class UserDAO
 {
 	public static final String TABLE_NAME = "users";
 
-	private final JdbcTemplate jdbcTemplate;
+	private final DatabaseService dbService;
 
-	private final MetaDAO metaDAO;
+	private final JdbcTemplate jdbcTemplate;
 
 	public void createDatabaseObjects() throws DBCreationDependencyNotSatisfiedException
 	{
-		if (metaDAO.doesTableExist(TABLE_NAME))
+		if (dbService.doesTableExist(TABLE_NAME))
 		{
 			throw new DBCreationDependencyNotSatisfiedException("Table '" + TABLE_NAME + "' cannot be created because it already exists");
 		}

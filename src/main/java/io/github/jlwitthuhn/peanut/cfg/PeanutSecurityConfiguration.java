@@ -37,9 +37,9 @@ public class PeanutSecurityConfiguration
 				authorizeHttpRequests
 					.requestMatchers(
 						HttpMethod.GET,
+						"/error",
 						"/favicon*",
 						"/login",
-						"/login-failure",
 						"/logout/success",
 						"/register",
 						"/setup",

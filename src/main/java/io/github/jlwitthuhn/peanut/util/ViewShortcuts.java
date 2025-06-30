@@ -6,6 +6,7 @@ package io.github.jlwitthuhn.peanut.util;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.HashMap;
 
@@ -22,5 +23,13 @@ public class ViewShortcuts
 	public static ModelAndView simpleMessage(String header, String message)
 	{
 		return simpleMessage(header, message, HttpStatus.OK);
+	}
+
+	public static ModelAndView simpleRedirect(String redirectPath)
+	{
+		RedirectView view = new RedirectView(redirectPath);
+		view.setStatusCode(HttpStatus.SEE_OTHER);
+		view.setExposeModelAttributes(false);
+		return new ModelAndView(view);
 	}
 }

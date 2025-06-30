@@ -130,6 +130,12 @@ public class AdminController
 		return ViewShortcuts.simpleMessage("Success", "Successfully created " + count + " test accounts.");
 	}
 
+	@GetMapping("/front_page")
+	ModelAndView generalFrontPage()
+	{
+		return new ModelAndView("admin/front_page.html");
+	}
+
 	@GetMapping("/groups")
 	ModelAndView groupsIndex()
 	{

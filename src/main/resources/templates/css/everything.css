@@ -92,6 +92,15 @@ th, td {
 	margin-left: auto;
 	margin-right: auto;
 }
+.simple-center-80 {
+	align-items: stretch;
+	margin-left: 10%;
+	margin-right: 10%;
+}
+.simple-center-80  p {
+	margin-left: auto;
+	margin-right: auto;
+}
 .simple-column {
 	display: flex;
 	flex-direction: column;

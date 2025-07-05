@@ -12,6 +12,7 @@ import io.github.jlwitthuhn.peanut.db.UserDAO;
 import io.github.jlwitthuhn.peanut.model.db.GroupRow;
 import io.github.jlwitthuhn.peanut.model.db.UserRow;
 import io.github.jlwitthuhn.peanut.model.form.AdminDebugCreateUsersForm;
+import io.github.jlwitthuhn.peanut.model.form.AdminGeneralWelcomeMessageForm;
 import io.github.jlwitthuhn.peanut.model.form.AdminUsersListByGroupForm;
 import io.github.jlwitthuhn.peanut.model.form.AdminUsersSearchByNamePatternForm;
 import io.github.jlwitthuhn.peanut.service.AdminService;
@@ -131,9 +132,18 @@ public class AdminController
 	}
 
 	@GetMapping("/front_page")
-	ModelAndView generalFrontPage()
+	ModelAndView generalFrontPage(Map<String, Object> model)
 	{
+		String welcomeMessage = configService.getString(ConfigKeyNames.WELCOME_MESSAGE_STR);
+		model.put("welcomeMessage", welcomeMessage);
 		return new ModelAndView("admin/front_page.html");
+	}
+
+	@PostMapping("/front_page/welcome_message")
+	ModelAndView generalWelcomeMessagePost(@ModelAttribute AdminGeneralWelcomeMessageForm form)
+	{
+		configService.setString(ConfigKeyNames.WELCOME_MESSAGE_STR, form.getMessage());
+		return ViewShortcuts.simpleRedirect("/admin/front_page");
 	}
 
 	@GetMapping("/groups")

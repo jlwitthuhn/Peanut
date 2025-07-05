@@ -23,4 +23,10 @@ public class ConfigService
 	{
 		return configDAO.selectStringByName(name);
 	}
+
+	public void setString(String name, String value)
+	{
+		// TODO: There should be some access control based on which value is being set here
+		configDAO.upsertStringByName(name, value);
+	}
 }

@@ -140,11 +140,11 @@ public class AdminController
 	}
 
 	@PostMapping("/front_page/welcome_message")
-	ModelAndView generalWelcomeMessagePost(@ModelAttribute AdminGeneralWelcomeMessageForm form)
+	ModelAndView generalWelcomeMessagePost(@ModelAttribute AdminGeneralWelcomeMessageForm form, Map<String, Object> model)
 	{
 		if (form.getConfirm() == null || !form.getConfirm())
 		{
-			return ViewShortcuts.simpleMessage("Message Not Set", "You must check the 'Confirm' box to set the welcome message.", HttpStatus.BAD_REQUEST);
+			return renderSimpleMessage("Error - Message Not Set", "You must check the 'Confirm' box to set the welcome message.", HttpStatus.BAD_REQUEST, model);
 		}
 		configService.setString(ConfigKeyNames.WELCOME_MESSAGE_STR, form.getMessage());
 		return ViewShortcuts.simpleRedirect("/admin/front_page");
@@ -266,5 +266,12 @@ public class AdminController
 		}
 		model.put("users", users);
 		return new ModelAndView("admin/users_list.html", model);
+	}
+
+	private ModelAndView renderSimpleMessage(String header, String message, HttpStatus status, Map<String, Object> model)
+	{
+		model.put("header", header);
+		model.put("message", message);
+		return new ModelAndView("admin/simple_message.html", model, status);
 	}
 }

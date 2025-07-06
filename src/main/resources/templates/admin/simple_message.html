@@ -1,0 +1,12 @@
+{% extends 'admin/base.html' %}
+
+{% block admin-content %}
+<div class="info-panel-container">
+	<div class="simple-panel">
+		<div class="simple-panel-header"><h1>{% block simple-message-header %} {{ header }} {% endblock %}</h1></div>
+		<div class="simple-panel-content">
+			<p>{% block simple-message-message %} {{ message }} {% endblock %}</p>
+		</div>
+	</div>
+</div>
+{% endblock %}

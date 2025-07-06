@@ -9,6 +9,7 @@
 				<div class="simple-column simple-center-60">
 					<label for="message_box">Message:</label>
 					<textarea id="message_box" name="message">{{ welcomeMessage }}</textarea>
+					<div><input id="confirm_check" type="checkbox" name="confirm"><label for="confirm_check">Confirm</label></div>
 					<input type="hidden" name="{{ _csrfParam }}" value="{{ _csrfToken }}">
 					<input type="submit" value="Update">
 				</div>

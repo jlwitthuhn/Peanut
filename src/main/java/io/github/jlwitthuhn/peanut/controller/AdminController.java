@@ -142,6 +142,10 @@ public class AdminController
 	@PostMapping("/front_page/welcome_message")
 	ModelAndView generalWelcomeMessagePost(@ModelAttribute AdminGeneralWelcomeMessageForm form)
 	{
+		if (form.getConfirm() == null || !form.getConfirm())
+		{
+			return ViewShortcuts.simpleMessage("Message Not Set", "You must check the 'Confirm' box to set the welcome message.", HttpStatus.BAD_REQUEST);
+		}
 		configService.setString(ConfigKeyNames.WELCOME_MESSAGE_STR, form.getMessage());
 		return ViewShortcuts.simpleRedirect("/admin/front_page");
 	}

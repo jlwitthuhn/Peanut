@@ -11,5 +11,9 @@ public class AdminGeneralWelcomeMessageForm
 {
 	@Getter
 	@Setter
+	private Boolean confirm;
+
+	@Getter
+	@Setter
 	private String message;
 }

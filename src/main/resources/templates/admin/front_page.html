@@ -1,5 +1,17 @@
 {% extends 'admin/base.html' %}
 
+{% block admin-javascript %}
+	document.addEventListener('DOMContentLoaded', function() {
+		let confirm_check = document.getElementById("confirm_check")
+		let submit_button = document.getElementById("submit_button")
+		confirm_check.addEventListener("click", function() {
+			submit_button.disabled = !(confirm_check.checked)
+		});
+		confirm_check.checked = false;
+		submit_button.disabled = true;
+	});
+{% endblock %}
+
 {% block admin-content %}
 <div class="vertical-flex-container">
 	<div class="simple-panel">
@@ -11,7 +23,7 @@
 					<textarea id="message_box" name="message">{{ welcomeMessage }}</textarea>
 					<div><input id="confirm_check" type="checkbox" name="confirm"><label for="confirm_check">Confirm</label></div>
 					<input type="hidden" name="{{ _csrfParam }}" value="{{ _csrfToken }}">
-					<input type="submit" value="Update">
+					<input id="submit_button" type="submit" value="Update">
 				</div>
 			</form>
 		</div>

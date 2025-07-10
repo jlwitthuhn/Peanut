@@ -38,8 +38,8 @@ public class GroupMembershipDAO
 		}
 		final String SQL_TABLE = """
 			CREATE TABLE group_membership (
-			    user_id BIGINT REFERENCES users(id),
-			    group_id BIGINT REFERENCES groups(id),
+			    user_id BIGINT REFERENCES users(id) NOT NULL,
+			    group_id BIGINT REFERENCES groups(id) NOT NULL,
 			    _created TIMESTAMP WITH TIME ZONE NOT NULL,
 			    _updated TIMESTAMP WITH TIME ZONE NOT NULL,
 			    PRIMARY KEY (user_id, group_id)

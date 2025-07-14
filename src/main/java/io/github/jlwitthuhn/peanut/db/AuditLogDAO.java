@@ -5,6 +5,8 @@
 package io.github.jlwitthuhn.peanut.db;
 
 import io.github.jlwitthuhn.peanut.err.DBCreationDependencyNotSatisfiedException;
+import io.github.jlwitthuhn.peanut.model.db.AuditLogEventType;
+import io.github.jlwitthuhn.peanut.model.db.AuditLogTargetType;
 import io.github.jlwitthuhn.peanut.service.DatabaseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -35,7 +37,7 @@ public class AuditLogDAO
 			    id BIGSERIAL PRIMARY KEY,
 			    source_user_id BIGINT REFERENCES users(id) NOT NULL,
 			    target_id BIGINT,
-			    target_id_type VARCHAR(256),
+			    target_id_type VARCHAR(256) NOT NULL,
 			    event_type VARCHAR(256) NOT NULL,
 			    message VARCHAR(1024) NOT NULL,
 			    _created TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -61,5 +63,16 @@ public class AuditLogDAO
 				fn_created_updated_before_update();
 			""";
 		jdbcTemplate.execute(SQL_TRIGGER_BEFORE_UPDATE);
+	}
+
+	public void insertEvent(Long srcUserId, Long targetId, AuditLogTargetType targetType, AuditLogEventType eventType, String message)
+	{
+		final String SQL = """
+			INSERT INTO
+				audit_log (source_user_id, target_id, target_id_type, event_type, message)
+			VALUES
+				(?, ?, ?, ?, ?)
+			""";
+		jdbcTemplate.update(SQL, srcUserId, targetId, targetType.name(), eventType.name(), message);
 	}
 }

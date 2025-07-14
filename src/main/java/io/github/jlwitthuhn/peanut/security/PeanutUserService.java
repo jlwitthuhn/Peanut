@@ -4,12 +4,15 @@
 
 package io.github.jlwitthuhn.peanut.security;
 
+import io.github.jlwitthuhn.peanut.db.AuditLogDAO;
+import io.github.jlwitthuhn.peanut.model.db.AuditLogEventType;
 import io.github.jlwitthuhn.peanut.db.GroupDAO;
 import io.github.jlwitthuhn.peanut.db.GroupMembershipDAO;
 import io.github.jlwitthuhn.peanut.db.MultiTableDAO;
 import io.github.jlwitthuhn.peanut.db.UserDAO;
 import io.github.jlwitthuhn.peanut.err.GroupNotFoundException;
 import io.github.jlwitthuhn.peanut.err.UserDetailsConflictException;
+import io.github.jlwitthuhn.peanut.model.db.AuditLogTargetType;
 import io.github.jlwitthuhn.peanut.model.db.UserRow;
 import io.github.jlwitthuhn.peanut.model.spring.PeanutUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PeanutUserService implements UserDetailsManager
 {
+	private final AuditLogDAO auditLogDAO;
 	private final GroupDAO groupDAO;
 	private final MultiTableDAO multiTableDAO;
 	private final UserDAO userDAO;
@@ -57,14 +61,16 @@ public class PeanutUserService implements UserDetailsManager
 			peanutUserDetails.getPassword()
 		);
 		UserRow newRow = userDAO.selectRowByDisplayName(peanutUserDetails.getUsername());
+		long newUserId = newRow.getId();
 		try
 		{
-			addRolesToUser(newRow.getId(), peanutUserDetails.getGroups());
+			addRolesToUser(newUserId, peanutUserDetails.getGroups());
 		}
 		catch (GroupNotFoundException e)
 		{
 			throw new RuntimeException(e);
 		}
+		auditLogDAO.insertEvent(newUserId, newUserId, AuditLogTargetType.USER, AuditLogEventType.CREATE_USER, "");
 	}
 
 	@Override

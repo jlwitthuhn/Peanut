@@ -106,6 +106,12 @@ public class AdminController
 		return new ModelAndView("admin/index.html", model);
 	}
 
+	@GetMapping("/audit_log")
+	ModelAndView auditLog(Map<String, Object> model)
+	{
+		return renderSimpleMessage("Not Implemented", "Page has not been implemented yet.", HttpStatus.OK, model);
+	}
+
 	@GetMapping("/debug")
 	ModelAndView debugIndex()
 	{

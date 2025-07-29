@@ -4,15 +4,15 @@
 
 package io.github.jlwitthuhn.peanut.security;
 
-import io.github.jlwitthuhn.peanut.db.AuditLogDAO;
-import io.github.jlwitthuhn.peanut.model.db.AuditLogEventType;
+import io.github.jlwitthuhn.peanut.model.db.EventLogEventType;
+import io.github.jlwitthuhn.peanut.db.EventLogDAO;
 import io.github.jlwitthuhn.peanut.db.GroupDAO;
 import io.github.jlwitthuhn.peanut.db.GroupMembershipDAO;
 import io.github.jlwitthuhn.peanut.db.MultiTableDAO;
 import io.github.jlwitthuhn.peanut.db.UserDAO;
 import io.github.jlwitthuhn.peanut.err.GroupNotFoundException;
 import io.github.jlwitthuhn.peanut.err.UserDetailsConflictException;
-import io.github.jlwitthuhn.peanut.model.db.AuditLogTargetType;
+import io.github.jlwitthuhn.peanut.model.db.EventLogTargetType;
 import io.github.jlwitthuhn.peanut.model.db.UserRow;
 import io.github.jlwitthuhn.peanut.model.spring.PeanutUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PeanutUserService implements UserDetailsManager
 {
-	private final AuditLogDAO auditLogDAO;
+	private final EventLogDAO eventLogDAO;
 	private final GroupDAO groupDAO;
 	private final MultiTableDAO multiTableDAO;
 	private final UserDAO userDAO;
@@ -70,7 +70,7 @@ public class PeanutUserService implements UserDetailsManager
 		{
 			throw new RuntimeException(e);
 		}
-		auditLogDAO.insertEvent(newUserId, newUserId, AuditLogTargetType.USER, AuditLogEventType.CREATE_USER, "");
+		eventLogDAO.insertEvent(newUserId, newUserId, EventLogTargetType.USER, EventLogEventType.CREATE_USER, "");
 	}
 
 	@Override

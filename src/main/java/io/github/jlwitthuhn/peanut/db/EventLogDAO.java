@@ -5,8 +5,8 @@
 package io.github.jlwitthuhn.peanut.db;
 
 import io.github.jlwitthuhn.peanut.err.DBCreationDependencyNotSatisfiedException;
-import io.github.jlwitthuhn.peanut.model.db.AuditLogEventType;
-import io.github.jlwitthuhn.peanut.model.db.AuditLogTargetType;
+import io.github.jlwitthuhn.peanut.model.db.EventLogEventType;
+import io.github.jlwitthuhn.peanut.model.db.EventLogTargetType;
 import io.github.jlwitthuhn.peanut.service.DatabaseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -14,9 +14,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class AuditLogDAO
+public class EventLogDAO
 {
-	public static final String TABLE_NAME = "audit_log";
+	public static final String TABLE_NAME = "event_log";
 
 	private final DatabaseService dbService;
 
@@ -33,7 +33,7 @@ public class AuditLogDAO
 			throw new DBCreationDependencyNotSatisfiedException("Table '" + TABLE_NAME + "' requires that table '" + UserDAO.TABLE_NAME + "' exists");
 		}
 		final String SQL_TABLE = """
-			CREATE TABLE audit_log (
+			CREATE TABLE event_log (
 			    id BIGSERIAL PRIMARY KEY,
 			    source_user_id BIGINT REFERENCES users(id) NOT NULL,
 			    target_id BIGINT,
@@ -47,29 +47,29 @@ public class AuditLogDAO
 		jdbcTemplate.execute(SQL_TABLE);
 		final String SQL_TRIGGER_BEFORE_INSERT = """
 			CREATE TRIGGER
-				audit_log_trigger_created_updated_before_insert
+				event_log_trigger_created_updated_before_insert
 			BEFORE INSERT ON
-				audit_log
+				event_log
 			FOR EACH ROW EXECUTE FUNCTION
 				fn_created_updated_before_insert();
 			""";
 		jdbcTemplate.execute(SQL_TRIGGER_BEFORE_INSERT);
 		final String SQL_TRIGGER_BEFORE_UPDATE = """
 			CREATE TRIGGER
-				audit_log_trigger_created_updated_before_update
+				event_log_trigger_created_updated_before_update
 			BEFORE UPDATE ON
-				audit_log
+				event_log
 			FOR EACH ROW EXECUTE FUNCTION
 				fn_created_updated_before_update();
 			""";
 		jdbcTemplate.execute(SQL_TRIGGER_BEFORE_UPDATE);
 	}
 
-	public void insertEvent(Long srcUserId, Long targetId, AuditLogTargetType targetType, AuditLogEventType eventType, String message)
+	public void insertEvent(Long srcUserId, Long targetId, EventLogTargetType targetType, EventLogEventType eventType, String message)
 	{
 		final String SQL = """
 			INSERT INTO
-				audit_log (source_user_id, target_id, target_id_type, event_type, message)
+				event_log (source_user_id, target_id, target_id_type, event_type, message)
 			VALUES
 				(?, ?, ?, ?, ?)
 			""";

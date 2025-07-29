@@ -106,12 +106,6 @@ public class AdminController
 		return new ModelAndView("admin/index.html", model);
 	}
 
-	@GetMapping("/audit_log")
-	ModelAndView auditLog(Map<String, Object> model)
-	{
-		return renderSimpleMessage("Not Implemented", "Page has not been implemented yet.", HttpStatus.OK, model);
-	}
-
 	@GetMapping("/debug")
 	ModelAndView debugIndex()
 	{
@@ -135,6 +129,12 @@ public class AdminController
 		adminService.createDebugUsers(count, form.getPrefix(), form.getPassword());
 
 		return ViewShortcuts.simpleMessage("Success", "Successfully created " + count + " test accounts.");
+	}
+
+	@GetMapping("/event_log")
+	ModelAndView eventLog(Map<String, Object> model)
+	{
+		return renderSimpleMessage("Not Implemented", "Page has not been implemented yet.", HttpStatus.OK, model);
 	}
 
 	@GetMapping("/front_page")

@@ -5,8 +5,8 @@
 package io.github.jlwitthuhn.peanut.service;
 
 import io.github.jlwitthuhn.peanut.cfg.ConfigKeyNames;
-import io.github.jlwitthuhn.peanut.db.AuditLogDAO;
 import io.github.jlwitthuhn.peanut.db.ConfigDAO;
+import io.github.jlwitthuhn.peanut.db.EventLogDAO;
 import io.github.jlwitthuhn.peanut.db.GroupDAO;
 import io.github.jlwitthuhn.peanut.db.GroupMembershipDAO;
 import io.github.jlwitthuhn.peanut.db.MetaDAO;
@@ -33,8 +33,8 @@ public class SetupService
 	private final PeanutUserService peanutUserService;
 	private final PasswordEncoder passwordEncoder;
 
-	private final AuditLogDAO auditLogDAO;
 	private final ConfigDAO configDAO;
+	private final EventLogDAO eventLogDAO;
 	private final GroupDAO groupDAO;
 	private final MetaDAO metaDAO;
 	private final UserDAO userDAO;
@@ -96,6 +96,6 @@ public class SetupService
 		configDAO.createDatabaseObjects();
 		userDAO.createDatabaseObjects();
 		groupMembershipDAO.createDatabaseObjects();
-		auditLogDAO.createDatabaseObjects();
+		eventLogDAO.createDatabaseObjects();
 	}
 }

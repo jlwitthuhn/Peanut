@@ -4,8 +4,7 @@
 
 package io.github.jlwitthuhn.peanut.model.db;
 
-public enum AuditLogEventType
+public enum EventLogTargetType
 {
-	// When a user account is created
-	CREATE_USER,
+	USER
 }

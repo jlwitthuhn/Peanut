@@ -1,0 +1,324 @@
+{{ define "common_css" }}
+:root {
+    --bg-color: #121212;
+    --alt-color: #202020;
+    --border-color: #707070;
+    --header-color: #303030;
+    --text-color: #F2F2F2;
+    --text-color-alt: #D8D8D8;
+}
+
+/* Base styles */
+body {
+    margin: 1rem auto;
+    min-width: 850px;
+    max-width: 1040px;
+
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: sans-serif;
+}
+a {
+    color: var(--text-color-alt);
+}
+h1, h2, p {
+    margin: 0;
+}
+hr {
+    border-color: var(--border-color);
+}
+input[type="text"], input[type="password"] {
+    color: var(--text-color-alt);
+    background-color: var(--bg-color);
+}
+table, th, td {
+    border: 1px solid;
+    border-color: var(--border-color);
+    border-collapse: collapse;
+}
+th, td {
+    padding: 4px;
+}
+
+/* Generic styles */
+.horizontal-space-evenly {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: baseline;
+}
+.vertical-flex-container {
+    display: flex;
+    flex-direction: column;
+}
+.fullwidth {
+    width: 100%;
+}
+
+/* Title */
+#title-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Navigation */
+#top-nav {
+    display: flex;
+    justify-content: space-between;
+
+    background-color: var(--header-color);
+    border: solid;
+    border-color: var(--border-color);
+    border-width: 1px;
+
+    padding: 0.3rem 0.5rem;
+    margin-bottom: 1rem;
+}
+#top-nav ul {
+    display: flex;
+    gap: 1rem;
+
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* Generic */
+.simple-center-60 {
+    align-items: stretch;
+    margin-left: 20%;
+    margin-right: 20%;
+}
+.simple-center-60  p {
+    margin-left: auto;
+    margin-right: auto;
+}
+.simple-center-80 {
+    align-items: stretch;
+    margin-left: 10%;
+    margin-right: 10%;
+}
+.simple-center-80  p {
+    margin-left: auto;
+    margin-right: auto;
+}
+.simple-column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    background-color: var(--alt-color);
+    width: 60%;
+}
+
+/* Generic panel */
+.simple-form {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    background-color: var(--alt-color);
+    padding: 0.3rem 0.5rem;
+}
+.simple-form p {
+    margin-left: auto;
+    margin-right: auto;
+}
+.simple-form form {
+    display: flex;
+    flex-direction: column;
+
+    margin-left: 20%;
+    margin-right: 20%;
+}
+.simple-form form input {
+    margin-bottom: 0.5rem;
+}
+.simple-panel {
+    display: flex;
+    flex-direction: column;
+
+    border: solid;
+    border-color: var(--border-color);
+    border-width: 1px;
+
+    margin-bottom: 1rem;
+}
+.simple-panel h1 {
+    font-size: 1.2rem;
+    font-weight: normal;
+}
+.simple-panel-header {
+    background-color: var(--header-color);
+
+    padding: 0.3rem 0.5rem;
+    border-bottom: solid;
+    border-color: var(--border-color);
+    border-width: 1px;
+}
+.simple-panel-content {
+    background-color: var(--alt-color);
+    padding: 0.5rem 0.5rem;
+}
+
+/* Info panel */
+.info-panel-container {
+    display: flex;
+    flex-direction: column;
+
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 500px;
+}
+
+/* Login page */
+.login-panel {
+    display: flex;
+    flex-direction: column;
+
+    border: solid;
+    border-color: var(--border-color);
+    border-width: 1px;
+
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 500px;
+}
+.login-panel h1 {
+    font-size: 1.2rem;
+    font-weight: normal;
+}
+.login-panel-header {
+    background-color: var(--header-color);
+    padding: 0.3rem 0.5rem;
+
+    border-bottom: solid;
+    border-color: var(--border-color);
+    border-width: 1px;
+}
+
+/* Forum index */
+.forum-index-container {
+    display: grid;
+    grid-template-columns: 6fr 1.5fr 1.5fr 2fr;
+
+    border: solid;
+    border-color: var(--border-color);
+    border-width: 1px;
+
+    margin-bottom: 1rem;
+}
+.forum-index-container h1 {
+    font-size: 1.2rem;
+    font-weight: normal;
+}
+.forum-index-cell {
+    align-content: center;
+    padding: 0.3rem 0.5rem;
+    border-bottom: solid;
+    border-color: var(--border-color);
+    border-width: 1px;
+}
+.forum-index-cell:nth-last-child(-n + 4) {
+    border-bottom: hidden;
+}
+.forum-index-header {
+    background-color: var(--header-color);
+}
+.forum-index-segment {
+    background-color: var(--alt-color);
+}
+.forum-index-segment:nth-child(8n), .forum-index-segment:nth-child(8n - 1), .forum-index-segment:nth-child(8n - 2), .forum-index-segment:nth-child(8n - 3){
+    background-color: var(--bg-color);
+}
+
+/* Thread index */
+.thread-index-breadcrumb p {
+    margin-bottom: 0.5rem;
+}
+.thread-index-container {
+    display: grid;
+    grid-template-columns: 6fr 2fr 1fr 2fr;
+
+    border: solid;
+    border-color: var(--border-color);
+    border-width: 1px;
+
+    margin-bottom: 1rem;
+}
+.thread-index-cell {
+    align-content: center;
+    padding: 0.3rem 0.5rem;
+    border-bottom: solid;
+    border-color: var(--border-color);
+    border-width: 1px;
+}
+.thread-index-cell:nth-last-child(-n + 4) {
+    border-bottom: hidden;
+}
+.thread-index-container h1 {
+    font-size: 1.2rem;
+    font-weight: normal;
+}
+.thread-index-container h2 {
+    font-size: 1rem;
+    font-weight: normal;
+}
+.thread-index-header {
+    background-color: var(--header-color);
+}
+.thread-index-thread-title-block {
+    display: flex;
+    align-content: center;
+    justify-content: space-between;
+}
+.thread-index-thread-title-block p {
+    margin: auto 0;
+}
+.thread-index-segment {
+    background-color: var(--alt-color);
+}
+.thread-index-segment:nth-child(8n),
+.thread-index-segment:nth-child(8n - 1),
+.thread-index-segment:nth-child(8n - 2),
+.thread-index-segment:nth-child(8n - 3) {
+    background-color: var(--bg-color);
+}
+
+/* Control panel */
+.cp-container {
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+    gap: 1rem;
+}
+.cp-container nav {
+    display: flex;
+    flex-direction: column;
+
+    border: solid;
+    border-color: var(--border-color);
+    border-width: 1px;
+
+    margin-bottom: auto;
+}
+.cp-container nav p {
+    align-content: center;
+    padding: 0.3rem 0.5rem;
+    border-bottom: solid;
+    border-color: var(--border-color);
+    border-width: 1px;
+}
+.cp-container nav p:nth-child(2n - 1) {
+    background-color: var(--alt-color);
+}
+.cp-container nav p:first-child {
+    background-color: var(--header-color);
+}
+.cp-container nav p:last-child {
+    border-bottom: hidden;
+}
+
+.footer {
+    text-align: center;
+}
+{{ end }}

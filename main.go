@@ -8,17 +8,23 @@ import (
 	"database/sql"
 	"embed"
 	"fmt"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
 
 	_ "github.com/lib/pq"
+
+	"peanut/internal/template"
 )
 
 //go:embed static
 var staticFs embed.FS
 
-func connectDb() {
+//go:embed template
+var templateFs embed.FS
+
+func connectDb() *sql.DB {
 	var host string
 	if os.Getenv("PEANUT_DB_HOST") != "" {
 		host = os.Getenv("PEANUT_DB_HOST")
@@ -51,20 +57,29 @@ func connectDb() {
 	}
 	pingErr := db.Ping()
 	if pingErr != nil {
-		log.Fatal("Error pinging database: ", pingErr)
+		log.Println("Error pinging database: ", pingErr)
 	}
-	defer db.Close()
+
+	return db
 }
 
 func main() {
 	log.Println("Preparing static files...")
 	http.Handle("/static/", http.FileServer(http.FS(staticFs)))
 
+	log.Println("Preparing templates...")
+	justTemplates, err := fs.Sub(templateFs, "template")
+	if err != nil {
+		log.Fatal("Error loading templates: ", err)
+	}
+	template.LoadTemplates(justTemplates)
+
 	log.Println("Connecting to database...")
 	connectDb()
 
 	http.HandleFunc("/{$}", func(w http.ResponseWriter, r *http.Request) {
-		_, err := fmt.Fprint(w, "Welcome to Peanut")
+		theTemplate := template.GetTemplate("_index")
+		err = theTemplate.Execute(w, nil)
 		if err != nil {
 			log.Println("Error:", err)
 		}

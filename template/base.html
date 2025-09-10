@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Peanut</title>
+    <style>
+        {{ template "common_css" }}
+    </style>
+    <script>
+        {{ block "head_script" . }}
+        {{ end }}
+    </script>
+</head>
+<body>
+<div id="title-bar">
+    <h1>Website</h1>
+    <div><a href="/">Log In</a></div>
+</div>
+<nav id="top-nav">
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/">Forum Index</a></li>
+    </ul>
+    <ul>
+        <li></li>
+    </ul>
+</nav>
+
+{{ block "content" . }}
+<p>No content</p>
+{{ end }}
+
+<hr>
+<div class="footer">
+    <p>Rendered in ??ms</p>
+</div>
+</body>
+</html>

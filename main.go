@@ -70,7 +70,7 @@ func main() {
 	log.Println("Preparing templates...")
 	justTemplates, err := fs.Sub(templateFs, "template")
 	if err != nil {
-		log.Fatal("Error loading templates: ", err)
+		log.Fatal("Failed to find embedded template directory: ", err)
 	}
 	template.LoadTemplates(justTemplates)
 

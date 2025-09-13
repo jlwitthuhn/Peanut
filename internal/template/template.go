@@ -8,6 +8,8 @@ import (
 	"html/template"
 	"io/fs"
 	"log"
+
+	"peanut/internal/logger"
 )
 
 var templatesByName map[string]*template.Template = make(map[string]*template.Template)
@@ -26,12 +28,12 @@ func LoadTemplates(fs fs.FS) {
 func loadTemplateOrDie(fs fs.FS, name string, files ...string) {
 	_, exists := templatesByName[name]
 	if exists {
-		log.Fatal("Template already exists: " + name)
+		logger.Fatal("Template already exists: " + name)
 	}
 	theTemplate, err := template.ParseFS(fs, files...)
 	if err != nil {
 		log.Fatal("Error parsing template: ", err)
 	}
 	templatesByName[name] = theTemplate
-	log.Println("Template loaded: " + name)
+	logger.Trace("Template loaded: " + name)
 }

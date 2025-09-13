@@ -15,6 +15,7 @@ import (
 
 	_ "github.com/lib/pq"
 
+	"peanut/internal/logger"
 	"peanut/internal/template"
 )
 
@@ -53,38 +54,41 @@ func connectDb() *sql.DB {
 	connStr := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", host, user, password, dbname)
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		log.Fatal("Error connecting to database: ", err)
+		logger.Fatal("Error connecting to database:", err)
 	}
 	pingErr := db.Ping()
 	if pingErr != nil {
-		log.Println("Error pinging database: ", pingErr)
+		logger.Warn("Error pinging database:", pingErr)
 	}
 
 	return db
 }
 
 func main() {
-	log.Println("Preparing static files...")
+	logger.Info("++ Starting Peanut ++")
+
+	logger.Info("Preparing static files...")
 	http.Handle("/static/", http.FileServer(http.FS(staticFs)))
 
-	log.Println("Preparing templates...")
+	logger.Info("Preparing templates...")
 	justTemplates, err := fs.Sub(templateFs, "template")
 	if err != nil {
 		log.Fatal("Failed to find embedded template directory: ", err)
 	}
 	template.LoadTemplates(justTemplates)
 
-	log.Println("Connecting to database...")
-	connectDb()
-
+	logger.Info("Registering routes...")
 	http.HandleFunc("/{$}", func(w http.ResponseWriter, r *http.Request) {
 		theTemplate := template.GetTemplate("_index")
 		err = theTemplate.Execute(w, nil)
 		if err != nil {
-			log.Println("Error:", err)
+			logger.Error("Error executing template:", err)
 		}
 	})
 
-	log.Println("Listening on :8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	logger.Info("Connecting to database...")
+	connectDb()
+
+	logger.Info("Startup complete, listening on :8080")
+	logger.Fatal(http.ListenAndServe(":8080", nil))
 }

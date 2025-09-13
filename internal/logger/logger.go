@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-var theLogger = log.New(os.Stdout, "[TRAC] ", log.LstdFlags|log.Lmicroseconds|log.Lmsgprefix)
+var theLogger = log.New(os.Stdout, "", log.LstdFlags|log.Lmicroseconds|log.Lmsgprefix)
 
 func Trace(args ...any) {
 	fullArgs := append([]any{"[TRAC]"}, args...)

@@ -12,6 +12,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"peanut/internal/middleware"
 
 	_ "github.com/lib/pq"
 
@@ -82,10 +83,11 @@ func main() {
 
 	logger.Info("Registering routes...")
 	pages.RegisterIndexHandlers(mux)
+	muxHandler := middleware.WrapHandler(mux, middleware.RequestLog)
 
 	logger.Info("Connecting to database...")
 	connectDb()
 
 	logger.Info("Startup complete, listening on :8080")
-	logger.Fatal(http.ListenAndServe(":8080", mux))
+	logger.Fatal(http.ListenAndServe(":8080", muxHandler))
 }

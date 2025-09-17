@@ -7,7 +7,6 @@ package pages
 import (
 	"net/http"
 	"peanut/internal/logger"
-	"peanut/internal/middleware"
 	"peanut/internal/template"
 )
 
@@ -20,6 +19,5 @@ func RegisterIndexHandlers(mux *http.ServeMux) {
 			logger.Error("Error executing template:", err)
 		}
 	})
-	indexHandlerWrapped := middleware.WrapHandlerFunc(indexHandler, middleware.RequestLog)
-	mux.Handle("/{$}", indexHandlerWrapped)
+	mux.Handle("/{$}", indexHandler)
 }

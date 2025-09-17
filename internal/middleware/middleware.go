@@ -8,8 +8,8 @@ import "net/http"
 
 type MiddlewareFunc func(next http.Handler) http.Handler
 
-func WrapHandlerFunc(baseFunc http.HandlerFunc, middleware ...MiddlewareFunc) http.Handler {
-	var result http.Handler = baseFunc
+func WrapHandler(baseHandler http.Handler, middleware ...MiddlewareFunc) http.Handler {
+	var result http.Handler = baseHandler
 	// Walk through the list backwards so the order the handlers run matches the list
 	for i := len(middleware) - 1; i >= 0; i-- {
 		result = middleware[i](result)

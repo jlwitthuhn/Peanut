@@ -12,12 +12,12 @@ import (
 
 func RegisterIndexHandlers(mux *http.ServeMux) {
 
-	indexHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	getIndexHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		theTemplate := template.GetTemplate("_index")
 		err := theTemplate.Execute(w, nil)
 		if err != nil {
 			logger.Error("Error executing template:", err)
 		}
 	})
-	mux.Handle("/{$}", indexHandler)
+	mux.Handle("GET /{$}", getIndexHandler)
 }

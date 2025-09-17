@@ -16,6 +16,7 @@ import (
 	_ "github.com/lib/pq"
 
 	"peanut/internal/logger"
+	"peanut/internal/pages"
 	"peanut/internal/template"
 )
 
@@ -78,13 +79,7 @@ func main() {
 	template.LoadTemplates(justTemplates)
 
 	logger.Info("Registering routes...")
-	http.HandleFunc("/{$}", func(w http.ResponseWriter, r *http.Request) {
-		theTemplate := template.GetTemplate("_index")
-		err = theTemplate.Execute(w, nil)
-		if err != nil {
-			logger.Error("Error executing template:", err)
-		}
-	})
+	pages.RegisterIndexHandlers()
 
 	logger.Info("Connecting to database...")
 	connectDb()

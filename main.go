@@ -68,8 +68,10 @@ func connectDb() *sql.DB {
 func main() {
 	logger.Info("++ Starting Peanut ++")
 
+	mux := http.NewServeMux()
+
 	logger.Info("Preparing static files...")
-	http.Handle("/static/", http.FileServer(http.FS(staticFs)))
+	mux.Handle("/static/", http.FileServer(http.FS(staticFs)))
 
 	logger.Info("Preparing templates...")
 	justTemplates, err := fs.Sub(templateFs, "template")
@@ -79,11 +81,11 @@ func main() {
 	template.LoadTemplates(justTemplates)
 
 	logger.Info("Registering routes...")
-	pages.RegisterIndexHandlers()
+	pages.RegisterIndexHandlers(mux)
 
 	logger.Info("Connecting to database...")
 	connectDb()
 
 	logger.Info("Startup complete, listening on :8080")
-	logger.Fatal(http.ListenAndServe(":8080", nil))
+	logger.Fatal(http.ListenAndServe(":8080", mux))
 }

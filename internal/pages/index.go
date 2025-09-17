@@ -11,7 +11,7 @@ import (
 	"peanut/internal/template"
 )
 
-func RegisterIndexHandlers() {
+func RegisterIndexHandlers(mux *http.ServeMux) {
 
 	indexHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		theTemplate := template.GetTemplate("_index")
@@ -21,5 +21,5 @@ func RegisterIndexHandlers() {
 		}
 	})
 	indexHandlerWrapped := middleware.WrapHandlerFunc(indexHandler, middleware.RequestLog)
-	http.Handle("/{$}", indexHandlerWrapped)
+	mux.Handle("/{$}", indexHandlerWrapped)
 }

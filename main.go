@@ -83,7 +83,7 @@ func main() {
 
 	logger.Info("Registering routes...")
 	pages.RegisterIndexHandlers(mux)
-	muxHandler := middleware.WrapHandler(mux, middleware.RequestLog)
+	muxHandler := middleware.WrapHandler(mux, middleware.RequestTimer, middleware.RequestLog)
 
 	logger.Info("Connecting to database...")
 	connectDb()

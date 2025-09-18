@@ -6,10 +6,11 @@ package pages
 
 import (
 	"net/http"
+	"time"
+
 	"peanut/internal/logger"
 	"peanut/internal/middleware"
 	"peanut/internal/template"
-	"time"
 )
 
 func RegisterIndexHandlers(mux *http.ServeMux) {

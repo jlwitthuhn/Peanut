@@ -9,13 +9,13 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
-	"peanut/internal/middleware"
-	"peanut/internal/persistence"
 
 	_ "github.com/lib/pq"
 
 	"peanut/internal/logger"
+	"peanut/internal/middleware"
 	"peanut/internal/pages"
+	"peanut/internal/persistence"
 	"peanut/internal/template"
 )
 

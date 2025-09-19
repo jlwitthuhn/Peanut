@@ -18,8 +18,13 @@ func DatabaseInitCheck(next http.Handler) http.Handler {
 			logger.Fatal(err)
 		}
 		if !tableExists {
-			w.WriteHeader(http.StatusNotFound)
-			genericpage.RenderSimpleMessage("Database Not Initialized", "The database must be configured before Peanut can be used.", w, r)
+			// Allow access to setup page only when DB is not initialized
+			if r.URL.Path == "/setup" {
+				next.ServeHTTP(w, r)
+			} else {
+				w.WriteHeader(http.StatusNotFound)
+				genericpage.RenderSimpleMessage("Database Not Initialized", "The database must be configured before Peanut can be used.", w, r)
+			}
 			return
 		}
 		next.ServeHTTP(w, r)

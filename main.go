@@ -46,6 +46,7 @@ func main() {
 
 	logger.Info("Registering routes...")
 	pages.RegisterIndexHandlers(middlewareMux)
+	pages.RegisterSetupHandlers(middlewareMux)
 	wrappedMiddlewareMux := middleware.WrapHandler(middlewareMux, middleware.RequestLog, middleware.RequestTimer, middleware.DatabaseInitCheck)
 	rootMux.Handle("/", wrappedMiddlewareMux)
 

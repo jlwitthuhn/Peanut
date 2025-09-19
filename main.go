@@ -28,10 +28,14 @@ var templateFs embed.FS
 func main() {
 	logger.Info("++ Starting Peanut ++")
 
-	mux := http.NewServeMux()
+	rawMux := http.NewServeMux()
+	middlewareMux := http.NewServeMux()
+	rootMux := http.NewServeMux()
+	rootMux.Handle("/favicon.ico", rawMux)
+	rootMux.Handle("/static/", rawMux)
 
 	logger.Info("Preparing static files...")
-	mux.Handle("/static/", http.FileServer(http.FS(staticFs)))
+	rawMux.Handle("/static/", http.FileServer(http.FS(staticFs)))
 
 	logger.Info("Preparing templates...")
 	justTemplates, err := fs.Sub(templateFs, "template")
@@ -41,12 +45,13 @@ func main() {
 	template.LoadTemplates(justTemplates)
 
 	logger.Info("Registering routes...")
-	pages.RegisterIndexHandlers(mux)
-	muxHandler := middleware.WrapHandler(mux, middleware.RequestLog, middleware.RequestTimer, middleware.DatabaseInitCheck)
+	pages.RegisterIndexHandlers(middlewareMux)
+	wrappedMiddlewareMux := middleware.WrapHandler(middlewareMux, middleware.RequestLog, middleware.RequestTimer, middleware.DatabaseInitCheck)
+	rootMux.Handle("/", wrappedMiddlewareMux)
 
 	logger.Info("Connecting to postgres...")
 	database.PostgresConnect()
 
 	logger.Info("Startup complete, listening on :8080")
-	logger.Fatal(http.ListenAndServe(":8080", muxHandler))
+	logger.Fatal(http.ListenAndServe(":8080", rootMux))
 }

@@ -23,8 +23,8 @@ func RegisterIndexHandlers(mux *http.ServeMux) {
 
 		templateCtx := make(map[string]any)
 		templateCtx["RequestDuration"] = requestDurationMs
-		theTemplate := template.GetTemplate("_index")
 
+		theTemplate := template.GetTemplate("_index")
 		err := theTemplate.Execute(w, templateCtx)
 		if err != nil {
 			logger.Error("Error executing template:", err)

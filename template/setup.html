@@ -1,0 +1,20 @@
+{{ define "content" }}
+<div class="vertical-flex-container">
+	<div class="simple-panel">
+		<div class="simple-panel-header"><h1>Forums Setup</h1></div>
+		<div class="simple-panel-content cp-NAME">
+			<form method="post">
+				<label for="admin-name">Admin username:</label><br>
+				<input type="text" id="admin-name" name="adminName"><br><br>
+				<label for="email">Admin email:</label><br>
+				<input type="text" id="email" name="email"><br><br>
+				<label for="admin-pass">Admin password:</label><br>
+				<input type="password" id="admin-pass" name="adminPass"><br><br>
+				<label for="admin-pass-2">Admin password (repeat):</label><br>
+				<input type="password" id="admin-pass-2" name="adminPass2"><br><br>
+				<input type="submit" value="Submit">
+			</form>
+		</div>
+	</div>
+</div>
+{{ end }}

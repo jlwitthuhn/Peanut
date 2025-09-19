@@ -23,6 +23,10 @@ func GetTemplate(name string) *template.Template {
 func LoadTemplates(fs fs.FS) {
 	indexFiles := []string{"base.html", "css/common.css", "index.html"}
 	loadTemplateOrDie(fs, "_index", indexFiles...)
+
+	setupFiles := []string{"base.html", "css/common.css", "setup.html"}
+	loadTemplateOrDie(fs, "_setup", setupFiles...)
+
 	simpleMessageFiles := []string{"base.html", "css/common.css", "simple_message.html"}
 	loadTemplateOrDie(fs, "_simple_message", simpleMessageFiles...)
 }

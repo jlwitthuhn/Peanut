@@ -6,12 +6,22 @@ package pages
 
 import (
 	"net/http"
-	"peanut/internal/pages/genericpage"
+	"peanut/internal/logger"
+	"peanut/internal/middleutil"
+	"peanut/internal/template"
 )
 
 func RegisterSetupHandlers(mux *http.ServeMux) {
+
 	getSetupHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		genericpage.RenderSimpleMessage("TODO", "Page not implemented", w, r)
+		templateCtx := make(map[string]any)
+		templateCtx["RequestDuration"] = middleutil.RequestTimerFinish(r)
+
+		theTemplate := template.GetTemplate("_setup")
+		err := theTemplate.Execute(w, templateCtx)
+		if err != nil {
+			logger.Error("Error executing setup template:", err)
+		}
 	})
 	mux.Handle("GET /setup", getSetupHandler)
 }

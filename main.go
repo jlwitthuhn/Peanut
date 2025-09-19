@@ -12,10 +12,10 @@ import (
 
 	_ "github.com/lib/pq"
 
+	"peanut/internal/database"
 	"peanut/internal/logger"
 	"peanut/internal/middleware"
 	"peanut/internal/pages"
-	"peanut/internal/persistence"
 	"peanut/internal/template"
 )
 
@@ -42,10 +42,10 @@ func main() {
 
 	logger.Info("Registering routes...")
 	pages.RegisterIndexHandlers(mux)
-	muxHandler := middleware.WrapHandler(mux, middleware.RequestTimer, middleware.RequestLog)
+	muxHandler := middleware.WrapHandler(mux, middleware.RequestLog, middleware.RequestTimer, middleware.DatabaseInitCheck)
 
 	logger.Info("Connecting to postgres...")
-	persistence.ConnectToPostgres()
+	database.PostgresConnect()
 
 	logger.Info("Startup complete, listening on :8080")
 	logger.Fatal(http.ListenAndServe(":8080", muxHandler))

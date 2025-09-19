@@ -2,7 +2,7 @@
 // https://www.gnu.org/licenses/agpl-3.0.en.html
 // SPDX-License-Identifier: AGPL-3.0-only
 
-package persistence
+package database
 
 import (
 	"database/sql"
@@ -12,7 +12,9 @@ import (
 	"peanut/internal/logger"
 )
 
-func ConnectToPostgres() *sql.DB {
+var pgDb *sql.DB = nil
+
+func PostgresConnect() {
 	var host string
 	if os.Getenv("PEANUT_DB_HOST") != "" {
 		host = os.Getenv("PEANUT_DB_HOST")
@@ -48,5 +50,9 @@ func ConnectToPostgres() *sql.DB {
 		logger.Warn("Database did not respond to ping:", pingErr)
 	}
 
-	return db
+	pgDb = db
+}
+
+func PostgresHandle() *sql.DB {
+	return pgDb
 }

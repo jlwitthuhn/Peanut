@@ -7,14 +7,13 @@ package middleware
 import (
 	"context"
 	"net/http"
+	"peanut/internal/middleutil"
 	"time"
 )
 
-var RequestTimerBeginKey string = "requestTimerBegin"
-
 func RequestTimer(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), RequestTimerBeginKey, time.Now())
+		ctx := context.WithValue(r.Context(), middleutil.RequestTimerBeginKey, time.Now())
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

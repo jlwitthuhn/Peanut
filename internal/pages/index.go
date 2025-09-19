@@ -6,23 +6,17 @@ package pages
 
 import (
 	"net/http"
-	"time"
-
 	"peanut/internal/logger"
-	"peanut/internal/middleware"
+	"peanut/internal/middleutil"
 	"peanut/internal/template"
 )
 
 func RegisterIndexHandlers(mux *http.ServeMux) {
 
 	getIndexHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		requestBegin := r.Context().Value(middleware.RequestTimerBeginKey).(time.Time)
-		requestDurationUs := time.Now().Sub(requestBegin).Microseconds()
-		requestDurationUs -= requestDurationUs % 10 // Two decimal places in milliseconds
-		requestDurationMs := float64(requestDurationUs) / 1000.0
 
 		templateCtx := make(map[string]any)
-		templateCtx["RequestDuration"] = requestDurationMs
+		templateCtx["RequestDuration"] = middleutil.RequestTimerFinish(r)
 
 		theTemplate := template.GetTemplate("_index")
 		err := theTemplate.Execute(w, templateCtx)

@@ -6,7 +6,6 @@ package middleware
 
 import (
 	"net/http"
-
 	"peanut/internal/logger"
 	"peanut/internal/pages/genericpage"
 	"peanut/internal/service/db_service"
@@ -20,7 +19,7 @@ func DatabaseInitCheck(next http.Handler) http.Handler {
 		}
 		if !tableExists {
 			w.WriteHeader(http.StatusNotFound)
-			genericpage.RenderSimpleMessage("Database Not Initialized", "The database must be configured before Peanut can be used.", w)
+			genericpage.RenderSimpleMessage("Database Not Initialized", "The database must be configured before Peanut can be used.", w, r)
 			return
 		}
 		next.ServeHTTP(w, r)

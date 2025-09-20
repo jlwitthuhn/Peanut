@@ -8,13 +8,13 @@ import (
 	"net/http"
 	"peanut/internal/logger"
 	"peanut/internal/pages/genericpage"
-	"peanut/internal/service/db_service"
+	"peanut/internal/service"
 )
 
-func DatabaseInitCheck() MiddlewareFunc {
+func DatabaseInitCheck(dbService service.DatabaseService) MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			tableExists, err := db_service.DoesTableExist("config_int")
+			tableExists, err := dbService.DoesTableExist("config_int")
 			if err != nil {
 				logger.Fatal(err)
 			}

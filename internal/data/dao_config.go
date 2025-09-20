@@ -13,8 +13,6 @@ type ConfigDao interface {
 	CreateDBObjects(*sql.Tx) error
 }
 
-type configDaoImpl struct{}
-
 var configDaoInstance ConfigDao
 var configDaoInstanceOnce sync.Once
 
@@ -24,6 +22,8 @@ func ConfigDaoInst() ConfigDao {
 	})
 	return configDaoInstance
 }
+
+type configDaoImpl struct{}
 
 func (*configDaoImpl) CreateDBObjects(tx *sql.Tx) error {
 	_, intErr := tx.Exec(sqlCreateTableInt)

@@ -13,6 +13,7 @@ import (
 	"peanut/internal/logger"
 	"peanut/internal/middleware"
 	"peanut/internal/pages"
+	"peanut/internal/service"
 	"peanut/internal/template"
 
 	_ "github.com/lib/pq"
@@ -43,10 +44,17 @@ func main() {
 	}
 	template.LoadTemplates(justTemplates)
 
+	logger.Info("Initializing services...")
+	var dbService service.DatabaseService = service.DatabaseServiceInst()
+
 	logger.Info("Registering routes...")
 	pages.RegisterIndexHandlers(middlewareMux)
-	pages.RegisterSetupHandlers(middlewareMux)
-	wrappedMiddlewareMux := middleware.WrapHandler(middlewareMux, middleware.RequestLog(), middleware.RequestTimer(), middleware.DatabaseInitCheck())
+	pages.RegisterSetupHandlers(middlewareMux, dbService)
+	wrappedMiddlewareMux := middleware.WrapHandler(middlewareMux,
+		middleware.RequestLog(),
+		middleware.RequestTimer(),
+		middleware.DatabaseInitCheck(dbService),
+	)
 	rootMux.Handle("/", wrappedMiddlewareMux)
 
 	logger.Info("Connecting to postgres...")

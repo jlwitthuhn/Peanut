@@ -11,7 +11,7 @@ import (
 	"peanut/internal/logger"
 	"peanut/internal/middleutil"
 	"peanut/internal/pages/genericpage"
-	"peanut/internal/service/db_service"
+	"peanut/internal/service"
 	"peanut/internal/template"
 )
 
@@ -27,7 +27,7 @@ func isUsernameValid(username string) bool {
 	return len(username) > 1
 }
 
-func RegisterSetupHandlers(mux *http.ServeMux) {
+func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService) {
 
 	getSetupHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		templateCtx := make(map[string]any)
@@ -42,7 +42,7 @@ func RegisterSetupHandlers(mux *http.ServeMux) {
 	mux.Handle("GET /setup", getSetupHandler)
 
 	postSetupHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		configTableExists, configTableErr := db_service.DoesTableExist("config_int")
+		configTableExists, configTableErr := dbService.DoesTableExist("config_int")
 		if configTableErr != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			genericpage.RenderSimpleMessage("Error", "Failed to query data.", w, r)

@@ -11,19 +11,24 @@ import (
 	"sync"
 )
 
-type MetaDao struct{}
+type MetaDao interface {
+	CreateDBObjects(*sql.Tx) error
+	DoesTableExist(tableName string) (bool, error)
+}
 
-var metaDaoInstance *MetaDao
+type metaDaoImpl struct{}
+
+var metaDaoInstance MetaDao
 var metaDaoInstanceOnce sync.Once
 
-func MetaDaoInst() *MetaDao {
+func MetaDaoInst() MetaDao {
 	metaDaoInstanceOnce.Do(func() {
-		metaDaoInstance = &MetaDao{}
+		metaDaoInstance = &metaDaoImpl{}
 	})
 	return metaDaoInstance
 }
 
-func (*MetaDao) CreateDBObjects(tx *sql.Tx) error {
+func (*metaDaoImpl) CreateDBObjects(tx *sql.Tx) error {
 	_, errInsert := tx.Exec(sqlCreatedUpdatedBeforeInsert)
 	if errInsert != nil {
 		return errInsert
@@ -35,7 +40,7 @@ func (*MetaDao) CreateDBObjects(tx *sql.Tx) error {
 	return nil
 }
 
-func (dao *MetaDao) DoesTableExist(tableName string) (bool, error) {
+func (dao *metaDaoImpl) DoesTableExist(tableName string) (bool, error) {
 	db := datasource.PostgresHandle()
 	rows, err := db.Query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = $1", tableName)
 	if err != nil {

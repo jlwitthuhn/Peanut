@@ -9,19 +9,23 @@ import (
 	"sync"
 )
 
-type ConfigDao struct{}
+type ConfigDao interface {
+	CreateDBObjects(*sql.Tx) error
+}
 
-var configDaoInstance *ConfigDao
+type configDaoImpl struct{}
+
+var configDaoInstance ConfigDao
 var configDaoInstanceOnce sync.Once
 
-func ConfigDaoInst() *ConfigDao {
+func ConfigDaoInst() ConfigDao {
 	configDaoInstanceOnce.Do(func() {
-		configDaoInstance = &ConfigDao{}
+		configDaoInstance = &configDaoImpl{}
 	})
 	return configDaoInstance
 }
 
-func (*ConfigDao) CreateDBObjects(tx *sql.Tx) error {
+func (*configDaoImpl) CreateDBObjects(tx *sql.Tx) error {
 	_, intErr := tx.Exec(sqlCreateTableInt)
 	if intErr != nil {
 		return intErr

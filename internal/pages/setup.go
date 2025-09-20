@@ -81,6 +81,7 @@ func RegisterSetupHandlers(mux *http.ServeMux) {
 			return
 		}
 
+		logger.Info("Input valid, beginning init...")
 		tx, txErr := database.PostgresHandle().BeginTx(r.Context(), nil)
 		if txErr != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -89,6 +90,7 @@ func RegisterSetupHandlers(mux *http.ServeMux) {
 		}
 		defer tx.Rollback()
 
+		logger.Info("Creating database tables...")
 		metaErr := data_meta.CreateDBObjects(tx)
 		if metaErr != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -102,6 +104,7 @@ func RegisterSetupHandlers(mux *http.ServeMux) {
 			return
 		}
 
+		logger.Info("Commiting transaction...")
 		commitErr := tx.Commit()
 		if commitErr != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -109,6 +112,7 @@ func RegisterSetupHandlers(mux *http.ServeMux) {
 			return
 		}
 
+		logger.Info("Peanut initialization complete.")
 		genericpage.RenderSimpleMessage("Complete", "Peanut has been initialized.", w, r)
 	})
 	mux.Handle("POST /setup", postSetupHandler)

@@ -6,10 +6,43 @@ package data_meta
 
 import (
 	"database/sql"
-
 	"peanut/internal/database"
 	"peanut/internal/logger"
 )
+
+var sqlCreatedUpdatedBeforeInsert = `
+	CREATE FUNCTION fn_created_updated_before_insert()
+	RETURNS TRIGGER AS $$
+	BEGIN
+		NEW._created := now();
+		NEW._updated := NEW._created;
+		RETURN NEW;
+	END;
+	$$ LANGUAGE plpgsql;
+`
+
+var sqlCreatedUpdatedBeforeUpdate = `
+	CREATE FUNCTION fn_created_updated_before_update()
+	RETURNS TRIGGER AS $$
+	BEGIN
+		NEW._created := OLD._created;
+		NEW._updated := now();
+		RETURN NEW;
+	END;
+	$$ LANGUAGE plpgsql;
+`
+
+func CreateDBObjects(tx *sql.Tx) error {
+	_, errInsert := tx.Exec(sqlCreatedUpdatedBeforeInsert)
+	if errInsert != nil {
+		return errInsert
+	}
+	_, errUpdate := tx.Exec(sqlCreatedUpdatedBeforeUpdate)
+	if errUpdate != nil {
+		return errUpdate
+	}
+	return nil
+}
 
 func DoesTableExist(tableName string) (bool, error) {
 	db := database.PostgresHandle()

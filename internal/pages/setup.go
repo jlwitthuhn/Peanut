@@ -6,6 +6,9 @@ package pages
 
 import (
 	"net/http"
+	"peanut/internal/database"
+	"peanut/internal/database/data/data_config"
+	"peanut/internal/database/data/data_meta"
 	"peanut/internal/logger"
 	"peanut/internal/middleutil"
 	"peanut/internal/pages/genericpage"
@@ -78,8 +81,35 @@ func RegisterSetupHandlers(mux *http.ServeMux) {
 			return
 		}
 
-		// TODO: This should create DB tables with default data through `SetupService`
-		genericpage.RenderSimpleMessage("TODO", "This is the part where database tables would be created.", w, r)
+		tx, txErr := database.PostgresHandle().BeginTx(r.Context(), nil)
+		if txErr != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			genericpage.RenderSimpleMessage("Error", "Failed to start database transaction.", w, r)
+			return
+		}
+		defer tx.Rollback()
+
+		metaErr := data_meta.CreateDBObjects(tx)
+		if metaErr != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			genericpage.RenderSimpleMessage("Error", "Failed to create meta db objects.", w, r)
+			return
+		}
+		configErr := data_config.CreateDBObjects(tx)
+		if configErr != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			genericpage.RenderSimpleMessage("Error", "Failed to create config db objects.", w, r)
+			return
+		}
+
+		commitErr := tx.Commit()
+		if commitErr != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			genericpage.RenderSimpleMessage("Error", "Failed to commit database transaction.", w, r)
+			return
+		}
+
+		genericpage.RenderSimpleMessage("Complete", "Peanut has been initialized.", w, r)
 	})
 	mux.Handle("POST /setup", postSetupHandler)
 }

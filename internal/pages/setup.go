@@ -7,8 +7,6 @@ package pages
 import (
 	"net/http"
 	"peanut/internal/database"
-	"peanut/internal/database/data/data_config"
-	"peanut/internal/database/data/data_meta"
 	"peanut/internal/logger"
 	"peanut/internal/middleutil"
 	"peanut/internal/pages/genericpage"
@@ -91,13 +89,13 @@ func RegisterSetupHandlers(mux *http.ServeMux) {
 		defer tx.Rollback()
 
 		logger.Info("Creating database tables...")
-		metaErr := data_meta.CreateDBObjects(tx)
+		metaErr := database.MetaDaoInst().CreateDBObjects(tx)
 		if metaErr != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			genericpage.RenderSimpleMessage("Error", "Failed to create meta db objects.", w, r)
 			return
 		}
-		configErr := data_config.CreateDBObjects(tx)
+		configErr := database.ConfigDaoInst().CreateDBObjects(tx)
 		if configErr != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			genericpage.RenderSimpleMessage("Error", "Failed to create config db objects.", w, r)

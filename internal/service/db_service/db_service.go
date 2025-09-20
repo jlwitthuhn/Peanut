@@ -4,8 +4,8 @@
 
 package db_service
 
-import "peanut/internal/database/data/data_meta"
+import "peanut/internal/database"
 
 func DoesTableExist(tableName string) (bool, error) {
-	return data_meta.DoesTableExist(tableName)
+	return database.MetaDaoInst().DoesTableExist(tableName)
 }

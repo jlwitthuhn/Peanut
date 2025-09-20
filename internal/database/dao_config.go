@@ -2,9 +2,32 @@
 // https://www.gnu.org/licenses/agpl-3.0.en.html
 // SPDX-License-Identifier: AGPL-3.0-only
 
-package data_config
+package database
 
-import "database/sql"
+import (
+	"database/sql"
+	"sync"
+)
+
+type ConfigDao struct{}
+
+var configDaoInstance *ConfigDao
+var configDaoInstanceOnce sync.Once
+
+func ConfigDaoInst() *ConfigDao {
+	configDaoInstanceOnce.Do(func() {
+		configDaoInstance = &ConfigDao{}
+	})
+	return configDaoInstance
+}
+
+func (*ConfigDao) CreateDBObjects(tx *sql.Tx) error {
+	_, intErr := tx.Exec(sqlCreateTableInt)
+	if intErr != nil {
+		return intErr
+	}
+	return nil
+}
 
 var sqlCreateTableInt = `
 	CREATE TABLE config_int (
@@ -28,11 +51,3 @@ var sqlCreateTableInt = `
 	FOR EACH ROW EXECUTE FUNCTION
 		fn_created_updated_before_update();
 `
-
-func CreateDBObjects(tx *sql.Tx) error {
-	_, intErr := tx.Exec(sqlCreateTableInt)
-	if intErr != nil {
-		return intErr
-	}
-	return nil
-}

@@ -2,37 +2,27 @@
 // https://www.gnu.org/licenses/agpl-3.0.en.html
 // SPDX-License-Identifier: AGPL-3.0-only
 
-package data_meta
+package database
 
 import (
 	"database/sql"
-	"peanut/internal/database"
 	"peanut/internal/logger"
+	"sync"
 )
 
-var sqlCreatedUpdatedBeforeInsert = `
-	CREATE FUNCTION fn_created_updated_before_insert()
-	RETURNS TRIGGER AS $$
-	BEGIN
-		NEW._created := now();
-		NEW._updated := NEW._created;
-		RETURN NEW;
-	END;
-	$$ LANGUAGE plpgsql;
-`
+type MetaDao struct{}
 
-var sqlCreatedUpdatedBeforeUpdate = `
-	CREATE FUNCTION fn_created_updated_before_update()
-	RETURNS TRIGGER AS $$
-	BEGIN
-		NEW._created := OLD._created;
-		NEW._updated := now();
-		RETURN NEW;
-	END;
-	$$ LANGUAGE plpgsql;
-`
+var metaDaoInstance *MetaDao
+var metaDaoInstanceOnce sync.Once
 
-func CreateDBObjects(tx *sql.Tx) error {
+func MetaDaoInst() *MetaDao {
+	metaDaoInstanceOnce.Do(func() {
+		metaDaoInstance = &MetaDao{}
+	})
+	return metaDaoInstance
+}
+
+func (*MetaDao) CreateDBObjects(tx *sql.Tx) error {
 	_, errInsert := tx.Exec(sqlCreatedUpdatedBeforeInsert)
 	if errInsert != nil {
 		return errInsert
@@ -44,8 +34,8 @@ func CreateDBObjects(tx *sql.Tx) error {
 	return nil
 }
 
-func DoesTableExist(tableName string) (bool, error) {
-	db := database.PostgresHandle()
+func (dao *MetaDao) DoesTableExist(tableName string) (bool, error) {
+	db := PostgresHandle()
 	rows, err := db.Query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = $1", tableName)
 	if err != nil {
 		logger.Warn("Error querying in data_meta.DoesTableExist:", tableName, err)
@@ -70,3 +60,25 @@ func DoesTableExist(tableName string) (bool, error) {
 	}
 	return theCount > 0, nil
 }
+
+var sqlCreatedUpdatedBeforeInsert = `
+	CREATE FUNCTION fn_created_updated_before_insert()
+	RETURNS TRIGGER AS $$
+	BEGIN
+		NEW._created := now();
+		NEW._updated := NEW._created;
+		RETURN NEW;
+	END;
+	$$ LANGUAGE plpgsql;
+`
+
+var sqlCreatedUpdatedBeforeUpdate = `
+	CREATE FUNCTION fn_created_updated_before_update()
+	RETURNS TRIGGER AS $$
+	BEGIN
+		NEW._created := OLD._created;
+		NEW._updated := now();
+		RETURN NEW;
+	END;
+	$$ LANGUAGE plpgsql;
+`

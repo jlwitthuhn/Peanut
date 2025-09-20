@@ -6,21 +6,14 @@ package service
 
 import (
 	"peanut/internal/data"
-	"sync"
 )
 
 type DatabaseService interface {
 	DoesTableExist(tableName string) (bool, error)
 }
 
-var dbServiceInstance DatabaseService
-var dbServiceInstanceOnce sync.Once
-
-func DatabaseServiceInst() DatabaseService {
-	dbServiceInstanceOnce.Do(func() {
-		dbServiceInstance = &databaseServiceImpl{}
-	})
-	return dbServiceInstance
+func NewDatabaseService() DatabaseService {
+	return &databaseServiceImpl{}
 }
 
 type databaseServiceImpl struct{}

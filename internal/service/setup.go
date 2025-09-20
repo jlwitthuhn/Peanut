@@ -7,28 +7,25 @@ package service
 import (
 	"context"
 	"peanut/internal/data"
+	"peanut/internal/data/configkey"
 	"peanut/internal/data/datasource"
 	"peanut/internal/logger"
-	"sync"
+	"time"
 )
 
 type SetupService interface {
 	InitializeDatabase(context.Context) error
 }
 
-var setupServiceInstance SetupService
-var setupServiceInstanceOnce sync.Once
-
-func SetupServiceInst() SetupService {
-	setupServiceInstanceOnce.Do(func() {
-		setupServiceInstance = &setupServiceImpl{}
-	})
-	return setupServiceInstance
+func NewSetupService(configService ConfigService) SetupService {
+	return &setupServiceImpl{configService: configService}
 }
 
-type setupServiceImpl struct{}
+type setupServiceImpl struct {
+	configService ConfigService
+}
 
-func (*setupServiceImpl) InitializeDatabase(ctx context.Context) error {
+func (this *setupServiceImpl) InitializeDatabase(ctx context.Context) error {
 	logger.Trace("Preparing transaction...")
 	tx, txErr := datasource.PostgresHandle().BeginTx(ctx, nil)
 	if txErr != nil {
@@ -36,7 +33,7 @@ func (*setupServiceImpl) InitializeDatabase(ctx context.Context) error {
 	}
 	defer tx.Rollback()
 
-	logger.Trace("Creating data tables...")
+	logger.Trace("Creating tables...")
 	metaErr := data.MetaDaoInst().CreateDBObjects(tx)
 	if metaErr != nil {
 		return metaErr
@@ -44,6 +41,12 @@ func (*setupServiceImpl) InitializeDatabase(ctx context.Context) error {
 	configErr := data.ConfigDaoInst().CreateDBObjects(tx)
 	if configErr != nil {
 		return configErr
+	}
+
+	logger.Trace("Populating data...")
+	configTimeErr := this.configService.SetInt(configkey.IntInitializedTime, time.Now().Unix(), tx)
+	if configTimeErr != nil {
+		return configTimeErr
 	}
 
 	logger.Trace("Commiting transaction...")

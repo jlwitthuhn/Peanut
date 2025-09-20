@@ -45,8 +45,9 @@ func main() {
 	template.LoadTemplates(justTemplates)
 
 	logger.Info("Initializing services...")
-	var dbService = service.DatabaseServiceInst()
-	var setupService = service.SetupServiceInst()
+	var configService = service.NewConfigService()
+	var dbService = service.NewDatabaseService()
+	var setupService = service.NewSetupService(configService)
 
 	logger.Info("Registering routes...")
 	pages.RegisterIndexHandlers(middlewareMux)

@@ -6,11 +6,14 @@ package data
 
 import (
 	"database/sql"
+	"peanut/internal/data/datasource"
+	"peanut/internal/logger"
 	"sync"
 )
 
 type ConfigDao interface {
 	CreateDBObjects(*sql.Tx) error
+	UpsertIntByName(name string, value int64, tx *sql.Tx) error
 }
 
 var configDaoInstance ConfigDao
@@ -24,14 +27,6 @@ func ConfigDaoInst() ConfigDao {
 }
 
 type configDaoImpl struct{}
-
-func (*configDaoImpl) CreateDBObjects(tx *sql.Tx) error {
-	_, intErr := tx.Exec(sqlCreateTableInt)
-	if intErr != nil {
-		return intErr
-	}
-	return nil
-}
 
 var sqlCreateTableInt = `
 	CREATE TABLE config_int (
@@ -55,3 +50,31 @@ var sqlCreateTableInt = `
 	FOR EACH ROW EXECUTE FUNCTION
 		fn_created_updated_before_update();
 `
+
+func (*configDaoImpl) CreateDBObjects(tx *sql.Tx) error {
+	_, err := tx.Exec(sqlCreateTableInt)
+	if err != nil {
+		logger.Error("Got error on ConfigDao/CreateDBObjects query: ", err)
+		return err
+	}
+	return nil
+}
+
+var sqlUpsertIntByName = `
+	INSERT INTO
+		config_int (name, value)
+	VALUES
+		($1, $2)
+	ON CONFLICT (name)
+		DO UPDATE SET value = EXCLUDED.value;
+`
+
+func (*configDaoImpl) UpsertIntByName(name string, value int64, tx *sql.Tx) error {
+	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
+	_, err := sqlh.Exec(sqlUpsertIntByName, name, value)
+	if err != nil {
+		logger.Error("Got error on ConfigDao/UpsertIntByName query: ", err)
+		return err
+	}
+	return nil
+}

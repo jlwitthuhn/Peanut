@@ -45,11 +45,12 @@ func main() {
 	template.LoadTemplates(justTemplates)
 
 	logger.Info("Initializing services...")
-	var dbService service.DatabaseService = service.DatabaseServiceInst()
+	var dbService = service.DatabaseServiceInst()
+	var setupService = service.SetupServiceInst()
 
 	logger.Info("Registering routes...")
 	pages.RegisterIndexHandlers(middlewareMux)
-	pages.RegisterSetupHandlers(middlewareMux, dbService)
+	pages.RegisterSetupHandlers(middlewareMux, dbService, setupService)
 	wrappedMiddlewareMux := middleware.WrapHandler(middlewareMux,
 		middleware.RequestLog(),
 		middleware.RequestTimer(),

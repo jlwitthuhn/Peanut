@@ -6,8 +6,6 @@ package pages
 
 import (
 	"net/http"
-	"peanut/internal/data"
-	"peanut/internal/data/datasource"
 	"peanut/internal/logger"
 	"peanut/internal/middleutil"
 	"peanut/internal/pages/genericpage"
@@ -27,7 +25,7 @@ func isUsernameValid(username string) bool {
 	return len(username) > 1
 }
 
-func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService) {
+func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService, setupService service.SetupService) {
 
 	getSetupHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		templateCtx := make(map[string]any)
@@ -80,34 +78,12 @@ func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService
 			return
 		}
 
-		logger.Info("Input valid, beginning init...")
-		tx, txErr := datasource.PostgresHandle().BeginTx(r.Context(), nil)
-		if txErr != nil {
+		logger.Info("Input valid, initializing...")
+		initErr := setupService.InitializeDatabase(r.Context())
+		if initErr != nil {
+			logger.Error("Error initializing database:", initErr)
 			w.WriteHeader(http.StatusInternalServerError)
-			genericpage.RenderSimpleMessage("Error", "Failed to start data transaction.", w, r)
-			return
-		}
-		defer tx.Rollback()
-
-		logger.Info("Creating data tables...")
-		metaErr := data.MetaDaoInst().CreateDBObjects(tx)
-		if metaErr != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			genericpage.RenderSimpleMessage("Error", "Failed to create meta db objects.", w, r)
-			return
-		}
-		configErr := data.ConfigDaoInst().CreateDBObjects(tx)
-		if configErr != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			genericpage.RenderSimpleMessage("Error", "Failed to create config db objects.", w, r)
-			return
-		}
-
-		logger.Info("Commiting transaction...")
-		commitErr := tx.Commit()
-		if commitErr != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			genericpage.RenderSimpleMessage("Error", "Failed to commit data transaction.", w, r)
+			genericpage.RenderSimpleMessage("Error", "Failed to initialize database.", w, r)
 			return
 		}
 

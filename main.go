@@ -10,13 +10,12 @@ import (
 	"log"
 	"net/http"
 	"peanut/internal/data/datasource"
-
-	_ "github.com/lib/pq"
-
 	"peanut/internal/logger"
 	"peanut/internal/middleware"
 	"peanut/internal/pages"
 	"peanut/internal/template"
+
+	_ "github.com/lib/pq"
 )
 
 //go:embed static
@@ -47,7 +46,7 @@ func main() {
 	logger.Info("Registering routes...")
 	pages.RegisterIndexHandlers(middlewareMux)
 	pages.RegisterSetupHandlers(middlewareMux)
-	wrappedMiddlewareMux := middleware.WrapHandler(middlewareMux, middleware.RequestLog, middleware.RequestTimer, middleware.DatabaseInitCheck)
+	wrappedMiddlewareMux := middleware.WrapHandler(middlewareMux, middleware.RequestLog(), middleware.RequestTimer(), middleware.DatabaseInitCheck())
 	rootMux.Handle("/", wrappedMiddlewareMux)
 
 	logger.Info("Connecting to postgres...")

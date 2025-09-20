@@ -11,22 +11,24 @@ import (
 	"peanut/internal/service/db_service"
 )
 
-func DatabaseInitCheck(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		tableExists, err := db_service.DoesTableExist("config_int")
-		if err != nil {
-			logger.Fatal(err)
-		}
-		if !tableExists {
-			// Allow access to setup page only when DB is not initialized
-			if r.URL.Path == "/setup" {
-				next.ServeHTTP(w, r)
-			} else {
-				w.WriteHeader(http.StatusNotFound)
-				genericpage.RenderSimpleMessage("Database Not Initialized", "The data must be configured before Peanut can be used.", w, r)
+func DatabaseInitCheck() MiddlewareFunc {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			tableExists, err := db_service.DoesTableExist("config_int")
+			if err != nil {
+				logger.Fatal(err)
 			}
-			return
-		}
-		next.ServeHTTP(w, r)
-	})
+			if !tableExists {
+				// Allow access to setup page only when DB is not initialized
+				if r.URL.Path == "/setup" {
+					next.ServeHTTP(w, r)
+				} else {
+					w.WriteHeader(http.StatusNotFound)
+					genericpage.RenderSimpleMessage("Database Not Initialized", "The data must be configured before Peanut can be used.", w, r)
+				}
+				return
+			}
+			next.ServeHTTP(w, r)
+		})
+	}
 }

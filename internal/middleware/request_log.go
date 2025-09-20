@@ -10,9 +10,11 @@ import (
 	"peanut/internal/logger"
 )
 
-func RequestLog(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		logger.Trace("Received request:", r.Method, r.URL.Path)
-		next.ServeHTTP(w, r)
-	})
+func RequestLog() MiddlewareFunc {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			logger.Trace("Received request:", r.Method, r.URL.Path)
+			next.ServeHTTP(w, r)
+		})
+	}
 }

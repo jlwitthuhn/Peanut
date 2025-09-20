@@ -2,7 +2,7 @@
 // https://www.gnu.org/licenses/agpl-3.0.en.html
 // SPDX-License-Identifier: AGPL-3.0-only
 
-package database
+package datasource
 
 import (
 	"database/sql"
@@ -43,7 +43,7 @@ func PostgresConnect() {
 	connStr := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", host, user, password, dbname)
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		logger.Fatal("Error connecting to database:", err)
+		logger.Fatal("Error connecting to data:", err)
 	}
 	pingErr := db.Ping()
 	if pingErr != nil {

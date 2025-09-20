@@ -2,7 +2,7 @@
 // https://www.gnu.org/licenses/agpl-3.0.en.html
 // SPDX-License-Identifier: AGPL-3.0-only
 
-package database
+package data
 
 import (
 	"database/sql"

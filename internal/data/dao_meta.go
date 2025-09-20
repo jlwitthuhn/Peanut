@@ -2,10 +2,11 @@
 // https://www.gnu.org/licenses/agpl-3.0.en.html
 // SPDX-License-Identifier: AGPL-3.0-only
 
-package database
+package data
 
 import (
 	"database/sql"
+	"peanut/internal/data/datasource"
 	"peanut/internal/logger"
 	"sync"
 )
@@ -35,7 +36,7 @@ func (*MetaDao) CreateDBObjects(tx *sql.Tx) error {
 }
 
 func (dao *MetaDao) DoesTableExist(tableName string) (bool, error) {
-	db := PostgresHandle()
+	db := datasource.PostgresHandle()
 	rows, err := db.Query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = $1", tableName)
 	if err != nil {
 		logger.Warn("Error querying in data_meta.DoesTableExist:", tableName, err)

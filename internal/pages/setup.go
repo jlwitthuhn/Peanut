@@ -6,7 +6,8 @@ package pages
 
 import (
 	"net/http"
-	"peanut/internal/database"
+	"peanut/internal/data"
+	"peanut/internal/data/datasource"
 	"peanut/internal/logger"
 	"peanut/internal/middleutil"
 	"peanut/internal/pages/genericpage"
@@ -44,7 +45,7 @@ func RegisterSetupHandlers(mux *http.ServeMux) {
 		configTableExists, configTableErr := db_service.DoesTableExist("config_int")
 		if configTableErr != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			genericpage.RenderSimpleMessage("Error", "Failed to query database.", w, r)
+			genericpage.RenderSimpleMessage("Error", "Failed to query data.", w, r)
 			return
 		}
 		if configTableExists {
@@ -80,22 +81,22 @@ func RegisterSetupHandlers(mux *http.ServeMux) {
 		}
 
 		logger.Info("Input valid, beginning init...")
-		tx, txErr := database.PostgresHandle().BeginTx(r.Context(), nil)
+		tx, txErr := datasource.PostgresHandle().BeginTx(r.Context(), nil)
 		if txErr != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			genericpage.RenderSimpleMessage("Error", "Failed to start database transaction.", w, r)
+			genericpage.RenderSimpleMessage("Error", "Failed to start data transaction.", w, r)
 			return
 		}
 		defer tx.Rollback()
 
-		logger.Info("Creating database tables...")
-		metaErr := database.MetaDaoInst().CreateDBObjects(tx)
+		logger.Info("Creating data tables...")
+		metaErr := data.MetaDaoInst().CreateDBObjects(tx)
 		if metaErr != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			genericpage.RenderSimpleMessage("Error", "Failed to create meta db objects.", w, r)
 			return
 		}
-		configErr := database.ConfigDaoInst().CreateDBObjects(tx)
+		configErr := data.ConfigDaoInst().CreateDBObjects(tx)
 		if configErr != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			genericpage.RenderSimpleMessage("Error", "Failed to create config db objects.", w, r)
@@ -106,7 +107,7 @@ func RegisterSetupHandlers(mux *http.ServeMux) {
 		commitErr := tx.Commit()
 		if commitErr != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			genericpage.RenderSimpleMessage("Error", "Failed to commit database transaction.", w, r)
+			genericpage.RenderSimpleMessage("Error", "Failed to commit data transaction.", w, r)
 			return
 		}
 

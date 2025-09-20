@@ -23,7 +23,7 @@ func DatabaseInitCheck(next http.Handler) http.Handler {
 				next.ServeHTTP(w, r)
 			} else {
 				w.WriteHeader(http.StatusNotFound)
-				genericpage.RenderSimpleMessage("Database Not Initialized", "The database must be configured before Peanut can be used.", w, r)
+				genericpage.RenderSimpleMessage("Database Not Initialized", "The data must be configured before Peanut can be used.", w, r)
 			}
 			return
 		}

@@ -9,10 +9,10 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	"peanut/internal/data/datasource"
 
 	_ "github.com/lib/pq"
 
-	"peanut/internal/database"
 	"peanut/internal/logger"
 	"peanut/internal/middleware"
 	"peanut/internal/pages"
@@ -51,7 +51,7 @@ func main() {
 	rootMux.Handle("/", wrappedMiddlewareMux)
 
 	logger.Info("Connecting to postgres...")
-	database.PostgresConnect()
+	datasource.PostgresConnect()
 
 	logger.Info("Startup complete, listening on :8080")
 	logger.Fatal(http.ListenAndServe(":8080", rootMux))

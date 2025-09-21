@@ -50,6 +50,10 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request) error {
 		if groupErr != nil {
 			return groupErr
 		}
+		userErr := data.UserDaoInst().CreateDBObjects(tx)
+		if userErr != nil {
+			return userErr
+		}
 	}
 
 	logger.Trace(r, "Populating data...")

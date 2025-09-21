@@ -36,13 +36,19 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request) error {
 	defer tx.Rollback()
 
 	logger.Trace(r, "Creating tables...")
-	metaErr := data.MetaDaoInst().CreateDBObjects(tx)
-	if metaErr != nil {
-		return metaErr
-	}
-	configErr := data.ConfigDaoInst().CreateDBObjects(tx)
-	if configErr != nil {
-		return configErr
+	{
+		metaErr := data.MetaDaoInst().CreateDBObjects(tx)
+		if metaErr != nil {
+			return metaErr
+		}
+		configErr := data.ConfigDaoInst().CreateDBObjects(tx)
+		if configErr != nil {
+			return configErr
+		}
+		groupErr := data.GroupDaoInst().CreateDBObjects(tx)
+		if groupErr != nil {
+			return groupErr
+		}
 	}
 
 	logger.Trace(r, "Populating data...")

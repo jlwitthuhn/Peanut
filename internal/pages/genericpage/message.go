@@ -20,6 +20,6 @@ func RenderSimpleMessage(title string, message string, w http.ResponseWriter, r 
 	theTemplate := template.GetTemplate("_simple_message")
 	err := theTemplate.Execute(w, templateCtx)
 	if err != nil {
-		logger.Error("Error executing simple message template:", err)
+		logger.Error(r, "Error executing simple message template:", err)
 	}
 }

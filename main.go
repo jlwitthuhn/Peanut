@@ -26,7 +26,7 @@ var staticFs embed.FS
 var templateFs embed.FS
 
 func main() {
-	logger.Info("++ Starting Peanut ++")
+	logger.Info(nil, "++ Starting Peanut ++")
 
 	rawMux := http.NewServeMux()
 	middlewareMux := http.NewServeMux()
@@ -34,34 +34,35 @@ func main() {
 	rootMux.Handle("/favicon.ico", rawMux)
 	rootMux.Handle("/static/", rawMux)
 
-	logger.Info("Preparing static files...")
+	logger.Info(nil, "Preparing static files...")
 	rawMux.Handle("/static/", http.FileServer(http.FS(staticFs)))
 
-	logger.Info("Preparing templates...")
+	logger.Info(nil, "Preparing templates...")
 	justTemplates, err := fs.Sub(templateFs, "template")
 	if err != nil {
 		log.Fatal("Failed to find embedded template directory: ", err)
 	}
 	template.LoadTemplates(justTemplates)
 
-	logger.Info("Initializing services...")
+	logger.Info(nil, "Initializing services...")
 	var configService = service.NewConfigService()
 	var dbService = service.NewDatabaseService()
 	var setupService = service.NewSetupService(configService)
 
-	logger.Info("Registering routes...")
+	logger.Info(nil, "Registering routes...")
 	pages.RegisterIndexHandlers(middlewareMux)
 	pages.RegisterSetupHandlers(middlewareMux, dbService, setupService)
 	wrappedMiddlewareMux := middleware.WrapHandler(middlewareMux,
+		middleware.RequestId(),
 		middleware.RequestLog(),
 		middleware.RequestTimer(),
 		middleware.DatabaseInitCheck(dbService),
 	)
 	rootMux.Handle("/", wrappedMiddlewareMux)
 
-	logger.Info("Connecting to postgres...")
+	logger.Info(nil, "Connecting to postgres...")
 	datasource.PostgresConnect()
 
-	logger.Info("Startup complete, listening on :8080")
-	logger.Fatal(http.ListenAndServe(":8080", rootMux))
+	logger.Info(nil, "Startup complete, listening on :8080")
+	logger.Fatal(nil, http.ListenAndServe(":8080", rootMux))
 }

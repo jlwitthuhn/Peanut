@@ -54,7 +54,7 @@ var sqlCreateTableInt = `
 func (*configDaoImpl) CreateDBObjects(tx *sql.Tx) error {
 	_, err := tx.Exec(sqlCreateTableInt)
 	if err != nil {
-		logger.Error("Got error on ConfigDao/CreateDBObjects query: ", err)
+		logger.Error(nil, "Got error on ConfigDao/CreateDBObjects query: ", err)
 		return err
 	}
 	return nil
@@ -73,7 +73,7 @@ func (*configDaoImpl) UpsertIntByName(name string, value int64, tx *sql.Tx) erro
 	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
 	_, err := sqlh.Exec(sqlUpsertIntByName, name, value)
 	if err != nil {
-		logger.Error("Got error on ConfigDao/UpsertIntByName query: ", err)
+		logger.Error(nil, "Got error on ConfigDao/UpsertIntByName query: ", err)
 		return err
 	}
 	return nil

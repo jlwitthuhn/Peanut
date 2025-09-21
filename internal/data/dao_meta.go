@@ -44,14 +44,14 @@ func (dao *metaDaoImpl) DoesTableExist(tableName string) (bool, error) {
 	db := datasource.PostgresHandle()
 	rows, err := db.Query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = $1", tableName)
 	if err != nil {
-		logger.Warn("Error querying in data_meta.DoesTableExist:", tableName, err)
+		logger.Warn(nil, "Error querying in data_meta.DoesTableExist:", tableName, err)
 		return false, err
 	}
 
 	defer func(rows *sql.Rows) {
 		err := rows.Close()
 		if err != nil {
-			logger.Warn("Error closing rows in data_meta.DoesTableExist:", err)
+			logger.Warn(nil, "Error closing rows in data_meta.DoesTableExist:", err)
 		}
 	}(rows)
 
@@ -59,7 +59,7 @@ func (dao *metaDaoImpl) DoesTableExist(tableName string) (bool, error) {
 	for rows.Next() {
 		rowErr := rows.Scan(&theCount)
 		if rowErr != nil {
-			logger.Warn("Error reading query result in data_meta.DoesTableExist:", tableName, err)
+			logger.Warn(nil, "Error reading query result in data_meta.DoesTableExist:", tableName, err)
 			return false, rowErr
 		}
 		break

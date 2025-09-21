@@ -5,33 +5,40 @@
 package logger
 
 import (
+	"fmt"
 	"log"
+	"net/http"
 	"os"
+	"peanut/internal/middleutil"
 )
 
 var theLogger = log.New(os.Stdout, "", log.LstdFlags|log.Lmicroseconds|log.Lmsgprefix)
 
-func Trace(args ...any) {
-	fullArgs := append([]any{"[TRAC]"}, args...)
+func Trace(r *http.Request, args ...any) {
+	fullArgs := append([]any{formatRequestId(r), "[TRAC]"}, args...)
 	theLogger.Println(fullArgs...)
 }
 
-func Info(args ...any) {
-	fullArgs := append([]any{"[INFO]"}, args...)
+func Info(r *http.Request, args ...any) {
+	fullArgs := append([]any{formatRequestId(r), "[INFO]"}, args...)
 	theLogger.Println(fullArgs...)
 }
 
-func Warn(args ...any) {
-	fullArgs := append([]any{"[WARN]"}, args...)
+func Warn(r *http.Request, args ...any) {
+	fullArgs := append([]any{formatRequestId(r), "[WARN]"}, args...)
 	theLogger.Println(fullArgs...)
 }
 
-func Error(args ...any) {
-	fullArgs := append([]any{"[EROR]"}, args...)
+func Error(r *http.Request, args ...any) {
+	fullArgs := append([]any{formatRequestId(r), "[EROR]"}, args...)
 	theLogger.Println(fullArgs...)
 }
 
-func Fatal(args ...any) {
-	fullArgs := append([]any{"[!!!!]"}, args...)
+func Fatal(r *http.Request, args ...any) {
+	fullArgs := append([]any{formatRequestId(r), "[!!!!]"}, args...)
 	theLogger.Fatal(fullArgs...)
+}
+
+func formatRequestId(r *http.Request) string {
+	return fmt.Sprintf("(%s)", middleutil.RetrieveRequestId(r))
 }

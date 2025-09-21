@@ -21,7 +21,7 @@ func RegisterIndexHandlers(mux *http.ServeMux) {
 		theTemplate := template.GetTemplate("_index")
 		err := theTemplate.Execute(w, templateCtx)
 		if err != nil {
-			logger.Error("Error executing template:", err)
+			logger.Error(r, "Error executing template:", err)
 		}
 	})
 	mux.Handle("GET /{$}", getIndexHandler)

@@ -43,11 +43,11 @@ func PostgresConnect() {
 	connStr := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", host, user, password, dbname)
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		logger.Fatal("Error connecting to data:", err)
+		logger.Fatal(nil, "Error connecting to data:", err)
 	}
 	pingErr := db.Ping()
 	if pingErr != nil {
-		logger.Warn("Database did not respond to ping:", pingErr)
+		logger.Warn(nil, "Database did not respond to ping:", pingErr)
 	}
 
 	pgDb = db

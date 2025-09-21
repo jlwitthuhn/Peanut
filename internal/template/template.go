@@ -34,12 +34,12 @@ func LoadTemplates(fs fs.FS) {
 func loadTemplateOrDie(fs fs.FS, name string, files ...string) {
 	_, exists := templatesByName[name]
 	if exists {
-		logger.Fatal("Template already exists: " + name)
+		logger.Fatal(nil, "Template already exists: "+name)
 	}
 	theTemplate, err := template.ParseFS(fs, files...)
 	if err != nil {
 		log.Fatal("Error parsing template: ", err)
 	}
 	templatesByName[name] = theTemplate
-	logger.Trace("Template loaded: " + name)
+	logger.Trace(nil, "Template loaded: "+name)
 }

@@ -34,7 +34,7 @@ func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService
 		theTemplate := template.GetTemplate("_setup")
 		err := theTemplate.Execute(w, templateCtx)
 		if err != nil {
-			logger.Error("Error executing setup template:", err)
+			logger.Error(r, "Error executing setup template:", err)
 		}
 	})
 	mux.Handle("GET /setup", getSetupHandler)
@@ -78,16 +78,16 @@ func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService
 			return
 		}
 
-		logger.Info("Input valid, initializing...")
-		initErr := setupService.InitializeDatabase(r.Context())
+		logger.Info(r, "Input valid, initializing...")
+		initErr := setupService.InitializeDatabase(r)
 		if initErr != nil {
-			logger.Error("Error initializing database:", initErr)
+			logger.Error(r, "Error initializing database:", initErr)
 			w.WriteHeader(http.StatusInternalServerError)
 			genericpage.RenderSimpleMessage("Error", "Failed to initialize database.", w, r)
 			return
 		}
 
-		logger.Info("Peanut initialization complete.")
+		logger.Info(r, "Peanut initialization complete.")
 		genericpage.RenderSimpleMessage("Complete", "Peanut has been initialized.", w, r)
 	})
 	mux.Handle("POST /setup", postSetupHandler)

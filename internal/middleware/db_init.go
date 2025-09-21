@@ -16,7 +16,7 @@ func DatabaseInitCheck(dbService service.DatabaseService) MiddlewareFunc {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			tableExists, err := dbService.DoesTableExist("config_int")
 			if err != nil {
-				logger.Fatal(err)
+				logger.Fatal(r, err)
 			}
 			if !tableExists {
 				// Allow access to setup page only when DB is not initialized

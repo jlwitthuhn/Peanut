@@ -13,6 +13,7 @@ import (
 
 type GroupDao interface {
 	CreateDBObjects(tx *sql.Tx) error
+	InsertRow(tx *sql.Tx, name string, desc string, systemOwned bool) error
 }
 
 var groupDaoInstance GroupDao
@@ -57,6 +58,18 @@ func (*groupDaoImpl) CreateDBObjects(tx *sql.Tx) error {
 	_, err := sqlh.Exec(sqlCreateTableGroups)
 	if err != nil {
 		logger.Error(nil, "Got error on GroupDao/CreateDBObjects query: ", err)
+		return err
+	}
+	return nil
+}
+
+var sqlInsertGroupsRow = "INSERT INTO groups(name, description, system_owned) VALUES ($1, $2, $3)"
+
+func (*groupDaoImpl) InsertRow(tx *sql.Tx, name string, desc string, systemOwned bool) error {
+	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
+	_, err := sqlh.Exec(sqlInsertGroupsRow, name, desc, systemOwned)
+	if err != nil {
+		logger.Error(nil, "Got error on GroupDao/InsertRow query: ", err)
 		return err
 	}
 	return nil

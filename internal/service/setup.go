@@ -18,12 +18,13 @@ type SetupService interface {
 	InitializeDatabase(r *http.Request) error
 }
 
-func NewSetupService(configService ConfigService) SetupService {
-	return &setupServiceImpl{configService: configService}
+func NewSetupService(configService ConfigService, groupService GroupService) SetupService {
+	return &setupServiceImpl{configService: configService, groupService: groupService}
 }
 
 type setupServiceImpl struct {
 	configService ConfigService
+	groupService  GroupService
 }
 
 func (this *setupServiceImpl) InitializeDatabase(r *http.Request) error {
@@ -55,6 +56,20 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request) error {
 	configTimeErr := this.configService.SetInt(configkey.IntInitializedTime, time.Now().Unix(), tx)
 	if configTimeErr != nil {
 		return configTimeErr
+	}
+	{
+		groupTurboErr := this.groupService.CreateGroup(tx, "TurboAdmin", "Full control over everything.", true)
+		if groupTurboErr != nil {
+			return groupTurboErr
+		}
+		groupAdminErr := this.groupService.CreateGroup(tx, "Admin", "Full control over everything except mass database updates and exports.", true)
+		if groupAdminErr != nil {
+			return groupAdminErr
+		}
+		groupUserErr := this.groupService.CreateGroup(tx, "User", "Ordinary registered user.", true)
+		if groupUserErr != nil {
+			return groupUserErr
+		}
 	}
 
 	logger.Trace(r, "Commiting transaction...")

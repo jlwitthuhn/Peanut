@@ -5,9 +5,13 @@
 package passhash
 
 import (
+	"bytes"
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
+	"strconv"
+	"strings"
+	"unicode"
 
 	"golang.org/x/crypto/argon2"
 )
@@ -27,6 +31,47 @@ func EncodeDefaultArgon2IdPhcString(plaintext string) string {
 	return EncodeArgon2IdPhcString(plaintext, salt, memory, time, parallel)
 }
 
+func IsArgon2IdPhcString(maybePhc string) bool {
+	segments := strings.Split(maybePhc, "$")
+	if len(segments) != 6 {
+		return false
+	}
+	if segments[0] != "" {
+		return false
+	}
+	if segments[1] != "argon2id" {
+		return false
+	}
+	if segments[2] != "v=19" {
+		return false
+	}
+	return true
+}
+
+func ValidateArgon2IdPhcString(plaintext string, phc string) bool {
+	if IsArgon2IdPhcString(phc) == false {
+		return false
+	}
+	segments := strings.Split(phc, "$")
+	params := segments[3]
+	saltB64 := segments[4]
+	hashB64 := segments[5]
+	m, t, p := parsePhcMtp(params)
+	salt, saltErr := base64.StdEncoding.DecodeString(saltB64)
+	if saltErr != nil {
+		return false
+	}
+
+	newHash := argon2.IDKey([]byte(plaintext), salt, t, m, p, 32)
+
+	hash, hashErr := base64.StdEncoding.DecodeString(hashB64)
+	if hashErr != nil {
+		return false
+	}
+
+	return bytes.Equal(newHash, hash)
+}
+
 func genSalt() []byte {
 	bytes := make([]byte, 8)
 	_, err := rand.Read(bytes)
@@ -34,4 +79,30 @@ func genSalt() []byte {
 		panic(err)
 	}
 	return bytes
+}
+
+func parsePhcMtp(input string) (uint32, uint32, uint8) {
+	m := parsePhcParam(input, "m=")
+	t := parsePhcParam(input, "t=")
+	p := parsePhcParam(input, "p=")
+	return m, t, uint8(p)
+}
+
+func parsePhcParam(input string, prefix string) uint32 {
+	prefixIndex := strings.Index(input, prefix)
+	numberBeginIndex := prefixIndex + len(prefix)
+	if numberBeginIndex == len(input) {
+		// Nothing exists after '='
+		return 0
+	}
+	numberEndIndex := numberBeginIndex + 1
+	for numberEndIndex < len(input) && unicode.IsDigit(rune(input[numberEndIndex])) {
+		numberEndIndex++
+	}
+	substr := input[numberBeginIndex:numberEndIndex]
+	result, err := strconv.Atoi(substr)
+	if err != nil {
+		return 0
+	}
+	return uint32(result)
 }

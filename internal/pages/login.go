@@ -33,7 +33,7 @@ func RegisterLoginHandlers(mux *http.ServeMux, userService service.UserService) 
 		err := userService.CreateSession(nil, username, password)
 		if err != nil {
 			logger.Error(r, "Error creating session:", err)
-			errMsg := fmt.Sprint("Error logging in:", err)
+			errMsg := fmt.Sprint("Error logging in: ", err)
 			w.WriteHeader(http.StatusBadRequest)
 			genericpage.RenderSimpleMessage("Error", errMsg, w, r)
 			return

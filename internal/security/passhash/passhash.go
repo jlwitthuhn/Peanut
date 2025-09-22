@@ -11,6 +11,8 @@ func GenerateDefaultPhcString(plaintext string) string {
 func ValidatePassword(password string, phcString string) bool {
 	if IsPlaintextPhcString(phcString) {
 		return ValidatePlaintextPassword(password, phcString)
+	} else if IsArgon2IdPhcString(phcString) {
+		return ValidateArgon2IdPhcString(password, phcString)
 	}
 	return false
 }

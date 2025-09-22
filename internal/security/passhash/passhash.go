@@ -5,5 +5,12 @@
 package passhash
 
 func GenerateDefaultPhcString(plaintext string) string {
-	return GeneratePlaintextPhcString(plaintext)
+	return EncodePlaintextPhcString(plaintext)
+}
+
+func ValidatePassword(password string, phcString string) bool {
+	if IsPlaintextPhcString(phcString) {
+		return ValidatePlaintextPassword(password, phcString)
+	}
+	return false
 }

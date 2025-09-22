@@ -12,6 +12,7 @@ import (
 )
 
 type UserService interface {
+	CreateSession(tx *sql.Tx, username string, plainPassword string) error
 	CreateUser(tx *sql.Tx, name string, email string, plainPassword string) error
 	IsEmailTaken(tx *sql.Tx, email string) (bool, error)
 	IsNameTaken(tx *sql.Tx, username string) (bool, error)
@@ -22,6 +23,18 @@ func NewUserService() UserService {
 }
 
 type userServiceImpl struct{}
+
+func (*userServiceImpl) CreateSession(tx *sql.Tx, username string, plainPassword string) error {
+	userDao := data.UserDaoInst()
+	userRow, userErr := userDao.SelectRowByName(tx, username)
+	if userErr != nil {
+		return userErr
+	}
+	if !passhash.ValidatePassword(plainPassword, userRow.Password) {
+		return errors.New("Invalid password")
+	}
+	return nil
+}
 
 func (this *userServiceImpl) CreateUser(tx *sql.Tx, name string, email string, plainPassword string) error {
 	nameTaken, nameErr := this.IsNameTaken(tx, name)

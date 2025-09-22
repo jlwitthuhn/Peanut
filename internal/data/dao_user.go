@@ -11,11 +11,19 @@ import (
 	"sync"
 )
 
+type UserRow struct {
+	Id          string
+	DisplayName string
+	Email       string
+	Password    string
+}
+
 type UserDao interface {
 	CreateDBObjects(tx *sql.Tx) error
 	CountRowsByEmail(tx *sql.Tx, name string) (int64, error)
 	CountRowsByName(tx *sql.Tx, name string) (int64, error)
 	InsertRow(tx *sql.Tx, name string, email string, hashedPassword string) error
+	SelectRowByName(tx *sql.Tx, name string) (*UserRow, error)
 }
 
 var userDaoInstance UserDao
@@ -106,4 +114,19 @@ func (*userDaoImpl) InsertRow(tx *sql.Tx, name string, email string, hashedPassw
 		return err
 	}
 	return nil
+}
+
+var sqlSelectUsersRowByName = "SELECT id, display_name, email, password FROM users WHERE display_name = $1"
+
+func (*userDaoImpl) SelectRowByName(tx *sql.Tx, name string) (*UserRow, error) {
+	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
+
+	result := &UserRow{}
+	row := sqlh.QueryRow(sqlSelectUsersRowByName, name)
+	err := row.Scan(&result.Id, &result.DisplayName, &result.Email, &result.Password)
+	if err != nil {
+		logger.Error(nil, "Got error on UserDao/SelectRowByName query: ", err)
+		return nil, err
+	}
+	return result, nil
 }

@@ -73,12 +73,12 @@ func ValidateArgon2IdPhcString(plaintext string, phc string) bool {
 }
 
 func genSalt() []byte {
-	bytes := make([]byte, 8)
-	_, err := rand.Read(bytes)
+	saltBytes := make([]byte, 8)
+	_, err := rand.Read(saltBytes)
 	if err != nil {
 		panic(err)
 	}
-	return bytes
+	return saltBytes
 }
 
 func parsePhcMtp(input string) (uint32, uint32, uint8) {

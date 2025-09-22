@@ -28,14 +28,9 @@ func GroupDaoInst() GroupDao {
 
 type groupDaoImpl struct{}
 
-func (*groupDaoImpl) SelectRowByName(name string, tx *sql.Tx) {
-	//TODO implement me
-	panic("implement me")
-}
-
 var sqlCreateTableGroups = `
 	CREATE TABLE groups (
-		id BIGSERIAL PRIMARY KEY,
+		id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 		name VARCHAR(127) UNIQUE NOT NULL,
 		description VARCHAR(255) NOT NULL,
 		system_owned BOOLEAN NOT NULL,

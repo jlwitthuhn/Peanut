@@ -17,6 +17,7 @@ import (
 type UserService interface {
 	CreateSession(r *http.Request, tx *sql.Tx, username string, plainPassword string) (string, error)
 	CreateUser(tx *sql.Tx, name string, email string, plainPassword string) error
+	GetLoggedInUserIdBySession(r *http.Request, tx *sql.Tx, sessionId string) (string, error)
 	IsEmailTaken(tx *sql.Tx, email string) (bool, error)
 	IsNameTaken(tx *sql.Tx, username string) (bool, error)
 }
@@ -74,6 +75,15 @@ func (this *userServiceImpl) CreateUser(tx *sql.Tx, name string, email string, p
 	}
 
 	return nil
+}
+
+func (*userServiceImpl) GetLoggedInUserIdBySession(r *http.Request, tx *sql.Tx, sessionId string) (string, error) {
+	sessionDao := data.SessionDaoInst()
+	sessionRow, sessionErr := sessionDao.SelectRowBySessionId(tx, sessionId)
+	if sessionErr != nil {
+		return "", sessionErr
+	}
+	return sessionRow.UserId, nil
 }
 
 func (*userServiceImpl) IsEmailTaken(tx *sql.Tx, email string) (bool, error) {

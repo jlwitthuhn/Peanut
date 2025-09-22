@@ -6,9 +6,11 @@ package cookie
 
 import "net/http"
 
+var SessionCookieName = "session"
+
 func CreateSessionCookie(sessionId string) http.Cookie {
 	return http.Cookie{
-		Name:     "session",
+		Name:     SessionCookieName,
 		Value:    sessionId,
 		Path:     "/",
 		HttpOnly: true,

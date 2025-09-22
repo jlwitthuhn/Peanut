@@ -11,9 +11,15 @@ import (
 	"sync"
 )
 
+type SessionRow struct {
+	Id     string
+	UserId string
+}
+
 type SessionDao interface {
 	CreateDBObjects(tx *sql.Tx) error
 	InsertRow(tx *sql.Tx, sessionId string, userId string) error
+	SelectRowBySessionId(tx *sql.Tx, sessionId string) (*SessionRow, error)
 }
 
 var sessionDaoInstance SessionDao
@@ -72,4 +78,19 @@ func (*sessionDaoImpl) InsertRow(tx *sql.Tx, sessionId string, userId string) er
 		return err
 	}
 	return nil
+}
+
+var sqlSelectSessionsRowById = "SELECT id, user_id FROM sessions WHERE id = $1"
+
+func (*sessionDaoImpl) SelectRowBySessionId(tx *sql.Tx, sessionId string) (*SessionRow, error) {
+	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
+
+	result := &SessionRow{}
+	row := sqlh.QueryRow(sqlSelectSessionsRowById, sessionId)
+	err := row.Scan(&result.Id, &result.UserId)
+	if err != nil {
+		logger.Error(nil, "Got error on SessionDao/SelectRowBySessionId query: ", err)
+		return nil, err
+	}
+	return result, nil
 }

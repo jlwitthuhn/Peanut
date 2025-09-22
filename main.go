@@ -63,6 +63,7 @@ func main() {
 		middleware.RequestLog(),
 		middleware.RequestTimer(),
 		middleware.DatabaseInitCheck(dbService, setupMux),
+		middleware.Authentication(userService),
 	)
 	rootMux.Handle("/", wrappedMiddlewareMux)
 

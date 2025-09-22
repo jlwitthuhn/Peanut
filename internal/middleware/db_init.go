@@ -11,7 +11,7 @@ import (
 	"peanut/internal/service"
 )
 
-func DatabaseInitCheck(dbService service.DatabaseService) MiddlewareFunc {
+func DatabaseInitCheck(dbService service.DatabaseService, setupHandler http.Handler) MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			tableExists, err := dbService.DoesTableExist("config_int")
@@ -21,7 +21,7 @@ func DatabaseInitCheck(dbService service.DatabaseService) MiddlewareFunc {
 			if !tableExists {
 				// Allow access to setup page only when DB is not initialized
 				if r.URL.Path == "/setup" {
-					next.ServeHTTP(w, r)
+					setupHandler.ServeHTTP(w, r)
 				} else {
 					w.WriteHeader(http.StatusNotFound)
 					genericpage.RenderSimpleMessage("Database Not Initialized", "The data must be configured before Peanut can be used.", w, r)

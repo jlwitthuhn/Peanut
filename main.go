@@ -51,15 +51,18 @@ func main() {
 	var userService = service.NewUserService()
 	var setupService = service.NewSetupService(configService, groupService, userService)
 
+	// Setup mux is separate and is only used from within DatabaseInitCheck
+	setupMux := http.NewServeMux()
+	pages.RegisterSetupHandlers(setupMux, dbService, setupService)
+
 	logger.Info(nil, "Registering routes...")
 	pages.RegisterIndexHandlers(middlewareMux)
 	pages.RegisterLoginHandlers(middlewareMux, userService)
-	pages.RegisterSetupHandlers(middlewareMux, dbService, setupService)
 	wrappedMiddlewareMux := middleware.WrapHandler(middlewareMux,
 		middleware.RequestId(),
 		middleware.RequestLog(),
 		middleware.RequestTimer(),
-		middleware.DatabaseInitCheck(dbService),
+		middleware.DatabaseInitCheck(dbService, setupMux),
 	)
 	rootMux.Handle("/", wrappedMiddlewareMux)
 

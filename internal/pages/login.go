@@ -17,6 +17,11 @@ import (
 
 func RegisterLoginHandlers(mux *http.ServeMux, userService service.UserService) {
 	getLoginHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if isAlreadyLoggedIn(r) {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+
 		templateCtx := make(map[string]any)
 		templateCtx["RequestDuration"] = middleutil.RequestTimerFinish(r)
 
@@ -29,6 +34,11 @@ func RegisterLoginHandlers(mux *http.ServeMux, userService service.UserService) 
 	mux.Handle("GET /login", getLoginHandler)
 
 	postLoginHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if isAlreadyLoggedIn(r) {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+
 		username := r.PostFormValue("username")
 		password := r.PostFormValue("password")
 		sessionId, err := userService.CreateSession(r, nil, username, password)
@@ -44,4 +54,8 @@ func RegisterLoginHandlers(mux *http.ServeMux, userService service.UserService) 
 		genericpage.RenderSimpleMessage("Success", "You have logged in.", w, r)
 	})
 	mux.Handle("POST /login", postLoginHandler)
+}
+
+func isAlreadyLoggedIn(r *http.Request) bool {
+	return r.Context().Value("loggedIn") == true
 }

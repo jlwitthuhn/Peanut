@@ -5,7 +5,7 @@
 package passhash
 
 func GenerateDefaultPhcString(plaintext string) string {
-	return EncodePlaintextPhcString(plaintext)
+	return EncodeDefaultArgon2IdPhcString(plaintext)
 }
 
 func ValidatePassword(password string, phcString string) bool {

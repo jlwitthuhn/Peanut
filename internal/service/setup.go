@@ -55,6 +55,10 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName stri
 		if userErr != nil {
 			return userErr
 		}
+		sessionErr := data.SessionDaoInst().CreateDBObjects(tx)
+		if sessionErr != nil {
+			return sessionErr
+		}
 	}
 
 	logger.Trace(r, "Populating data...")

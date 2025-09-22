@@ -22,7 +22,11 @@ func Authentication(userService service.UserService) MiddlewareFunc {
 					continue
 				}
 				ctx = context.WithValue(ctx, "userId", userId)
+				ctx = context.WithValue(ctx, "loggedIn", true)
 				break
+			}
+			if ctx.Value("loggedIn") == nil {
+				ctx = context.WithValue(ctx, "loggedIn", false)
 			}
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})

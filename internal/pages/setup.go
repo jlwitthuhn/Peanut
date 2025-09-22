@@ -7,8 +7,8 @@ package pages
 import (
 	"net/http"
 	"peanut/internal/logger"
-	"peanut/internal/middleutil"
 	"peanut/internal/pages/genericpage"
+	"peanut/internal/pages/templatecontext"
 	"peanut/internal/service"
 	"peanut/internal/template"
 )
@@ -28,9 +28,7 @@ func isUsernameValid(username string) bool {
 func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService, setupService service.SetupService) {
 
 	getSetupHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		templateCtx := make(map[string]any)
-		templateCtx["RequestDuration"] = middleutil.RequestTimerFinish(r)
-
+		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		theTemplate := template.GetTemplate("_setup")
 		err := theTemplate.Execute(w, templateCtx)
 		if err != nil {

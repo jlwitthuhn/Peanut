@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"peanut/internal/cookie"
 	"peanut/internal/logger"
-	"peanut/internal/middleutil"
 	"peanut/internal/pages/genericpage"
+	"peanut/internal/pages/templatecontext"
 	"peanut/internal/service"
 	"peanut/internal/template"
 )
@@ -22,9 +22,7 @@ func RegisterLoginHandlers(mux *http.ServeMux, userService service.UserService) 
 			return
 		}
 
-		templateCtx := make(map[string]any)
-		templateCtx["RequestDuration"] = middleutil.RequestTimerFinish(r)
-
+		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		theTemplate := template.GetTemplate("_login")
 		err := theTemplate.Execute(w, templateCtx)
 		if err != nil {

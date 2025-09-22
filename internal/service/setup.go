@@ -15,19 +15,20 @@ import (
 )
 
 type SetupService interface {
-	InitializeDatabase(r *http.Request) error
+	InitializeDatabase(r *http.Request, adminName string, adminEmail string, adminPlainPassword string) error
 }
 
-func NewSetupService(configService ConfigService, groupService GroupService) SetupService {
-	return &setupServiceImpl{configService: configService, groupService: groupService}
+func NewSetupService(configService ConfigService, groupService GroupService, userService UserService) SetupService {
+	return &setupServiceImpl{configService: configService, groupService: groupService, userService: userService}
 }
 
 type setupServiceImpl struct {
 	configService ConfigService
 	groupService  GroupService
+	userService   UserService
 }
 
-func (this *setupServiceImpl) InitializeDatabase(r *http.Request) error {
+func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName string, adminEmail string, adminPlainPassword string) error {
 	logger.Trace(r, "Preparing transaction...")
 	ctx := context.Background()
 	tx, txErr := datasource.PostgresHandle().BeginTx(ctx, nil)
@@ -74,6 +75,10 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request) error {
 		if groupUserErr != nil {
 			return groupUserErr
 		}
+	}
+	userErr := this.userService.CreateUser(tx, adminName, adminEmail, adminPlainPassword)
+	if userErr != nil {
+		return userErr
 	}
 
 	logger.Trace(r, "Commiting transaction...")

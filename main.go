@@ -48,7 +48,8 @@ func main() {
 	var configService = service.NewConfigService()
 	var dbService = service.NewDatabaseService()
 	var groupService = service.NewGroupService()
-	var setupService = service.NewSetupService(configService, groupService)
+	var userService = service.NewUserService()
+	var setupService = service.NewSetupService(configService, groupService, userService)
 
 	logger.Info(nil, "Registering routes...")
 	pages.RegisterIndexHandlers(middlewareMux)

@@ -18,6 +18,11 @@ type MetaDao interface {
 
 type metaDaoImpl struct{}
 
+func (*metaDaoImpl) SelectRowByName(name string, tx *sql.Tx) {
+	//TODO implement me
+	panic("implement me")
+}
+
 var metaDaoInstance MetaDao
 var metaDaoInstanceOnce sync.Once
 

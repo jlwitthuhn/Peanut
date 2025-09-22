@@ -79,7 +79,7 @@ func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService
 		}
 
 		logger.Info(r, "Input valid, initializing...")
-		initErr := setupService.InitializeDatabase(r)
+		initErr := setupService.InitializeDatabase(r, adminName, email, adminPassword)
 		if initErr != nil {
 			logger.Error(r, "Error initializing database:", initErr)
 			w.WriteHeader(http.StatusInternalServerError)

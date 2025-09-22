@@ -28,6 +28,11 @@ func GroupDaoInst() GroupDao {
 
 type groupDaoImpl struct{}
 
+func (*groupDaoImpl) SelectRowByName(name string, tx *sql.Tx) {
+	//TODO implement me
+	panic("implement me")
+}
+
 var sqlCreateTableGroups = `
 	CREATE TABLE groups (
 		id BIGSERIAL PRIMARY KEY,

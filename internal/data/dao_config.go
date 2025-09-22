@@ -28,6 +28,11 @@ func ConfigDaoInst() ConfigDao {
 
 type configDaoImpl struct{}
 
+func (*configDaoImpl) SelectRowByName(name string, tx *sql.Tx) {
+	//TODO implement me
+	panic("implement me")
+}
+
 var sqlCreateTableInt = `
 	CREATE TABLE config_int (
 		name VARCHAR(255) PRIMARY KEY,

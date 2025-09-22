@@ -13,6 +13,7 @@ import (
 
 type SessionDao interface {
 	CreateDBObjects(tx *sql.Tx) error
+	InsertRow(tx *sql.Tx, sessionId string, userId string) error
 }
 
 var sessionDaoInstance SessionDao
@@ -55,6 +56,19 @@ func (*sessionDaoImpl) CreateDBObjects(tx *sql.Tx) error {
 	_, err := sqlh.Exec(sqlCreateTableSessions)
 	if err != nil {
 		logger.Error(nil, "Got error on SessionDao/CreateDBObjects query: ", err)
+		return err
+	}
+	return nil
+}
+
+var sqlInsertSessionsRow = "INSERT INTO sessions (id, user_id) VALUES ($1, $2::uuid)"
+
+func (*sessionDaoImpl) InsertRow(tx *sql.Tx, sessionId string, userId string) error {
+	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
+
+	_, err := sqlh.Exec(sqlInsertSessionsRow, sessionId, userId)
+	if err != nil {
+		logger.Error(nil, "Got error on SessionDao/InsertRow query: ", err)
 		return err
 	}
 	return nil

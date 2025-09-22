@@ -8,6 +8,7 @@ import (
 	"database/sql"
 	"errors"
 	"peanut/internal/data"
+	"peanut/internal/security/passhash"
 )
 
 type UserService interface {
@@ -38,8 +39,10 @@ func (this *userServiceImpl) CreateUser(tx *sql.Tx, name string, email string, p
 		return errors.New("User email is already taken.")
 	}
 
+	hashedPassword := passhash.GenerateDefaultPhcString(plainPassword)
+
 	userDao := data.UserDaoInst()
-	insertErr := userDao.InsertRow(tx, name, email, plainPassword)
+	insertErr := userDao.InsertRow(tx, name, email, hashedPassword)
 	if insertErr != nil {
 		return insertErr
 	}

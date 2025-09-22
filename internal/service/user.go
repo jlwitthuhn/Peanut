@@ -15,7 +15,7 @@ import (
 )
 
 type UserService interface {
-	CreateSession(r *http.Request, tx *sql.Tx, username string, plainPassword string) error
+	CreateSession(r *http.Request, tx *sql.Tx, username string, plainPassword string) (string, error)
 	CreateUser(tx *sql.Tx, name string, email string, plainPassword string) error
 	IsEmailTaken(tx *sql.Tx, email string) (bool, error)
 	IsNameTaken(tx *sql.Tx, username string) (bool, error)
@@ -27,26 +27,26 @@ func NewUserService() UserService {
 
 type userServiceImpl struct{}
 
-func (*userServiceImpl) CreateSession(r *http.Request, tx *sql.Tx, username string, plainPassword string) error {
+func (*userServiceImpl) CreateSession(r *http.Request, tx *sql.Tx, username string, plainPassword string) (string, error) {
 	userDao := data.UserDaoInst()
 	userRow, userErr := userDao.SelectRowByName(tx, username)
 	if userErr != nil {
-		return userErr
+		return "", userErr
 	}
 	if passhash.ValidatePassword(plainPassword, userRow.Password) == false {
-		return errors.New("Invalid password")
+		return "", errors.New("Invalid password")
 	}
 
 	sessionDao := data.SessionDaoInst()
 	newSessionId := security.GenerateSessionId()
 	err := sessionDao.InsertRow(tx, newSessionId, userRow.Id)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	logger.Info(r, "User logger in:", userRow.Id)
 
-	return nil
+	return newSessionId, nil
 }
 
 func (this *userServiceImpl) CreateUser(tx *sql.Tx, name string, email string, plainPassword string) error {

@@ -7,6 +7,7 @@ package pages
 import (
 	"fmt"
 	"net/http"
+	"peanut/internal/cookie"
 	"peanut/internal/logger"
 	"peanut/internal/middleutil"
 	"peanut/internal/pages/genericpage"
@@ -30,7 +31,7 @@ func RegisterLoginHandlers(mux *http.ServeMux, userService service.UserService) 
 	postLoginHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		username := r.PostFormValue("username")
 		password := r.PostFormValue("password")
-		err := userService.CreateSession(r, nil, username, password)
+		sessionId, err := userService.CreateSession(r, nil, username, password)
 		if err != nil {
 			logger.Error(r, "Error creating session:", err)
 			errMsg := fmt.Sprint("Error logging in: ", err)
@@ -38,6 +39,8 @@ func RegisterLoginHandlers(mux *http.ServeMux, userService service.UserService) 
 			genericpage.RenderSimpleMessage("Error", errMsg, w, r)
 			return
 		}
+		sesssionCookie := cookie.CreateSessionCookie(sessionId)
+		http.SetCookie(w, &sesssionCookie)
 		genericpage.RenderSimpleMessage("Success", "You have logged in.", w, r)
 	})
 	mux.Handle("POST /login", postLoginHandler)

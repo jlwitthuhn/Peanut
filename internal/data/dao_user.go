@@ -22,7 +22,7 @@ type UserDao interface {
 	CreateDBObjects(tx *sql.Tx) error
 	CountRowsByEmail(tx *sql.Tx, name string) (int64, error)
 	CountRowsByName(tx *sql.Tx, name string) (int64, error)
-	InsertRow(tx *sql.Tx, name string, email string, hashedPassword string) error
+	InsertRow(tx *sql.Tx, name string, email string, hashedPassword string) (string, error)
 	SelectRowByName(tx *sql.Tx, name string) (*UserRow, error)
 }
 
@@ -103,17 +103,19 @@ func (*userDaoImpl) CountRowsByName(tx *sql.Tx, name string) (int64, error) {
 	return count, nil
 }
 
-var sqlInsertUsersRow = "INSERT INTO users (display_name, email, password) VALUES ($1, $2, $3)"
+var sqlInsertUsersRow = "INSERT INTO users (display_name, email, password) VALUES ($1, $2, $3) RETURNING id"
 
-func (*userDaoImpl) InsertRow(tx *sql.Tx, name string, email string, hashedPassword string) error {
+func (*userDaoImpl) InsertRow(tx *sql.Tx, name string, email string, hashedPassword string) (string, error) {
 	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
 
-	_, err := sqlh.Exec(sqlInsertUsersRow, name, email, hashedPassword)
+	row := sqlh.QueryRow(sqlInsertUsersRow, name, email, hashedPassword)
+	newId := ""
+	err := row.Scan(&newId)
 	if err != nil {
 		logger.Error(nil, "Got error on UserDao/InsertRow query: ", err)
-		return err
+		return "", err
 	}
-	return nil
+	return newId, nil
 }
 
 var sqlSelectUsersRowByName = "SELECT id, display_name, email, password FROM users WHERE display_name = $1"

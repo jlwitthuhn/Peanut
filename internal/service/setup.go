@@ -84,9 +84,23 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName stri
 			return groupUserErr
 		}
 	}
-	userErr := this.userService.CreateUser(tx, adminName, adminEmail, adminPlainPassword)
+	userId, userErr := this.userService.CreateUser(tx, adminName, adminEmail, adminPlainPassword)
 	if userErr != nil {
 		return userErr
+	}
+	{
+		memberTurboErr := this.groupService.EnrollUserInGroup(r, tx, userId, "TurboAdmin")
+		if memberTurboErr != nil {
+			return memberTurboErr
+		}
+		memberAdminErr := this.groupService.EnrollUserInGroup(r, tx, userId, "Admin")
+		if memberAdminErr != nil {
+			return memberAdminErr
+		}
+		memberUserErr := this.groupService.EnrollUserInGroup(r, tx, userId, "User")
+		if memberUserErr != nil {
+			return memberUserErr
+		}
 	}
 
 	logger.Debug(r, "Commiting transaction...")

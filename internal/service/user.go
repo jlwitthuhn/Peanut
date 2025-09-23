@@ -16,7 +16,7 @@ import (
 
 type UserService interface {
 	CreateSession(r *http.Request, tx *sql.Tx, username string, plainPassword string) (string, error)
-	CreateUser(tx *sql.Tx, name string, email string, plainPassword string) error
+	CreateUser(tx *sql.Tx, name string, email string, plainPassword string) (string, error)
 	DestroySession(r *http.Request, tx *sql.Tx, sessionId string) error
 	GetLoggedInUserIdBySession(r *http.Request, tx *sql.Tx, sessionId string) (string, error)
 	IsEmailTaken(tx *sql.Tx, email string) (bool, error)
@@ -51,31 +51,31 @@ func (*userServiceImpl) CreateSession(r *http.Request, tx *sql.Tx, username stri
 	return newSessionId, nil
 }
 
-func (this *userServiceImpl) CreateUser(tx *sql.Tx, name string, email string, plainPassword string) error {
+func (this *userServiceImpl) CreateUser(tx *sql.Tx, name string, email string, plainPassword string) (string, error) {
 	nameTaken, nameErr := this.IsNameTaken(tx, name)
 	if nameErr != nil {
-		return nameErr
+		return "", nameErr
 	}
 	if nameTaken {
-		return errors.New("User name is already taken.")
+		return "", errors.New("User name is already taken.")
 	}
 	emailTaken, emailErr := this.IsEmailTaken(tx, email)
 	if emailErr != nil {
-		return emailErr
+		return "", emailErr
 	}
 	if emailTaken {
-		return errors.New("User email is already taken.")
+		return "", errors.New("User email is already taken.")
 	}
 
 	hashedPassword := passhash.GenerateDefaultPhcString(plainPassword)
 
 	userDao := data.UserDaoInst()
-	insertErr := userDao.InsertRow(tx, name, email, hashedPassword)
+	newId, insertErr := userDao.InsertRow(tx, name, email, hashedPassword)
 	if insertErr != nil {
-		return insertErr
+		return "", insertErr
 	}
 
-	return nil
+	return newId, nil
 }
 
 func (*userServiceImpl) DestroySession(r *http.Request, tx *sql.Tx, sessionId string) error {

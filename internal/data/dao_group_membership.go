@@ -13,6 +13,7 @@ import (
 
 type GroupMembershipDao interface {
 	CreateDBObjects(tx *sql.Tx) error
+	InsertRow(tx *sql.Tx, userId string, groupId string) error
 }
 
 var groupMembershipDaoInstance GroupMembershipDao
@@ -56,6 +57,18 @@ func (*groupMembershipDaoImpl) CreateDBObjects(tx *sql.Tx) error {
 	_, err := sqlh.Exec(sqlCreateTableGroupMembership)
 	if err != nil {
 		logger.Error(nil, "Got error on GroupMembershipDao/CreateDBObjects query: ", err)
+		return err
+	}
+	return nil
+}
+
+var sqlInsertGroupMembershipRow = "INSERT INTO group_membership (user_id, group_id) VALUES ($1,$2)"
+
+func (*groupMembershipDaoImpl) InsertRow(tx *sql.Tx, userId string, groupId string) error {
+	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
+	_, err := sqlh.Exec(sqlInsertGroupMembershipRow, userId, groupId)
+	if err != nil {
+		logger.Error(nil, "Got error on GroupMembershipDao/InsertRow query: ", err)
 		return err
 	}
 	return nil

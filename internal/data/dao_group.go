@@ -11,9 +11,17 @@ import (
 	"sync"
 )
 
+type GroupRow struct {
+	Id          string
+	Name        string
+	Description string
+	SystemOwned bool
+}
+
 type GroupDao interface {
 	CreateDBObjects(tx *sql.Tx) error
 	InsertRow(tx *sql.Tx, name string, desc string, systemOwned bool) error
+	SelectRowByName(tx *sql.Tx, name string) (*GroupRow, error)
 }
 
 var groupDaoInstance GroupDao
@@ -73,4 +81,19 @@ func (*groupDaoImpl) InsertRow(tx *sql.Tx, name string, desc string, systemOwned
 		return err
 	}
 	return nil
+}
+
+var sqlSelectGroupsRowByName = "SELECT id, name, description, system_owned FROM groups WHERE name = $1"
+
+func (*groupDaoImpl) SelectRowByName(tx *sql.Tx, name string) (*GroupRow, error) {
+	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
+
+	result := &GroupRow{}
+	row := sqlh.QueryRow(sqlSelectGroupsRowByName, name)
+	err := row.Scan(&result.Id, &result.Name, &result.Description, &result.SystemOwned)
+	if err != nil {
+		logger.Error(nil, "Got error on GroupDao/SelectRowByName query: ", err)
+		return nil, err
+	}
+	return result, nil
 }

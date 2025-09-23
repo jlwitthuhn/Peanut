@@ -14,6 +14,5 @@ var RequestTimerBeginKey string = "requestTimerBegin"
 func RequestTimerFinish(req *http.Request) float64 {
 	requestBegin := req.Context().Value(RequestTimerBeginKey).(time.Time)
 	requestDurationUs := time.Now().Sub(requestBegin).Microseconds()
-	requestDurationUs -= requestDurationUs % 10 // Two decimal places in milliseconds
 	return float64(requestDurationUs) / 1000.0
 }

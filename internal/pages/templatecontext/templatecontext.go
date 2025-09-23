@@ -5,6 +5,7 @@
 package templatecontext
 
 import (
+	"fmt"
 	"net/http"
 	"peanut/internal/middleutil"
 )
@@ -14,7 +15,7 @@ func GetStandardTemplateContext(r *http.Request) map[string]any {
 	result["LoggedIn"] = r.Context().Value("loggedIn")
 
 	// Always do this one last
-	result["RequestDuration"] = middleutil.RequestTimerFinish(r)
-
+	timeMs := middleutil.RequestTimerFinish(r)
+	result["RequestDuration"] = fmt.Sprintf("%.1f", timeMs)
 	return result
 }

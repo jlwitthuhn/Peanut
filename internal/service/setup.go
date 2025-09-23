@@ -55,6 +55,10 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName stri
 		if userErr != nil {
 			return userErr
 		}
+		groupMembershipErr := data.GroupMembershipDaoInst().CreateDBObjects(tx)
+		if groupMembershipErr != nil {
+			return groupMembershipErr
+		}
 		sessionErr := data.SessionDaoInst().CreateDBObjects(tx)
 		if sessionErr != nil {
 			return sessionErr

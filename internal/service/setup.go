@@ -29,7 +29,7 @@ type setupServiceImpl struct {
 }
 
 func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName string, adminEmail string, adminPlainPassword string) error {
-	logger.Trace(r, "Preparing transaction...")
+	logger.Debug(r, "Preparing transaction...")
 	ctx := context.Background()
 	tx, txErr := datasource.PostgresHandle().BeginTx(ctx, nil)
 	if txErr != nil {
@@ -37,7 +37,7 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName stri
 	}
 	defer tx.Rollback()
 
-	logger.Trace(r, "Creating tables...")
+	logger.Debug(r, "Creating tables...")
 	{
 		metaErr := data.MetaDaoInst().CreateDBObjects(tx)
 		if metaErr != nil {
@@ -61,7 +61,7 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName stri
 		}
 	}
 
-	logger.Trace(r, "Populating data...")
+	logger.Debug(r, "Populating data...")
 	configTimeErr := this.configService.SetInt(configkey.IntInitializedTime, time.Now().Unix(), tx)
 	if configTimeErr != nil {
 		return configTimeErr
@@ -85,7 +85,7 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName stri
 		return userErr
 	}
 
-	logger.Trace(r, "Commiting transaction...")
+	logger.Debug(r, "Commiting transaction...")
 	commitErr := tx.Commit()
 	if commitErr != nil {
 		return commitErr

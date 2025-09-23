@@ -19,6 +19,11 @@ func Trace(r *http.Request, args ...any) {
 	theLogger.Println(fullArgs...)
 }
 
+func Debug(r *http.Request, args ...any) {
+	fullArgs := append([]any{formatRequestId(r), "[DBUG]"}, args...)
+	theLogger.Println(fullArgs...)
+}
+
 func Info(r *http.Request, args ...any) {
 	fullArgs := append([]any{formatRequestId(r), "[INFO]"}, args...)
 	theLogger.Println(fullArgs...)

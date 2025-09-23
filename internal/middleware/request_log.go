@@ -13,7 +13,7 @@ import (
 func RequestLog() MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			logger.Trace(r, "Received request:", r.Method, r.URL.Path)
+			logger.Debug(r, "Received request:", r.Method, r.URL.Path)
 			next.ServeHTTP(w, r)
 		})
 	}

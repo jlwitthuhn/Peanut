@@ -18,6 +18,7 @@ type SessionRow struct {
 
 type SessionDao interface {
 	CreateDBObjects(tx *sql.Tx) error
+	DeleteRowById(tx *sql.Tx, sessionId string) error
 	InsertRow(tx *sql.Tx, sessionId string, userId string) error
 	SelectRowBySessionId(tx *sql.Tx, sessionId string) (*SessionRow, error)
 }
@@ -62,6 +63,19 @@ func (*sessionDaoImpl) CreateDBObjects(tx *sql.Tx) error {
 	_, err := sqlh.Exec(sqlCreateTableSessions)
 	if err != nil {
 		logger.Error(nil, "Got error on SessionDao/CreateDBObjects query: ", err)
+		return err
+	}
+	return nil
+}
+
+var sqlDeleteSessionsRowById = "DELETE FROM sessions WHERE id = $1"
+
+func (*sessionDaoImpl) DeleteRowById(tx *sql.Tx, sessionId string) error {
+	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
+
+	_, err := sqlh.Exec(sqlDeleteSessionsRowById, sessionId)
+	if err != nil {
+		logger.Error(nil, "Got error on SessionDao/DeleteRowById query: ", err)
 		return err
 	}
 	return nil

@@ -21,8 +21,12 @@ func Authentication(userService service.UserService) MiddlewareFunc {
 				if err != nil {
 					continue
 				}
-				ctx = context.WithValue(ctx, "userId", userId)
+				if userId == "" {
+					continue
+				}
 				ctx = context.WithValue(ctx, "loggedIn", true)
+				ctx = context.WithValue(ctx, "sessionId", thisCookie.Value)
+				ctx = context.WithValue(ctx, "userId", userId)
 				break
 			}
 			if ctx.Value("loggedIn") == nil {

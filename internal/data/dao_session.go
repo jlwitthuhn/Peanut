@@ -20,7 +20,7 @@ type SessionDao interface {
 	CreateDBObjects(tx *sql.Tx) error
 	DeleteRowById(tx *sql.Tx, sessionId string) error
 	InsertRow(tx *sql.Tx, sessionId string, userId string) error
-	SelectRowBySessionId(tx *sql.Tx, sessionId string) (*SessionRow, error)
+	SelectValidRowBySessionId(tx *sql.Tx, sessionId string) (*SessionRow, error)
 }
 
 var sessionDaoInstance SessionDao
@@ -39,6 +39,7 @@ var sqlCreateTableSessions = `
 	CREATE TABLE sessions (
 		id VARCHAR(63) PRIMARY KEY,
 		user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+		valid_until TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (NOW() + INTERVAL '5 minutes'),
 		_created TIMESTAMP WITH TIME ZONE NOT NULL,
 		_updated TIMESTAMP WITH TIME ZONE NOT NULL
 	);
@@ -94,9 +95,9 @@ func (*sessionDaoImpl) InsertRow(tx *sql.Tx, sessionId string, userId string) er
 	return nil
 }
 
-var sqlSelectSessionsRowById = "SELECT id, user_id FROM sessions WHERE id = $1"
+var sqlSelectSessionsRowById = "SELECT id, user_id FROM sessions WHERE id = $1 AND valid_until >= NOW()"
 
-func (*sessionDaoImpl) SelectRowBySessionId(tx *sql.Tx, sessionId string) (*SessionRow, error) {
+func (*sessionDaoImpl) SelectValidRowBySessionId(tx *sql.Tx, sessionId string) (*SessionRow, error) {
 	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
 
 	result := &SessionRow{}

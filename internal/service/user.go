@@ -89,7 +89,7 @@ func (*userServiceImpl) DestroySession(r *http.Request, tx *sql.Tx, sessionId st
 
 func (*userServiceImpl) GetLoggedInUserIdBySession(r *http.Request, tx *sql.Tx, sessionId string) (string, error) {
 	sessionDao := data.SessionDaoInst()
-	sessionRow, sessionErr := sessionDao.SelectRowBySessionId(tx, sessionId)
+	sessionRow, sessionErr := sessionDao.SelectValidRowBySessionId(tx, sessionId)
 	if sessionErr != nil {
 		return "", sessionErr
 	}

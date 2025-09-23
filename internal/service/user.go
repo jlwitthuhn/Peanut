@@ -83,6 +83,9 @@ func (*userServiceImpl) GetLoggedInUserIdBySession(r *http.Request, tx *sql.Tx, 
 	if sessionErr != nil {
 		return "", sessionErr
 	}
+	if sessionRow == nil {
+		return "", nil
+	}
 	return sessionRow.UserId, nil
 }
 

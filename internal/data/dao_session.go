@@ -89,8 +89,12 @@ func (*sessionDaoImpl) SelectRowBySessionId(tx *sql.Tx, sessionId string) (*Sess
 	row := sqlh.QueryRow(sqlSelectSessionsRowById, sessionId)
 	err := row.Scan(&result.Id, &result.UserId)
 	if err != nil {
-		logger.Error(nil, "Got error on SessionDao/SelectRowBySessionId query: ", err)
-		return nil, err
+		if err == sql.ErrNoRows {
+			return nil, nil
+		} else {
+			logger.Error(nil, "Got error on SessionDao/SelectRowBySessionId query: ", err)
+			return nil, err
+		}
 	}
 	return result, nil
 }

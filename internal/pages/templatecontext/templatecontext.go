@@ -11,6 +11,10 @@ import (
 
 func GetStandardTemplateContext(r *http.Request) map[string]any {
 	result := make(map[string]any)
+	result["LoggedIn"] = r.Context().Value("loggedIn")
+
+	// Always do this one last
 	result["RequestDuration"] = middleutil.RequestTimerFinish(r)
+
 	return result
 }

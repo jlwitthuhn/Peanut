@@ -13,7 +13,15 @@
 <body>
 	<div id="title-bar">
 		<h1>Website</h1>
-		<div><a href="/login">Log In</a></div>
+		{{ if .LoggedIn }}
+			<form action="/logout" method="post">
+				<div><p>
+					Welcome - <input type="submit" value="Log out">
+				</p></div>
+			</form>
+		{{ else }}
+			<div><a href="/login">Log In</a></div>
+		{{ end }}
 	</div>
 	<nav id="top-nav">
 		<ul>
@@ -26,7 +34,7 @@
 	</nav>
 
 	{{ block "content" . }}
-	<p>No content</p>
+		<p>No content</p>
 	{{ end }}
 
 	<hr>

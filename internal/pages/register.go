@@ -11,15 +11,14 @@ import (
 	"peanut/internal/template"
 )
 
-func RegisterIndexHandlers(mux *http.ServeMux) {
-	
-	getIndexHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func RegisterRegisterHandlers(mux *http.ServeMux) {
+	getRegisterHandles := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
-		theTemplate := template.GetTemplate("_index")
+		theTemplate := template.GetTemplate("_register")
 		err := theTemplate.Execute(w, templateCtx)
 		if err != nil {
 			logger.Error(r, "Error executing template:", err)
 		}
 	})
-	mux.Handle("GET /{$}", getIndexHandler)
+	mux.Handle("GET /register", getRegisterHandles)
 }

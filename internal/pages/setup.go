@@ -11,19 +11,8 @@ import (
 	"peanut/internal/pages/templatecontext"
 	"peanut/internal/service"
 	"peanut/internal/template"
+	"peanut/internal/validator"
 )
-
-func isEmailValid(email string) bool {
-	return len(email) > 1
-}
-
-func isPasswordValid(password string) bool {
-	return len(password) > 1
-}
-
-func isUsernameValid(username string) bool {
-	return len(username) > 1
-}
 
 func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService, setupService service.SetupService) {
 
@@ -55,14 +44,14 @@ func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService
 		adminPassword := r.PostFormValue("admin-pass")
 		adminPassword2 := r.PostFormValue("admin-pass-2")
 
-		if !isUsernameValid(adminName) {
+		if err := validator.ValidateUsername(adminName); err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			genericpage.RenderSimpleMessage("Error", "Username is not valid.", w, r)
+			genericpage.RenderSimpleMessage("Error", "Username is not valid: "+err.Error(), w, r)
 			return
 		}
-		if !isEmailValid(email) {
+		if err := validator.ValidateEmail(email); err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			genericpage.RenderSimpleMessage("Error", "Email is not valid.", w, r)
+			genericpage.RenderSimpleMessage("Error", "Email is not valid: "+err.Error(), w, r)
 			return
 		}
 		if adminPassword != adminPassword2 {
@@ -70,9 +59,9 @@ func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService
 			genericpage.RenderSimpleMessage("Error", "Passwords must match.", w, r)
 			return
 		}
-		if !isPasswordValid(adminPassword) {
+		if err := validator.ValidatePassword(adminPassword); err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			genericpage.RenderSimpleMessage("Error", "Passwords is not valid.", w, r)
+			genericpage.RenderSimpleMessage("Error", "Passwords is not valid: "+err.Error(), w, r)
 			return
 		}
 

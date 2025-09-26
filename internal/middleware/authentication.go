@@ -8,29 +8,44 @@ import (
 	"context"
 	"net/http"
 	"peanut/internal/cookie"
+	"peanut/internal/data/datasource"
+	"peanut/internal/pages/genericpage"
 	"peanut/internal/service"
 )
 
-func Authentication(userService service.UserService) MiddlewareFunc {
+func Authentication(groupService service.GroupService, userService service.UserService) MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
 			cookies := r.CookiesNamed(cookie.SessionCookieName)
+			tx, txErr := datasource.PostgresHandle().BeginTx(r.Context(), nil)
+			if txErr != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				genericpage.RenderSimpleMessage("Authentication Error", "Failed to create database transaction.", w, r)
+				return
+			}
+			defer tx.Rollback()
 			for _, thisCookie := range cookies {
-				userId, err := userService.GetLoggedInUserIdBySession(r, nil, thisCookie.Value)
-				if err != nil {
+				userId, sessionErr := userService.GetLoggedInUserIdBySession(r, nil, thisCookie.Value)
+				if sessionErr != nil {
 					continue
 				}
 				if userId == "" {
 					continue
 				}
+				groups, groupsErr := groupService.GetGroupsByUserId(tx, userId)
+				if groupsErr != nil {
+					continue
+				}
 				ctx = context.WithValue(ctx, "loggedIn", true)
 				ctx = context.WithValue(ctx, "sessionId", thisCookie.Value)
+				ctx = context.WithValue(ctx, "userGroups", groups)
 				ctx = context.WithValue(ctx, "userId", userId)
 				break
 			}
 			if ctx.Value("loggedIn") == nil {
 				ctx = context.WithValue(ctx, "loggedIn", false)
+				ctx = context.WithValue(ctx, "userGroups", []string{"Guest"})
 			}
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})

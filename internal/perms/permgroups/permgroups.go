@@ -7,3 +7,4 @@ package permgroups
 const TurboAdmin = "TurboAdmin"
 const Admin = "Admin"
 const User = "User"
+const Guest = "Guest"

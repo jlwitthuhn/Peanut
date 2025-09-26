@@ -7,21 +7,14 @@ package data
 import (
 	"database/sql"
 	"peanut/internal/data/datasource"
-	"sync"
 )
 
 type MultiTableDao interface {
 	SelectGroupNamesByUserId(tx *sql.Tx, userId string) ([]string, error)
 }
 
-var multiTableDaoInstance MultiTableDao
-var multiTableDaoInstanceOnce sync.Once
-
-func MultiTableDaoInst() MultiTableDao {
-	multiTableDaoInstanceOnce.Do(func() {
-		multiTableDaoInstance = &multiTableDaoImpl{}
-	})
-	return multiTableDaoInstance
+func NewMultiTableDao() MultiTableDao {
+	return &multiTableDaoImpl{}
 }
 
 type multiTableDaoImpl struct{}

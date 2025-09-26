@@ -8,7 +8,6 @@ import (
 	"database/sql"
 	"peanut/internal/data/datasource"
 	"peanut/internal/logger"
-	"sync"
 )
 
 type SessionRow struct {
@@ -23,14 +22,8 @@ type SessionDao interface {
 	SelectValidRowBySessionId(tx *sql.Tx, sessionId string) (*SessionRow, error)
 }
 
-var sessionDaoInstance SessionDao
-var sessionDaoInstanceOnce sync.Once
-
-func SessionDaoInst() SessionDao {
-	sessionDaoInstanceOnce.Do(func() {
-		sessionDaoInstance = &sessionDaoImpl{}
-	})
-	return sessionDaoInstance
+func NewSessionDao() SessionDao {
+	return &sessionDaoImpl{}
 }
 
 type sessionDaoImpl struct{}

@@ -18,26 +18,30 @@ type GroupService interface {
 	EnrollUserInGroup(r *http.Request, tx *sql.Tx, userId string, groupName string) error
 }
 
-func NewGroupService() GroupService {
-	return &groupServiceImpl{}
+func NewGroupService(groupDao data.GroupDao, groupMembershipDao data.GroupMembershipDao, multiTableDao data.MultiTableDao) GroupService {
+	return &groupServiceImpl{groupDao: groupDao, groupMembershipDao: groupMembershipDao, multiTableDao: multiTableDao}
 }
 
-type groupServiceImpl struct{}
+type groupServiceImpl struct {
+	groupDao           data.GroupDao
+	groupMembershipDao data.GroupMembershipDao
+	multiTableDao      data.MultiTableDao
+}
 
-func (*groupServiceImpl) CreateGroup(tx *sql.Tx, name string, desc string, systemOwned bool) error {
-	err := data.GroupDaoInst().InsertRow(tx, name, desc, systemOwned)
+func (this *groupServiceImpl) CreateGroup(tx *sql.Tx, name string, desc string, systemOwned bool) error {
+	err := this.groupDao.InsertRow(tx, name, desc, systemOwned)
 	return err
 }
 
-func (*groupServiceImpl) GetGroupsByUserId(tx *sql.Tx, userId string) ([]string, error) {
-	groupNames, err := data.MultiTableDaoInst().SelectGroupNamesByUserId(tx, userId)
+func (this *groupServiceImpl) GetGroupsByUserId(tx *sql.Tx, userId string) ([]string, error) {
+	groupNames, err := this.multiTableDao.SelectGroupNamesByUserId(tx, userId)
 	if err != nil {
 		return nil, err
 	}
 	return groupNames, nil
 }
 
-func (*groupServiceImpl) EnrollUserInGroup(r *http.Request, tx *sql.Tx, userId string, groupName string) error {
+func (this *groupServiceImpl) EnrollUserInGroup(r *http.Request, tx *sql.Tx, userId string, groupName string) error {
 	shouldCommit := false
 	if tx == nil {
 		newTx, txErr := datasource.PostgresHandle().BeginTx(r.Context(), nil)
@@ -48,13 +52,11 @@ func (*groupServiceImpl) EnrollUserInGroup(r *http.Request, tx *sql.Tx, userId s
 		shouldCommit = true
 		defer tx.Rollback()
 	}
-	groupDao := data.GroupDaoInst()
-	groupRow, groupErr := groupDao.SelectRowByName(tx, groupName)
+	groupRow, groupErr := this.groupDao.SelectRowByName(tx, groupName)
 	if groupErr != nil {
 		return groupErr
 	}
-	groupMembershipDao := data.GroupMembershipDaoInst()
-	err := groupMembershipDao.InsertRow(tx, userId, groupRow.Id)
+	err := this.groupMembershipDao.InsertRow(tx, userId, groupRow.Id)
 	if err != nil {
 		return err
 	}

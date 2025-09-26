@@ -19,14 +19,40 @@ type SetupService interface {
 	InitializeDatabase(r *http.Request, adminName string, adminEmail string, adminPlainPassword string) error
 }
 
-func NewSetupService(configService ConfigService, groupService GroupService, userService UserService) SetupService {
-	return &setupServiceImpl{configService: configService, groupService: groupService, userService: userService}
+func NewSetupService(
+	configDao data.ConfigDao,
+	groupDao data.GroupDao,
+	groupMembershipDao data.GroupMembershipDao,
+	metaDao data.MetaDao,
+	sessionDao data.SessionDao,
+	userDao data.UserDao,
+	configService ConfigService,
+	groupService GroupService,
+	userService UserService,
+) SetupService {
+	return &setupServiceImpl{
+		configDao:          configDao,
+		groupDao:           groupDao,
+		groupMembershipDao: groupMembershipDao,
+		metaDao:            metaDao,
+		sessionDao:         sessionDao,
+		userDao:            userDao,
+		configService:      configService,
+		groupService:       groupService,
+		userService:        userService,
+	}
 }
 
 type setupServiceImpl struct {
-	configService ConfigService
-	groupService  GroupService
-	userService   UserService
+	configDao          data.ConfigDao
+	groupDao           data.GroupDao
+	groupMembershipDao data.GroupMembershipDao
+	metaDao            data.MetaDao
+	sessionDao         data.SessionDao
+	userDao            data.UserDao
+	configService      ConfigService
+	groupService       GroupService
+	userService        UserService
 }
 
 func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName string, adminEmail string, adminPlainPassword string) error {
@@ -40,27 +66,27 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName stri
 
 	logger.Debug(r, "Creating tables...")
 	{
-		metaErr := data.MetaDaoInst().CreateDBObjects(tx)
+		metaErr := this.metaDao.CreateDBObjects(tx)
 		if metaErr != nil {
 			return metaErr
 		}
-		configErr := data.ConfigDaoInst().CreateDBObjects(tx)
+		configErr := this.configDao.CreateDBObjects(tx)
 		if configErr != nil {
 			return configErr
 		}
-		groupErr := data.GroupDaoInst().CreateDBObjects(tx)
+		groupErr := this.groupDao.CreateDBObjects(tx)
 		if groupErr != nil {
 			return groupErr
 		}
-		userErr := data.UserDaoInst().CreateDBObjects(tx)
+		userErr := this.userDao.CreateDBObjects(tx)
 		if userErr != nil {
 			return userErr
 		}
-		groupMembershipErr := data.GroupMembershipDaoInst().CreateDBObjects(tx)
+		groupMembershipErr := this.groupMembershipDao.CreateDBObjects(tx)
 		if groupMembershipErr != nil {
 			return groupMembershipErr
 		}
-		sessionErr := data.SessionDaoInst().CreateDBObjects(tx)
+		sessionErr := this.sessionDao.CreateDBObjects(tx)
 		if sessionErr != nil {
 			return sessionErr
 		}

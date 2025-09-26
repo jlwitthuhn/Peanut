@@ -8,7 +8,6 @@ import (
 	"database/sql"
 	"peanut/internal/data/datasource"
 	"peanut/internal/logger"
-	"sync"
 )
 
 type MetaDao interface {
@@ -23,14 +22,8 @@ func (*metaDaoImpl) SelectRowByName(name string, tx *sql.Tx) {
 	panic("implement me")
 }
 
-var metaDaoInstance MetaDao
-var metaDaoInstanceOnce sync.Once
-
-func MetaDaoInst() MetaDao {
-	metaDaoInstanceOnce.Do(func() {
-		metaDaoInstance = &metaDaoImpl{}
-	})
-	return metaDaoInstance
+func NewMetaDao() MetaDao {
+	return &metaDaoImpl{}
 }
 
 func (*metaDaoImpl) CreateDBObjects(tx *sql.Tx) error {

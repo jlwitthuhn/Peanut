@@ -8,7 +8,6 @@ import (
 	"database/sql"
 	"peanut/internal/data/datasource"
 	"peanut/internal/logger"
-	"sync"
 )
 
 type GroupMembershipDao interface {
@@ -16,14 +15,8 @@ type GroupMembershipDao interface {
 	InsertRow(tx *sql.Tx, userId string, groupId string) error
 }
 
-var groupMembershipDaoInstance GroupMembershipDao
-var groupMembershipDaoInstanceOnce sync.Once
-
-func GroupMembershipDaoInst() GroupMembershipDao {
-	groupMembershipDaoInstanceOnce.Do(func() {
-		groupMembershipDaoInstance = &groupMembershipDaoImpl{}
-	})
-	return groupMembershipDaoInstance
+func NewGroupMembershipDao() GroupMembershipDao {
+	return &groupMembershipDaoImpl{}
 }
 
 type groupMembershipDaoImpl struct{}

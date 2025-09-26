@@ -23,15 +23,17 @@ type UserService interface {
 	IsNameTaken(tx *sql.Tx, username string) (bool, error)
 }
 
-func NewUserService() UserService {
-	return &userServiceImpl{}
+func NewUserService(sessionDao data.SessionDao, userDao data.UserDao) UserService {
+	return &userServiceImpl{sessionDao: sessionDao, userDao: userDao}
 }
 
-type userServiceImpl struct{}
+type userServiceImpl struct {
+	sessionDao data.SessionDao
+	userDao    data.UserDao
+}
 
-func (*userServiceImpl) CreateSession(r *http.Request, tx *sql.Tx, username string, plainPassword string) (string, error) {
-	userDao := data.UserDaoInst()
-	userRow, userErr := userDao.SelectRowByName(tx, username)
+func (this *userServiceImpl) CreateSession(r *http.Request, tx *sql.Tx, username string, plainPassword string) (string, error) {
+	userRow, userErr := this.userDao.SelectRowByName(tx, username)
 	if userErr != nil {
 		return "", userErr
 	}
@@ -39,9 +41,8 @@ func (*userServiceImpl) CreateSession(r *http.Request, tx *sql.Tx, username stri
 		return "", errors.New("Invalid password")
 	}
 
-	sessionDao := data.SessionDaoInst()
 	newSessionId := security.GenerateSessionId()
-	err := sessionDao.InsertRow(tx, newSessionId, userRow.Id)
+	err := this.sessionDao.InsertRow(tx, newSessionId, userRow.Id)
 	if err != nil {
 		return "", err
 	}
@@ -69,8 +70,7 @@ func (this *userServiceImpl) CreateUser(tx *sql.Tx, name string, email string, p
 
 	hashedPassword := passhash.GenerateDefaultPhcString(plainPassword)
 
-	userDao := data.UserDaoInst()
-	newId, insertErr := userDao.InsertRow(tx, name, email, hashedPassword)
+	newId, insertErr := this.userDao.InsertRow(tx, name, email, hashedPassword)
 	if insertErr != nil {
 		return "", insertErr
 	}
@@ -78,18 +78,16 @@ func (this *userServiceImpl) CreateUser(tx *sql.Tx, name string, email string, p
 	return newId, nil
 }
 
-func (*userServiceImpl) DestroySession(r *http.Request, tx *sql.Tx, sessionId string) error {
-	sessionDao := data.SessionDaoInst()
-	err := sessionDao.DeleteRowById(tx, sessionId)
+func (this *userServiceImpl) DestroySession(r *http.Request, tx *sql.Tx, sessionId string) error {
+	err := this.sessionDao.DeleteRowById(tx, sessionId)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (*userServiceImpl) GetLoggedInUserIdBySession(r *http.Request, tx *sql.Tx, sessionId string) (string, error) {
-	sessionDao := data.SessionDaoInst()
-	sessionRow, sessionErr := sessionDao.SelectValidRowBySessionId(tx, sessionId)
+func (this *userServiceImpl) GetLoggedInUserIdBySession(r *http.Request, tx *sql.Tx, sessionId string) (string, error) {
+	sessionRow, sessionErr := this.sessionDao.SelectValidRowBySessionId(tx, sessionId)
 	if sessionErr != nil {
 		return "", sessionErr
 	}
@@ -99,18 +97,16 @@ func (*userServiceImpl) GetLoggedInUserIdBySession(r *http.Request, tx *sql.Tx, 
 	return sessionRow.UserId, nil
 }
 
-func (*userServiceImpl) IsEmailTaken(tx *sql.Tx, email string) (bool, error) {
-	userDao := data.UserDaoInst()
-	count, err := userDao.CountRowsByEmail(tx, email)
+func (this *userServiceImpl) IsEmailTaken(tx *sql.Tx, email string) (bool, error) {
+	count, err := this.userDao.CountRowsByEmail(tx, email)
 	if err != nil {
 		return true, err
 	}
 	return count > 0, nil
 }
 
-func (*userServiceImpl) IsNameTaken(tx *sql.Tx, username string) (bool, error) {
-	userDao := data.UserDaoInst()
-	count, err := userDao.CountRowsByName(tx, username)
+func (this *userServiceImpl) IsNameTaken(tx *sql.Tx, username string) (bool, error) {
+	count, err := this.userDao.CountRowsByName(tx, username)
 	if err != nil {
 		return true, err
 	}

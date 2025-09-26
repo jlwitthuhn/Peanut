@@ -8,7 +8,6 @@ import (
 	"database/sql"
 	"peanut/internal/data/datasource"
 	"peanut/internal/logger"
-	"sync"
 )
 
 type ConfigDao interface {
@@ -16,14 +15,8 @@ type ConfigDao interface {
 	UpsertIntByName(name string, value int64, tx *sql.Tx) error
 }
 
-var configDaoInstance ConfigDao
-var configDaoInstanceOnce sync.Once
-
-func ConfigDaoInst() ConfigDao {
-	configDaoInstanceOnce.Do(func() {
-		configDaoInstance = &configDaoImpl{}
-	})
-	return configDaoInstance
+func NewConfigDao() ConfigDao {
+	return &configDaoImpl{}
 }
 
 type configDaoImpl struct{}

@@ -8,7 +8,6 @@ import (
 	"database/sql"
 	"peanut/internal/data/datasource"
 	"peanut/internal/logger"
-	"sync"
 )
 
 type UserRow struct {
@@ -26,14 +25,8 @@ type UserDao interface {
 	SelectRowByName(tx *sql.Tx, name string) (*UserRow, error)
 }
 
-var userDaoInstance UserDao
-var userDaoInstanceOnce sync.Once
-
-func UserDaoInst() UserDao {
-	userDaoInstanceOnce.Do(func() {
-		userDaoInstance = &userDaoImpl{}
-	})
-	return userDaoInstance
+func NewUserDao() UserDao {
+	return &userDaoImpl{}
 }
 
 type userDaoImpl struct{}

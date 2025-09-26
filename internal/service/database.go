@@ -12,12 +12,14 @@ type DatabaseService interface {
 	DoesTableExist(tableName string) (bool, error)
 }
 
-func NewDatabaseService() DatabaseService {
-	return &databaseServiceImpl{}
+func NewDatabaseService(metaDao data.MetaDao) DatabaseService {
+	return &databaseServiceImpl{metaDao: metaDao}
 }
 
-type databaseServiceImpl struct{}
+type databaseServiceImpl struct {
+	metaDao data.MetaDao
+}
 
-func (*databaseServiceImpl) DoesTableExist(tableName string) (bool, error) {
-	return data.MetaDaoInst().DoesTableExist(tableName)
+func (this *databaseServiceImpl) DoesTableExist(tableName string) (bool, error) {
+	return this.metaDao.DoesTableExist(tableName)
 }

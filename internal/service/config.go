@@ -13,13 +13,15 @@ type ConfigService interface {
 	SetInt(key string, value int64, tx *sql.Tx) error
 }
 
-func NewConfigService() ConfigService {
-	return &configServiceImpl{}
+func NewConfigService(configDao data.ConfigDao) ConfigService {
+	return &configServiceImpl{configDao: configDao}
 }
 
-type configServiceImpl struct{}
+type configServiceImpl struct {
+	configDao data.ConfigDao
+}
 
-func (*configServiceImpl) SetInt(name string, value int64, tx *sql.Tx) error {
-	err := data.ConfigDaoInst().UpsertIntByName(name, value, tx)
+func (this *configServiceImpl) SetInt(name string, value int64, tx *sql.Tx) error {
+	err := this.configDao.UpsertIntByName(name, value, tx)
 	return err
 }

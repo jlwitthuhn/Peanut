@@ -8,7 +8,6 @@ import (
 	"database/sql"
 	"peanut/internal/data/datasource"
 	"peanut/internal/logger"
-	"sync"
 )
 
 type GroupRow struct {
@@ -24,14 +23,8 @@ type GroupDao interface {
 	SelectRowByName(tx *sql.Tx, name string) (*GroupRow, error)
 }
 
-var groupDaoInstance GroupDao
-var groupDaoInstanceOnce sync.Once
-
-func GroupDaoInst() GroupDao {
-	groupDaoInstanceOnce.Do(func() {
-		groupDaoInstance = &groupDaoImpl{}
-	})
-	return groupDaoInstance
+func NewGroupDao() GroupDao {
+	return &groupDaoImpl{}
 }
 
 type groupDaoImpl struct{}

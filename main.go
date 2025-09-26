@@ -9,6 +9,7 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	"peanut/internal/data"
 	"peanut/internal/data/datasource"
 	"peanut/internal/logger"
 	"peanut/internal/middleware"
@@ -45,11 +46,21 @@ func main() {
 	template.LoadTemplates(justTemplates)
 
 	logger.Info(nil, "Initializing services...")
-	var configService = service.NewConfigService()
-	var dbService = service.NewDatabaseService()
-	var groupService = service.NewGroupService()
-	var userService = service.NewUserService()
-	var setupService = service.NewSetupService(configService, groupService, userService)
+	configDao := data.NewConfigDao()
+	groupDao := data.NewGroupDao()
+	groupMembershipDao := data.NewGroupMembershipDao()
+	metaDao := data.NewMetaDao()
+	multiTableDao := data.NewMultiTableDao()
+	sessionDao := data.NewSessionDao()
+	userDao := data.NewUserDao()
+	configService := service.NewConfigService(configDao)
+	dbService := service.NewDatabaseService(metaDao)
+	groupService := service.NewGroupService(groupDao, groupMembershipDao, multiTableDao)
+	userService := service.NewUserService(sessionDao, userDao)
+	setupService := service.NewSetupService(
+		configDao, groupDao, groupMembershipDao, metaDao, sessionDao, userDao,
+		configService, groupService, userService,
+	)
 
 	// Setup mux is separate and is only used from within DatabaseInitCheck
 	setupMux := http.NewServeMux()

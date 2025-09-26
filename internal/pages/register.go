@@ -10,6 +10,7 @@ import (
 	"peanut/internal/logger"
 	"peanut/internal/pages/genericpage"
 	"peanut/internal/pages/templatecontext"
+	"peanut/internal/perms/permgroups"
 	"peanut/internal/service"
 	"peanut/internal/template"
 	"peanut/internal/validator"
@@ -67,7 +68,7 @@ func RegisterRegisterHandlers(mux *http.ServeMux, groupService service.GroupServ
 			genericpage.RenderSimpleMessage("Error", "Failed to crete user.", w, r)
 			return
 		}
-		groupErr := groupService.EnrollUserInGroup(r, tx, userId, "User")
+		groupErr := groupService.EnrollUserInGroup(r, tx, userId, permgroups.User)
 		if groupErr != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			genericpage.RenderSimpleMessage("Error", "Failed to add new user to default group.", w, r)

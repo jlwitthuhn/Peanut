@@ -11,6 +11,7 @@ import (
 	"peanut/internal/data/configkey"
 	"peanut/internal/data/datasource"
 	"peanut/internal/logger"
+	"peanut/internal/perms/permgroups"
 	"time"
 )
 
@@ -71,15 +72,15 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName stri
 		return configTimeErr
 	}
 	{
-		groupTurboErr := this.groupService.CreateGroup(tx, "TurboAdmin", "Full control over everything.", true)
+		groupTurboErr := this.groupService.CreateGroup(tx, permgroups.TurboAdmin, "Full control over everything.", true)
 		if groupTurboErr != nil {
 			return groupTurboErr
 		}
-		groupAdminErr := this.groupService.CreateGroup(tx, "Admin", "Full control over everything except mass database updates and exports.", true)
+		groupAdminErr := this.groupService.CreateGroup(tx, permgroups.Admin, "Full control over everything except mass database updates and exports.", true)
 		if groupAdminErr != nil {
 			return groupAdminErr
 		}
-		groupUserErr := this.groupService.CreateGroup(tx, "User", "Ordinary registered user.", true)
+		groupUserErr := this.groupService.CreateGroup(tx, permgroups.User, "Ordinary registered user.", true)
 		if groupUserErr != nil {
 			return groupUserErr
 		}
@@ -89,15 +90,15 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName stri
 		return userErr
 	}
 	{
-		memberTurboErr := this.groupService.EnrollUserInGroup(r, tx, userId, "TurboAdmin")
+		memberTurboErr := this.groupService.EnrollUserInGroup(r, tx, userId, permgroups.TurboAdmin)
 		if memberTurboErr != nil {
 			return memberTurboErr
 		}
-		memberAdminErr := this.groupService.EnrollUserInGroup(r, tx, userId, "Admin")
+		memberAdminErr := this.groupService.EnrollUserInGroup(r, tx, userId, permgroups.Admin)
 		if memberAdminErr != nil {
 			return memberAdminErr
 		}
-		memberUserErr := this.groupService.EnrollUserInGroup(r, tx, userId, "User")
+		memberUserErr := this.groupService.EnrollUserInGroup(r, tx, userId, permgroups.User)
 		if memberUserErr != nil {
 			return memberUserErr
 		}

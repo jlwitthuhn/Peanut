@@ -59,7 +59,7 @@ func main() {
 	pages.RegisterIndexHandlers(middlewareMux)
 	pages.RegisterLoginHandlers(middlewareMux, userService)
 	pages.RegisterLogoutHandlers(middlewareMux, userService)
-	pages.RegisterRegisterHandlers(middlewareMux)
+	pages.RegisterRegisterHandlers(middlewareMux, groupService, userService)
 	wrappedMiddlewareMux := middleware.WrapHandler(middlewareMux,
 		middleware.RequestId(),
 		middleware.RequestLog(),

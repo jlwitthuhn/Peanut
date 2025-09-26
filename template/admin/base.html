@@ -1,0 +1,13 @@
+{{ define "content" }}
+<div class="cp-container">
+	<div>
+		<nav>
+			<p>General</p>
+			<p><a href="/admin">Index</a></p>
+		</nav>
+	</div>
+	{{ block "admin_content" . }}
+		<p>Admin page. You should never see this text.</p>
+	{{ end }}
+</div>
+{{ end }}

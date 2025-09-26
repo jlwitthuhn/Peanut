@@ -21,6 +21,9 @@ func GetTemplate(name string) *template.Template {
 // LoadTemplates builds the list of view name to template list mappings.
 // Because of the way go manages templates, this needs to be kept separately from template content.
 func LoadTemplates(fs fs.FS) {
+	adminIndexFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/index.html"}
+	loadTemplateOrDie(fs, "_admin/index", adminIndexFiles...)
+
 	indexFiles := []string{"base.html", "css/common.css", "index.html"}
 	loadTemplateOrDie(fs, "_index", indexFiles...)
 

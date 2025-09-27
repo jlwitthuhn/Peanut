@@ -45,6 +45,8 @@ func RegisterAdminHandlers(mux *http.ServeMux, configService service.ConfigServi
 		var envInfo = make(map[string]string)
 		envInfo["Go Runtime"] = runtime.Version()
 		envInfo["PostgreSQL Version"] = dbVersion
+		envInfo["Host OS"] = runtime.GOOS
+		envInfo["Host Arch"] = runtime.GOARCH
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["WebsiteInfo"] = websiteInfo

@@ -10,8 +10,14 @@ import (
 	"peanut/internal/logger"
 )
 
+type ConfigIntRow struct {
+	Name  string
+	Value int64
+}
+
 type ConfigDao interface {
 	CreateDBObjects(*sql.Tx) error
+	SelectIntRowByName(tx *sql.Tx, name string) (*ConfigIntRow, error)
 	UpsertIntByName(name string, value int64, tx *sql.Tx) error
 }
 
@@ -56,6 +62,20 @@ func (*configDaoImpl) CreateDBObjects(tx *sql.Tx) error {
 		return err
 	}
 	return nil
+}
+
+var sqlSelectConfigIntRowByName = "SELECT name, value FROM config_int WHERE name = $1"
+
+func (*configDaoImpl) SelectIntRowByName(tx *sql.Tx, name string) (*ConfigIntRow, error) {
+	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
+
+	result := &ConfigIntRow{}
+	row := sqlh.QueryRow(sqlSelectConfigIntRowByName, name)
+	err := row.Scan(&result.Name, &result.Value)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 var sqlUpsertIntByName = `

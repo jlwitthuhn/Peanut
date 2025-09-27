@@ -10,6 +10,7 @@ import (
 )
 
 type ConfigService interface {
+	GetInt(tx *sql.Tx, key string) (int64, error)
 	SetInt(key string, value int64, tx *sql.Tx) error
 }
 
@@ -19,6 +20,14 @@ func NewConfigService(configDao data.ConfigDao) ConfigService {
 
 type configServiceImpl struct {
 	configDao data.ConfigDao
+}
+
+func (this *configServiceImpl) GetInt(tx *sql.Tx, key string) (int64, error) {
+	row, err := this.configDao.SelectIntRowByName(tx, key)
+	if err != nil {
+		return 0, err
+	}
+	return row.Value, nil
 }
 
 func (this *configServiceImpl) SetInt(name string, value int64, tx *sql.Tx) error {

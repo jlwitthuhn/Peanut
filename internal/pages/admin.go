@@ -33,7 +33,7 @@ func RegisterAdminHandlers(mux *http.ServeMux, configService service.ConfigServi
 		}
 
 		var websiteInfo = make(map[string]string)
-		websiteInfo["Initialized Time"] = time.Unix(initTime, 0).UTC().Format(time.RFC3339)
+		websiteInfo["Initialized Time"] = time.Unix(initTime, 0).UTC().Format("2006-01-02 15:04:05 MST")
 
 		var envInfo = make(map[string]string)
 		envInfo["Go Version"] = runtime.Version()

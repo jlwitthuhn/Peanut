@@ -10,7 +10,7 @@ import (
 	"peanut/internal/middleutil"
 	"peanut/internal/pages/genericpage"
 	"peanut/internal/pages/templatecontext"
-	"peanut/internal/perms"
+	"peanut/internal/security/perms"
 	"peanut/internal/template"
 )
 

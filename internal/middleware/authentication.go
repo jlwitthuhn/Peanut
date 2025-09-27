@@ -10,7 +10,7 @@ import (
 	"peanut/internal/cookie"
 	"peanut/internal/data/datasource"
 	"peanut/internal/pages/genericpage"
-	"peanut/internal/perms"
+	"peanut/internal/security/perms"
 	"peanut/internal/service"
 )
 

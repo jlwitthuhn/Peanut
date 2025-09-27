@@ -11,7 +11,7 @@ import (
 	"peanut/internal/data/configkey"
 	"peanut/internal/data/datasource"
 	"peanut/internal/logger"
-	"peanut/internal/perms/permgroups"
+	"peanut/internal/security/perms/permgroups"
 	"time"
 )
 

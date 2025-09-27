@@ -6,7 +6,7 @@ package perms
 
 import (
 	"peanut/internal/logger"
-	"peanut/internal/perms/permgroups"
+	"peanut/internal/security/perms/permgroups"
 	"sort"
 )
 

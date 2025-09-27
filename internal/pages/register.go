@@ -10,7 +10,7 @@ import (
 	"peanut/internal/logger"
 	"peanut/internal/pages/genericpage"
 	"peanut/internal/pages/templatecontext"
-	"peanut/internal/perms/permgroups"
+	"peanut/internal/security/perms/permgroups"
 	"peanut/internal/service"
 	"peanut/internal/template"
 	"peanut/internal/validator"

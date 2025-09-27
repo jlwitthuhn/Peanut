@@ -10,6 +10,7 @@ import (
 
 type DatabaseService interface {
 	DoesTableExist(tableName string) (bool, error)
+	GetPostgresVersion() (string, error)
 }
 
 func NewDatabaseService(metaDao data.MetaDao) DatabaseService {
@@ -22,4 +23,8 @@ type databaseServiceImpl struct {
 
 func (this *databaseServiceImpl) DoesTableExist(tableName string) (bool, error) {
 	return this.metaDao.DoesTableExist(tableName)
+}
+
+func (this *databaseServiceImpl) GetPostgresVersion() (string, error) {
+	return this.metaDao.SelectVersion()
 }

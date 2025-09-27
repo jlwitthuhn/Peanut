@@ -13,6 +13,7 @@ import (
 type MetaDao interface {
 	CreateDBObjects(*sql.Tx) error
 	DoesTableExist(tableName string) (bool, error)
+	SelectVersion() (string, error)
 }
 
 type metaDaoImpl struct{}
@@ -38,9 +39,9 @@ func (*metaDaoImpl) CreateDBObjects(tx *sql.Tx) error {
 	return nil
 }
 
-func (dao *metaDaoImpl) DoesTableExist(tableName string) (bool, error) {
-	db := datasource.PostgresHandle()
-	rows, err := db.Query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = $1", tableName)
+func (*metaDaoImpl) DoesTableExist(tableName string) (bool, error) {
+	sqlh := selectExecutor(datasource.PostgresHandle(), nil)
+	rows, err := sqlh.Query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = $1", tableName)
 	if err != nil {
 		logger.Warn(nil, "Error querying in data_meta.DoesTableExist:", tableName, err)
 		return false, err
@@ -63,6 +64,20 @@ func (dao *metaDaoImpl) DoesTableExist(tableName string) (bool, error) {
 		break
 	}
 	return theCount > 0, nil
+}
+
+var sqlShowServerVersion = "SHOW server_version;"
+
+func (*metaDaoImpl) SelectVersion() (string, error) {
+	sqlh := selectExecutor(datasource.PostgresHandle(), nil)
+
+	var version string
+	row := sqlh.QueryRow(sqlShowServerVersion)
+	err := row.Scan(&version)
+	if err != nil {
+		return "", err
+	}
+	return version, nil
 }
 
 var sqlCreatedUpdatedBeforeInsert = `

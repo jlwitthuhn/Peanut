@@ -18,7 +18,7 @@ import (
 	"time"
 )
 
-func RegisterAdminHandlers(mux *http.ServeMux, configService service.ConfigService) {
+func RegisterAdminHandlers(mux *http.ServeMux, configService service.ConfigService, databaseService service.DatabaseService) {
 	getIndexHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if middleutil.RequestHasPermission(r, perms.Admin_Gui_View) == false {
 			genericpage.RenderErrorHttp403Forbidden(w, r)
@@ -32,11 +32,19 @@ func RegisterAdminHandlers(mux *http.ServeMux, configService service.ConfigServi
 			return
 		}
 
+		dbVersion, dbVersionErr := databaseService.GetPostgresVersion()
+		if dbVersionErr != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			genericpage.RenderSimpleMessage("Error", "Failed to query postgres version.", w, r)
+			return
+		}
+
 		var websiteInfo = make(map[string]string)
 		websiteInfo["Initialized Time"] = time.Unix(initTime, 0).UTC().Format("2006-01-02 15:04:05 MST")
 
 		var envInfo = make(map[string]string)
-		envInfo["Go Version"] = runtime.Version()
+		envInfo["Go Runtime"] = runtime.Version()
+		envInfo["PostgreSQL Version"] = dbVersion
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["WebsiteInfo"] = websiteInfo

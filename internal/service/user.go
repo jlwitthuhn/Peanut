@@ -15,6 +15,7 @@ import (
 )
 
 type UserService interface {
+	CountUsers(tx *sql.Tx) (int64, error)
 	CreateSession(r *http.Request, tx *sql.Tx, username string, plainPassword string) (string, error)
 	CreateUser(tx *sql.Tx, name string, email string, plainPassword string) (string, error)
 	DestroySession(r *http.Request, tx *sql.Tx, sessionId string) error
@@ -30,6 +31,10 @@ func NewUserService(sessionDao data.SessionDao, userDao data.UserDao) UserServic
 type userServiceImpl struct {
 	sessionDao data.SessionDao
 	userDao    data.UserDao
+}
+
+func (this *userServiceImpl) CountUsers(tx *sql.Tx) (int64, error) {
+	return this.userDao.CountRows(tx)
 }
 
 func (this *userServiceImpl) CreateSession(r *http.Request, tx *sql.Tx, username string, plainPassword string) (string, error) {

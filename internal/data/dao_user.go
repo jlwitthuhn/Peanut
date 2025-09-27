@@ -19,6 +19,7 @@ type UserRow struct {
 
 type UserDao interface {
 	CreateDBObjects(tx *sql.Tx) error
+	CountRows(tx *sql.Tx) (int64, error)
 	CountRowsByEmail(tx *sql.Tx, name string) (int64, error)
 	CountRowsByName(tx *sql.Tx, name string) (int64, error)
 	InsertRow(tx *sql.Tx, name string, email string, hashedPassword string) (string, error)
@@ -66,13 +67,28 @@ func (*userDaoImpl) CreateDBObjects(tx *sql.Tx) error {
 	return nil
 }
 
-var sqlSelectUsersByEmail = "SELECT COUNT(*) FROM users WHERE email = $1"
+var sqlCountUsers = "SELECT COUNT(*) FROM users;"
+
+func (*userDaoImpl) CountRows(tx *sql.Tx) (int64, error) {
+	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
+
+	var count int64
+	row := sqlh.QueryRow(sqlCountUsers)
+	err := row.Scan(&count)
+	if err != nil {
+		logger.Error(nil, "Got error on UserDao/CountRows query: ", err)
+		return 0, err
+	}
+	return count, nil
+}
+
+var sqlCountUsersByEmail = "SELECT COUNT(*) FROM users WHERE email = $1;"
 
 func (*userDaoImpl) CountRowsByEmail(tx *sql.Tx, email string) (int64, error) {
 	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
 
 	var count int64
-	row := sqlh.QueryRow(sqlSelectUsersByEmail, email)
+	row := sqlh.QueryRow(sqlCountUsersByEmail, email)
 	err := row.Scan(&count)
 	if err != nil {
 		logger.Error(nil, "Got error on UserDao/CountRowsByEmail query: ", err)
@@ -81,13 +97,13 @@ func (*userDaoImpl) CountRowsByEmail(tx *sql.Tx, email string) (int64, error) {
 	return count, nil
 }
 
-var sqlSelectUsersByName = "SELECT COUNT(*) FROM users WHERE display_name = $1"
+var sqlCountUsersByName = "SELECT COUNT(*) FROM users WHERE display_name = $1;"
 
 func (*userDaoImpl) CountRowsByName(tx *sql.Tx, name string) (int64, error) {
 	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
 
 	var count int64
-	row := sqlh.QueryRow(sqlSelectUsersByName, name)
+	row := sqlh.QueryRow(sqlCountUsersByName, name)
 	err := row.Scan(&count)
 	if err != nil {
 		logger.Error(nil, "Got error on UserDao/CountRowsByName query: ", err)

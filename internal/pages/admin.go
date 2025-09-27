@@ -15,6 +15,7 @@ import (
 	"peanut/internal/service"
 	"peanut/internal/template"
 	"runtime"
+	"strconv"
 	"time"
 )
 
@@ -23,7 +24,7 @@ type adminPageStringPair struct {
 	B string
 }
 
-func RegisterAdminHandlers(mux *http.ServeMux, configService service.ConfigService, databaseService service.DatabaseService) {
+func RegisterAdminHandlers(mux *http.ServeMux, configService service.ConfigService, databaseService service.DatabaseService, userService service.UserService) {
 	getIndexHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if middleutil.RequestHasPermission(r, perms.Admin_Gui_View) == false {
 			genericpage.RenderErrorHttp403Forbidden(w, r)
@@ -44,8 +45,16 @@ func RegisterAdminHandlers(mux *http.ServeMux, configService service.ConfigServi
 			return
 		}
 
+		userCount, userCountErr := userService.CountUsers(nil)
+		if userCountErr != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			genericpage.RenderSimpleMessage("Error", "Failed to query user count.", w, r)
+			return
+		}
+
 		var websiteInfo = []adminPageStringPair{
 			{A: "Initialized Time", B: time.Unix(initTime, 0).UTC().Format("2006-01-02 15:04:05 MST")},
+			{A: "Registered Users", B: strconv.FormatInt(userCount, 10)},
 		}
 
 		var envInfo = []adminPageStringPair{

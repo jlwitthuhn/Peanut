@@ -10,6 +10,7 @@ import (
 	"peanut/internal/cookie"
 	"peanut/internal/data/datasource"
 	"peanut/internal/pages/genericpage"
+	"peanut/internal/perms"
 	"peanut/internal/service"
 )
 
@@ -37,15 +38,20 @@ func Authentication(groupService service.GroupService, userService service.UserS
 				if groupsErr != nil {
 					continue
 				}
+				permissions := perms.GetGranularPermissionsForGroups(groups...)
 				ctx = context.WithValue(ctx, "loggedIn", true)
 				ctx = context.WithValue(ctx, "sessionId", thisCookie.Value)
 				ctx = context.WithValue(ctx, "userGroups", groups)
 				ctx = context.WithValue(ctx, "userId", userId)
+				ctx = context.WithValue(ctx, "userPerms", permissions)
 				break
 			}
 			if ctx.Value("loggedIn") == nil {
+				defaultGroups := []string{"Guest"}
+				permissions := perms.GetGranularPermissionsForGroups(defaultGroups...)
 				ctx = context.WithValue(ctx, "loggedIn", false)
-				ctx = context.WithValue(ctx, "userGroups", []string{"Guest"})
+				ctx = context.WithValue(ctx, "userGroups", defaultGroups)
+				ctx = context.WithValue(ctx, "userPerms", permissions)
 			}
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})

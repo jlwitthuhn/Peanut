@@ -7,12 +7,19 @@ package pages
 import (
 	"net/http"
 	"peanut/internal/logger"
+	"peanut/internal/middleutil"
+	"peanut/internal/pages/genericpage"
 	"peanut/internal/pages/templatecontext"
+	"peanut/internal/perms"
 	"peanut/internal/template"
 )
 
 func RegisterAdminHandlers(mux *http.ServeMux) {
 	getIndexHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if middleutil.RequestHasPermission(r, perms.Admin_Gui_View) == false {
+			genericpage.RenderErrorHttp403Forbidden(w, r)
+			return
+		}
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		theTemplate := template.GetTemplate("_admin/index")
 		err := theTemplate.Execute(w, templateCtx)

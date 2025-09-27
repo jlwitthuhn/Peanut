@@ -11,6 +11,11 @@ import (
 	"peanut/internal/template"
 )
 
+func RenderErrorHttp403Forbidden(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusForbidden)
+	RenderSimpleMessage("Forbidden", "You do not have permission to access this page.", w, r)
+}
+
 func RenderSimpleMessage(title string, message string, w http.ResponseWriter, r *http.Request) {
 	templateCtx := templatecontext.GetStandardTemplateContext(r)
 	templateCtx["MessageBody"] = message

@@ -8,11 +8,20 @@ import (
 	"fmt"
 	"net/http"
 	"peanut/internal/middleutil"
+	"strings"
 )
 
 func GetStandardTemplateContext(r *http.Request) map[string]any {
 	result := make(map[string]any)
 	result["LoggedIn"] = r.Context().Value("loggedIn")
+
+	permSlice, ok := r.Context().Value("userPerms").([]string)
+	if ok {
+		for _, perm := range permSlice {
+			fullPerm := "Perm_" + strings.ReplaceAll(perm, "/", "_")
+			result[fullPerm] = true
+		}
+	}
 
 	// Always do this one last
 	timeMs := middleutil.RequestTimerFinish(r)

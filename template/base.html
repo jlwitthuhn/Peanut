@@ -26,6 +26,9 @@
 	<nav id="top-nav">
 		<ul>
 			<li><a href="/">Home</a></li>
+			{{ if .Perm_Admin_Gui_View }}
+				<li><a href="/admin">Admin</a></li>
+			{{ end }}
 			<li><a href="/">Forum Index</a></li>
 		</ul>
 		<ul>

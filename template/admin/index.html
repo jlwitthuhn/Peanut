@@ -5,19 +5,19 @@
 		<div class="simple-panel-content horizontal-space-evenly">
 			<table>
 				<tr><th colspan="2">Website Information</th></tr>
-				{{ range $key, $value := .WebsiteInfo }}
+				{{ range $index, $value := .WebsiteInfo }}
 				<tr>
-					<td>{{ $key }}</td>
-					<td>{{ $value }}</td>
+					<td>{{ $value.A }}</td>
+					<td>{{ $value.B }}</td>
 				</tr>
 				{{ end }}
 			</table>
 			<table>
 				<tr><th colspan="2">Environment Information</th></tr>
-				{{ range $key, $value := .EnvironmentInfo }}
+				{{ range $index, $value := .EnvironmentInfo }}
 				<tr>
-					<td>{{ $key }}</td>
-					<td>{{ $value }}</td>
+					<td>{{ $value.A }}</td>
+					<td>{{ $value.B }}</td>
 				</tr>
 				{{ end }}
 			</table>

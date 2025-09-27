@@ -18,6 +18,11 @@ import (
 	"time"
 )
 
+type adminPageStringPair struct {
+	A string
+	B string
+}
+
 func RegisterAdminHandlers(mux *http.ServeMux, configService service.ConfigService, databaseService service.DatabaseService) {
 	getIndexHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if middleutil.RequestHasPermission(r, perms.Admin_Gui_View) == false {
@@ -39,14 +44,16 @@ func RegisterAdminHandlers(mux *http.ServeMux, configService service.ConfigServi
 			return
 		}
 
-		var websiteInfo = make(map[string]string)
-		websiteInfo["Initialized Time"] = time.Unix(initTime, 0).UTC().Format("2006-01-02 15:04:05 MST")
+		var websiteInfo = []adminPageStringPair{
+			{A: "Initialized Time", B: time.Unix(initTime, 0).UTC().Format("2006-01-02 15:04:05 MST")},
+		}
 
-		var envInfo = make(map[string]string)
-		envInfo["Go Runtime"] = runtime.Version()
-		envInfo["PostgreSQL Version"] = dbVersion
-		envInfo["Host OS"] = runtime.GOOS
-		envInfo["Host Arch"] = runtime.GOARCH
+		var envInfo = []adminPageStringPair{
+			{A: "Go Runtime", B: runtime.Version()},
+			{A: "PostgreSQL Version", B: dbVersion},
+			{A: "Host OS", B: runtime.GOOS},
+			{A: "Host Arch", B: runtime.GOARCH},
+		}
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["WebsiteInfo"] = websiteInfo

@@ -31,37 +31,45 @@ func RegisterAdminHandlers(mux *http.ServeMux, configService service.ConfigServi
 			return
 		}
 
-		initTime, initTimeErr := configService.GetInt(nil, configkey.IntInitializedTime)
-		if initTimeErr != nil {
+		initTime, err := configService.GetInt(nil, configkey.IntInitializedTime)
+		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			genericpage.RenderSimpleMessage("Error", "Failed to query init time.", w, r)
 			return
 		}
 
-		dbVersion, dbVersionErr := databaseService.GetPostgresVersion()
-		if dbVersionErr != nil {
+		dbVersion, err := databaseService.GetPostgresVersion()
+		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			genericpage.RenderSimpleMessage("Error", "Failed to query postgres version.", w, r)
 			return
 		}
 
-		userCount, userCountErr := userService.CountUsers(nil)
-		if userCountErr != nil {
+		userCount, err := userService.CountUsers(nil)
+		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			genericpage.RenderSimpleMessage("Error", "Failed to query user count.", w, r)
 			return
 		}
 
+		userSessionCount, err := userService.CountUsersWithValidSession(nil)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			genericpage.RenderSimpleMessage("Error", "Failed to query user session count.", w, r)
+			return
+		}
+
 		var websiteInfo = []adminPageStringPair{
-			{A: "Initialized Time", B: time.Unix(initTime, 0).UTC().Format("2006-01-02 15:04:05 MST")},
-			{A: "Registered Users", B: strconv.FormatInt(userCount, 10)},
+			{A: "Initialized time", B: time.Unix(initTime, 0).UTC().Format("2006-01-02 15:04:05 MST")},
+			{A: "Registered users", B: strconv.FormatInt(userCount, 10)},
+			{A: "Logged in users", B: strconv.FormatInt(userSessionCount, 10)},
 		}
 
 		var envInfo = []adminPageStringPair{
-			{A: "Go Runtime", B: runtime.Version()},
-			{A: "PostgreSQL Version", B: dbVersion},
+			{A: "Go runtime", B: runtime.Version()},
+			{A: "PostgreSQL version", B: dbVersion},
 			{A: "Host OS", B: runtime.GOOS},
-			{A: "Host Arch", B: runtime.GOARCH},
+			{A: "Host arch", B: runtime.GOARCH},
 		}
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
@@ -69,7 +77,7 @@ func RegisterAdminHandlers(mux *http.ServeMux, configService service.ConfigServi
 		templateCtx["EnvironmentInfo"] = envInfo
 
 		theTemplate := template.GetTemplate("_admin/index")
-		err := theTemplate.Execute(w, templateCtx)
+		err = theTemplate.Execute(w, templateCtx)
 		if err != nil {
 			logger.Error(r, "Error executing template:", err)
 		}

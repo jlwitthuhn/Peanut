@@ -17,6 +17,7 @@ type SessionRow struct {
 
 type SessionDao interface {
 	CreateDBObjects(tx *sql.Tx) error
+	CountValidDedupeByUser(tx *sql.Tx) (int64, error)
 	DeleteRowById(tx *sql.Tx, sessionId string) error
 	InsertRow(tx *sql.Tx, sessionId string, userId string) error
 	SelectValidRowBySessionId(tx *sql.Tx, sessionId string) (*SessionRow, error)
@@ -60,6 +61,21 @@ func (*sessionDaoImpl) CreateDBObjects(tx *sql.Tx) error {
 		return err
 	}
 	return nil
+}
+
+var sqlCountValidSessionsDedupeByUser = "SELECT COUNT(DISTINCT user_id) FROM sessions WHERE valid_until >= NOW();"
+
+func (*sessionDaoImpl) CountValidDedupeByUser(tx *sql.Tx) (int64, error) {
+	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
+
+	var count int64
+	row := sqlh.QueryRow(sqlCountValidSessionsDedupeByUser)
+	err := row.Scan(&count)
+	if err != nil {
+		logger.Error(nil, "Got error on SessionDao/CountValidDedupeByUser query: ", err)
+		return 0, err
+	}
+	return count, nil
 }
 
 var sqlDeleteSessionsRowById = "DELETE FROM sessions WHERE id = $1"

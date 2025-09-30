@@ -18,7 +18,8 @@ type ConfigIntRow struct {
 type ConfigDao interface {
 	CreateDBObjects(*sql.Tx) error
 	SelectIntRowByName(tx *sql.Tx, name string) (*ConfigIntRow, error)
-	UpsertIntByName(name string, value int64, tx *sql.Tx) error
+	UpsertIntByName(tx *sql.Tx, name string, value int64) error
+	UpsertStringByName(tx *sql.Tx, name string, value string) error
 }
 
 func NewConfigDao() ConfigDao {
@@ -32,7 +33,7 @@ func (*configDaoImpl) SelectRowByName(name string, tx *sql.Tx) {
 	panic("implement me")
 }
 
-var sqlCreateTableInt = `
+var sqlCreateTableConfigInt = `
 	CREATE TABLE config_int (
 		name VARCHAR(255) PRIMARY KEY,
 		value BIGINT NOT NULL,
@@ -55,8 +56,36 @@ var sqlCreateTableInt = `
 		fn_created_updated_before_update();
 `
 
+var sqlCreateTableConfigString = `
+	CREATE TABLE config_string (
+		name VARCHAR(255) PRIMARY KEY,
+		value VARCHAR(4096) NOT NULL,
+		_created TIMESTAMP WITH TIME ZONE NOT NULL,
+		_updated TIMESTAMP WITH TIME ZONE NOT NULL
+	);
+
+	CREATE TRIGGER
+		config_string_trigger_created_updated_before_insert
+	BEFORE INSERT ON
+		config_string
+	FOR EACH ROW EXECUTE FUNCTION
+		fn_created_updated_before_insert();
+
+	CREATE TRIGGER
+		config_string_trigger_created_updated_before_update
+	BEFORE UPDATE ON
+		config_string
+	FOR EACH ROW EXECUTE FUNCTION
+		fn_created_updated_before_update();
+`
+
 func (*configDaoImpl) CreateDBObjects(tx *sql.Tx) error {
-	_, err := tx.Exec(sqlCreateTableInt)
+	_, err := tx.Exec(sqlCreateTableConfigInt)
+	if err != nil {
+		logger.Error(nil, "Got error on ConfigDao/CreateDBObjects query: ", err)
+		return err
+	}
+	_, err = tx.Exec(sqlCreateTableConfigString)
 	if err != nil {
 		logger.Error(nil, "Got error on ConfigDao/CreateDBObjects query: ", err)
 		return err
@@ -78,7 +107,7 @@ func (*configDaoImpl) SelectIntRowByName(tx *sql.Tx, name string) (*ConfigIntRow
 	return result, nil
 }
 
-var sqlUpsertIntByName = `
+var sqlUpsertConfigIntByName = `
 	INSERT INTO
 		config_int (name, value)
 	VALUES
@@ -87,11 +116,30 @@ var sqlUpsertIntByName = `
 		DO UPDATE SET value = EXCLUDED.value;
 `
 
-func (*configDaoImpl) UpsertIntByName(name string, value int64, tx *sql.Tx) error {
+func (*configDaoImpl) UpsertIntByName(tx *sql.Tx, name string, value int64) error {
 	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
-	_, err := sqlh.Exec(sqlUpsertIntByName, name, value)
+	_, err := sqlh.Exec(sqlUpsertConfigIntByName, name, value)
 	if err != nil {
 		logger.Error(nil, "Got error on ConfigDao/UpsertIntByName query: ", err)
+		return err
+	}
+	return nil
+}
+
+var sqlUpsertConfigStringByName = `
+	INSERT INTO
+		config_string (name, value)
+	VALUES
+		($1, $2)
+	ON CONFLICT (name)
+		DO UPDATE SET value = EXCLUDED.value;
+`
+
+func (*configDaoImpl) UpsertStringByName(tx *sql.Tx, name string, value string) error {
+	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
+	_, err := sqlh.Exec(sqlUpsertConfigStringByName, name, value)
+	if err != nil {
+		logger.Error(nil, "Got error on ConfigDao/UpsertStringByName query: ", err)
 		return err
 	}
 	return nil

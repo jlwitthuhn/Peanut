@@ -93,7 +93,11 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName stri
 	}
 
 	logger.Debug(r, "Populating data...")
-	err = this.configService.SetInt(configkey.IntInitializedTime, time.Now().Unix(), tx)
+	err = this.configService.SetInt(tx, configkey.IntInitializedTime, time.Now().Unix())
+	if err != nil {
+		return err
+	}
+	err = this.configService.SetString(tx, configkey.StringWelcomeMessage, "Haldo.")
 	if err != nil {
 		return err
 	}

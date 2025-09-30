@@ -11,7 +11,8 @@ import (
 
 type ConfigService interface {
 	GetInt(tx *sql.Tx, key string) (int64, error)
-	SetInt(key string, value int64, tx *sql.Tx) error
+	SetInt(tx *sql.Tx, key string, value int64) error
+	SetString(tx *sql.Tx, key string, value string) error
 }
 
 func NewConfigService(configDao data.ConfigDao) ConfigService {
@@ -30,7 +31,12 @@ func (this *configServiceImpl) GetInt(tx *sql.Tx, key string) (int64, error) {
 	return row.Value, nil
 }
 
-func (this *configServiceImpl) SetInt(name string, value int64, tx *sql.Tx) error {
-	err := this.configDao.UpsertIntByName(name, value, tx)
+func (this *configServiceImpl) SetInt(tx *sql.Tx, name string, value int64) error {
+	err := this.configDao.UpsertIntByName(tx, name, value)
+	return err
+}
+
+func (this *configServiceImpl) SetString(tx *sql.Tx, name string, value string) error {
+	err := this.configDao.UpsertStringByName(tx, name, value)
 	return err
 }

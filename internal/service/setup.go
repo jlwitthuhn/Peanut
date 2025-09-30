@@ -58,82 +58,82 @@ type setupServiceImpl struct {
 func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName string, adminEmail string, adminPlainPassword string) error {
 	logger.Debug(r, "Preparing transaction...")
 	ctx := context.Background()
-	tx, txErr := datasource.PostgresHandle().BeginTx(ctx, nil)
-	if txErr != nil {
-		return txErr
+	tx, err := datasource.PostgresHandle().BeginTx(ctx, nil)
+	if err != nil {
+		return err
 	}
 	defer tx.Rollback()
 
 	logger.Debug(r, "Creating tables...")
 	{
-		metaErr := this.metaDao.CreateDBObjects(tx)
-		if metaErr != nil {
-			return metaErr
+		err := this.metaDao.CreateDBObjects(tx)
+		if err != nil {
+			return err
 		}
-		configErr := this.configDao.CreateDBObjects(tx)
-		if configErr != nil {
-			return configErr
+		err = this.configDao.CreateDBObjects(tx)
+		if err != nil {
+			return err
 		}
-		groupErr := this.groupDao.CreateDBObjects(tx)
-		if groupErr != nil {
-			return groupErr
+		err = this.groupDao.CreateDBObjects(tx)
+		if err != nil {
+			return err
 		}
-		userErr := this.userDao.CreateDBObjects(tx)
-		if userErr != nil {
-			return userErr
+		err = this.userDao.CreateDBObjects(tx)
+		if err != nil {
+			return err
 		}
-		groupMembershipErr := this.groupMembershipDao.CreateDBObjects(tx)
-		if groupMembershipErr != nil {
-			return groupMembershipErr
+		err = this.groupMembershipDao.CreateDBObjects(tx)
+		if err != nil {
+			return err
 		}
-		sessionErr := this.sessionDao.CreateDBObjects(tx)
-		if sessionErr != nil {
-			return sessionErr
+		err = this.sessionDao.CreateDBObjects(tx)
+		if err != nil {
+			return err
 		}
 	}
 
 	logger.Debug(r, "Populating data...")
-	configTimeErr := this.configService.SetInt(configkey.IntInitializedTime, time.Now().Unix(), tx)
-	if configTimeErr != nil {
-		return configTimeErr
+	err = this.configService.SetInt(configkey.IntInitializedTime, time.Now().Unix(), tx)
+	if err != nil {
+		return err
 	}
 	{
-		groupTurboErr := this.groupService.CreateGroup(tx, permgroups.TurboAdmin, "Full control over everything.", true)
-		if groupTurboErr != nil {
-			return groupTurboErr
+		err := this.groupService.CreateGroup(tx, permgroups.TurboAdmin, "Full control over everything.", true)
+		if err != nil {
+			return err
 		}
-		groupAdminErr := this.groupService.CreateGroup(tx, permgroups.Admin, "Full control over everything except mass database updates and exports.", true)
-		if groupAdminErr != nil {
-			return groupAdminErr
+		err = this.groupService.CreateGroup(tx, permgroups.Admin, "Full control over everything except mass database updates and exports.", true)
+		if err != nil {
+			return err
 		}
-		groupUserErr := this.groupService.CreateGroup(tx, permgroups.User, "Ordinary registered user.", true)
-		if groupUserErr != nil {
-			return groupUserErr
+		err = this.groupService.CreateGroup(tx, permgroups.User, "Ordinary registered user.", true)
+		if err != nil {
+			return err
 		}
 	}
-	userId, userErr := this.userService.CreateUser(tx, adminName, adminEmail, adminPlainPassword)
-	if userErr != nil {
-		return userErr
+	userId, err := this.userService.CreateUser(tx, adminName, adminEmail, adminPlainPassword)
+	if err != nil {
+		return err
 	}
 	{
-		memberTurboErr := this.groupService.EnrollUserInGroup(r, tx, userId, permgroups.TurboAdmin)
-		if memberTurboErr != nil {
-			return memberTurboErr
+		err := this.groupService.EnrollUserInGroup(r, tx, userId, permgroups.TurboAdmin)
+		if err != nil {
+			return err
 		}
-		memberAdminErr := this.groupService.EnrollUserInGroup(r, tx, userId, permgroups.Admin)
-		if memberAdminErr != nil {
-			return memberAdminErr
+		err = this.groupService.EnrollUserInGroup(r, tx, userId, permgroups.Admin)
+		if err != nil {
+			return err
 		}
-		memberUserErr := this.groupService.EnrollUserInGroup(r, tx, userId, permgroups.User)
-		if memberUserErr != nil {
-			return memberUserErr
+		err = this.groupService.EnrollUserInGroup(r, tx, userId, permgroups.User)
+		if err != nil {
+			return err
 		}
 	}
 
 	logger.Debug(r, "Commiting transaction...")
-	commitErr := tx.Commit()
-	if commitErr != nil {
-		return commitErr
+	err = tx.Commit()
+	if err != nil {
+		return err
 	}
 
 	return nil

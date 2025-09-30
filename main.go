@@ -68,7 +68,7 @@ func main() {
 
 	logger.Info(nil, "Registering routes...")
 	pages.RegisterAdminHandlers(middlewareMux, configService, dbService, userService)
-	pages.RegisterIndexHandlers(middlewareMux)
+	pages.RegisterIndexHandlers(middlewareMux, configService)
 	pages.RegisterLoginHandlers(middlewareMux, userService)
 	pages.RegisterLogoutHandlers(middlewareMux, userService)
 	pages.RegisterRegisterHandlers(middlewareMux, groupService, userService)

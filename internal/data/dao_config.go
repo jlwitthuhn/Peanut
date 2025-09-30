@@ -15,9 +15,15 @@ type ConfigIntRow struct {
 	Value int64
 }
 
+type ConfigStringRow struct {
+	Name  string
+	Value string
+}
+
 type ConfigDao interface {
 	CreateDBObjects(*sql.Tx) error
 	SelectIntRowByName(tx *sql.Tx, name string) (*ConfigIntRow, error)
+	SelectStringRowByName(tx *sql.Tx, name string) (*ConfigStringRow, error)
 	UpsertIntByName(tx *sql.Tx, name string, value int64) error
 	UpsertStringByName(tx *sql.Tx, name string, value string) error
 }
@@ -27,11 +33,6 @@ func NewConfigDao() ConfigDao {
 }
 
 type configDaoImpl struct{}
-
-func (*configDaoImpl) SelectRowByName(name string, tx *sql.Tx) {
-	//TODO implement me
-	panic("implement me")
-}
 
 var sqlCreateTableConfigInt = `
 	CREATE TABLE config_int (
@@ -100,6 +101,20 @@ func (*configDaoImpl) SelectIntRowByName(tx *sql.Tx, name string) (*ConfigIntRow
 
 	result := &ConfigIntRow{}
 	row := sqlh.QueryRow(sqlSelectConfigIntRowByName, name)
+	err := row.Scan(&result.Name, &result.Value)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+var sqlSelectConfigStringRowByName = "SELECT name, value FROM config_string WHERE name = $1"
+
+func (*configDaoImpl) SelectStringRowByName(tx *sql.Tx, name string) (*ConfigStringRow, error) {
+	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
+
+	result := &ConfigStringRow{}
+	row := sqlh.QueryRow(sqlSelectConfigStringRowByName, name)
 	err := row.Scan(&result.Name, &result.Value)
 	if err != nil {
 		return nil, err

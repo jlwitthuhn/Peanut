@@ -11,6 +11,7 @@ import (
 
 type ConfigService interface {
 	GetInt(tx *sql.Tx, key string) (int64, error)
+	GetString(tx *sql.Tx, key string) (string, error)
 	SetInt(tx *sql.Tx, key string, value int64) error
 	SetString(tx *sql.Tx, key string, value string) error
 }
@@ -27,6 +28,14 @@ func (this *configServiceImpl) GetInt(tx *sql.Tx, key string) (int64, error) {
 	row, err := this.configDao.SelectIntRowByName(tx, key)
 	if err != nil {
 		return 0, err
+	}
+	return row.Value, nil
+}
+
+func (this *configServiceImpl) GetString(tx *sql.Tx, key string) (string, error) {
+	row, err := this.configDao.SelectStringRowByName(tx, key)
+	if err != nil {
+		return "", err
 	}
 	return row.Value, nil
 }

@@ -83,4 +83,13 @@ func RegisterAdminHandlers(mux *http.ServeMux, configService service.ConfigServi
 		}
 	})
 	mux.Handle("GET /admin", getIndexHandler)
+
+	getFrontPageHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if middleutil.RequestHasPermission(r, perms.Admin_Gui_View) == false || middleutil.RequestHasPermission(r, perms.Admin_FrontPage_Edit) == false {
+			genericpage.RenderErrorHttp403Forbidden(w, r)
+			return
+		}
+		genericpage.RenderSimpleMessage("Front Page", "Configuration will go here.", w, r)
+	})
+	mux.Handle("GET /admin/front_page", getFrontPageHandler)
 }

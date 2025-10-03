@@ -108,4 +108,30 @@ func RegisterAdminHandlers(mux *http.ServeMux, configService service.ConfigServi
 		}
 	})
 	mux.Handle("GET /admin/front_page", getFrontPageHandler)
+
+	postFrontPageWelcomeMessageHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if middleutil.RequestHasPermission(r, perms.Admin_Gui_View) == false || middleutil.RequestHasPermission(r, perms.Admin_FrontPage_Edit) == false {
+			genericpage.RenderErrorHttp403Forbidden(w, r)
+			return
+		}
+
+		newMessage := r.PostFormValue("message")
+		confirm := r.PostFormValue("confirm")
+
+		if confirm != "on" {
+			w.WriteHeader(http.StatusBadRequest)
+			genericpage.RenderSimpleMessage("Error", "You must check the 'Confirm' box to set the welcome message.", w, r)
+			return
+		}
+
+		err := configService.SetString(nil, configkey.StringWelcomeMessage, newMessage)
+		if err != nil {
+			logger.Error(r, "Failed to set new welcome message.", err)
+			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to set new welcome message.", w, r)
+			return
+		}
+
+		genericpage.RenderSimpleMessage("Success", "New welcome message has been set: "+newMessage, w, r)
+	})
+	mux.Handle("POST /admin/front_page/welcome_message", postFrontPageWelcomeMessageHandler)
 }

@@ -1,3 +1,15 @@
+{{ define "admin_head_script"}}
+	document.addEventListener('DOMContentLoaded', function() {
+		let confirm_check = document.getElementById("confirm_check")
+		let submit_button = document.getElementById("submit_button")
+		confirm_check.addEventListener("click", function() {
+		submit_button.disabled = !(confirm_check.checked)
+		});
+		confirm_check.checked = false;
+		submit_button.disabled = true;
+	});
+{{ end }}
+
 {{ block "admin_content" . }}
 <div class="vertical-flex-container">
 	<div class="simple-panel">

@@ -12,6 +12,7 @@ import (
 	"peanut/internal/data"
 	"peanut/internal/data/datasource"
 	"peanut/internal/endpoints"
+	"peanut/internal/endpoints/ep_admin"
 	"peanut/internal/logger"
 	"peanut/internal/middleware"
 	"peanut/internal/service"
@@ -67,7 +68,7 @@ func main() {
 	endpoints.RegisterSetupHandlers(setupMux, dbService, setupService)
 
 	logger.Info(nil, "Registering routes...")
-	endpoints.RegisterAdminHandlers(middlewareMux, configService, dbService, userService)
+	ep_admin.RegisterAdminHandlers(middlewareMux, configService, dbService, userService)
 	endpoints.RegisterIndexHandlers(middlewareMux, configService)
 	endpoints.RegisterLoginHandlers(middlewareMux, userService)
 	endpoints.RegisterLogoutHandlers(middlewareMux, userService)

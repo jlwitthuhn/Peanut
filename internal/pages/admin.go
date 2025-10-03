@@ -89,7 +89,23 @@ func RegisterAdminHandlers(mux *http.ServeMux, configService service.ConfigServi
 			genericpage.RenderErrorHttp403Forbidden(w, r)
 			return
 		}
-		genericpage.RenderSimpleMessage("Front Page", "Configuration will go here.", w, r)
+
+		welcomeMessage, err := configService.GetString(nil, configkey.StringWelcomeMessage)
+		if err != nil {
+			logger.Error(r, "Error retrieving welcome message.", err)
+			genericpage.RenderErrorHttp403Forbidden(w, r)
+			return
+		}
+
+		templateCtx := templatecontext.GetStandardTemplateContext(r)
+		templateCtx["WelcomeMessage"] = welcomeMessage
+		theTemplate := template.GetTemplate("_admin/front_page")
+		err = theTemplate.Execute(w, templateCtx)
+		if err != nil {
+			logger.Error(r, "Error executing template:", err)
+			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to execute template.", w, r)
+			return
+		}
 	})
 	mux.Handle("GET /admin/front_page", getFrontPageHandler)
 }

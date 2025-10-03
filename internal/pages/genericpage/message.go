@@ -13,7 +13,16 @@ import (
 
 func RenderErrorHttp403Forbidden(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusForbidden)
-	RenderSimpleMessage("Forbidden", "You do not have permission to access this page.", w, r)
+	RenderSimpleMessage("403 - Forbidden", "You do not have permission to access this page.", w, r)
+}
+
+func RenderErrorHttp500InternalServerError(w http.ResponseWriter, r *http.Request) {
+	RenderErrorHttp500InternalServerErrorWithMessage("The server encountered an error while processing your request.", w, r)
+}
+
+func RenderErrorHttp500InternalServerErrorWithMessage(message string, w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusInternalServerError)
+	RenderSimpleMessage("500 - Internal Server Error", message, w, r)
 }
 
 func RenderSimpleMessage(title string, message string, w http.ResponseWriter, r *http.Request) {

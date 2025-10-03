@@ -1,0 +1,17 @@
+{{ block "admin_content" . }}
+<div class="vertical-flex-container">
+	<div class="simple-panel">
+		<div class="simple-panel-header"><h1>Welcome Message</h1></div>
+		<div class="simple-panel-content">
+			<form action="/admin/front_page/welcome_message" method="post">
+				<div class="simple-column simple-center-60">
+					<label for="message_box">Message:</label>
+					<textarea id="message_box" name="message">{{ .WelcomeMessage }}</textarea>
+					<div><input id="confirm_check" type="checkbox" name="confirm"><label for="confirm_check">Confirm</label></div>
+					<input id="submit_button" type="submit" value="Update">
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+{{ end }}

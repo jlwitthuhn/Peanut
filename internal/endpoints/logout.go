@@ -2,13 +2,13 @@
 // https://www.gnu.org/licenses/agpl-3.0.en.html
 // SPDX-License-Identifier: AGPL-3.0-only
 
-package pages
+package endpoints
 
 import (
 	"net/http"
 	"peanut/internal/cookie"
+	"peanut/internal/endpoints/genericpage"
 	"peanut/internal/logger"
-	"peanut/internal/pages/genericpage"
 	"peanut/internal/service"
 )
 

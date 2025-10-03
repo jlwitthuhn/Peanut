@@ -6,8 +6,8 @@ package genericpage
 
 import (
 	"net/http"
+	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/logger"
-	"peanut/internal/pages/templatecontext"
 	"peanut/internal/template"
 )
 

@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"peanut/internal/cookie"
 	"peanut/internal/data/datasource"
-	"peanut/internal/pages/genericpage"
+	"peanut/internal/endpoints/genericpage"
 	"peanut/internal/security/perms"
 	"peanut/internal/service"
 )

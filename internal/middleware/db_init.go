@@ -6,8 +6,8 @@ package middleware
 
 import (
 	"net/http"
+	"peanut/internal/endpoints/genericpage"
 	"peanut/internal/logger"
-	"peanut/internal/pages/genericpage"
 	"peanut/internal/service"
 )
 

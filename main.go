@@ -11,9 +11,9 @@ import (
 	"net/http"
 	"peanut/internal/data"
 	"peanut/internal/data/datasource"
+	"peanut/internal/endpoints"
 	"peanut/internal/logger"
 	"peanut/internal/middleware"
-	"peanut/internal/pages"
 	"peanut/internal/service"
 	"peanut/internal/template"
 
@@ -64,14 +64,14 @@ func main() {
 
 	// Setup mux is separate and is only used from within DatabaseInitCheck
 	setupMux := http.NewServeMux()
-	pages.RegisterSetupHandlers(setupMux, dbService, setupService)
+	endpoints.RegisterSetupHandlers(setupMux, dbService, setupService)
 
 	logger.Info(nil, "Registering routes...")
-	pages.RegisterAdminHandlers(middlewareMux, configService, dbService, userService)
-	pages.RegisterIndexHandlers(middlewareMux, configService)
-	pages.RegisterLoginHandlers(middlewareMux, userService)
-	pages.RegisterLogoutHandlers(middlewareMux, userService)
-	pages.RegisterRegisterHandlers(middlewareMux, groupService, userService)
+	endpoints.RegisterAdminHandlers(middlewareMux, configService, dbService, userService)
+	endpoints.RegisterIndexHandlers(middlewareMux, configService)
+	endpoints.RegisterLoginHandlers(middlewareMux, userService)
+	endpoints.RegisterLogoutHandlers(middlewareMux, userService)
+	endpoints.RegisterRegisterHandlers(middlewareMux, groupService, userService)
 	wrappedMiddlewareMux := middleware.WrapHandler(middlewareMux,
 		middleware.RequestId(),
 		middleware.RequestLog(),

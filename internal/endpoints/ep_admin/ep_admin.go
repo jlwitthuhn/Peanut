@@ -6,10 +6,18 @@ package ep_admin
 
 import (
 	"net/http"
+	"peanut/internal/middleware"
+	"peanut/internal/security/perms"
 	"peanut/internal/service"
 )
 
 func RegisterAdminHandlers(mux *http.ServeMux, configService service.ConfigService, databaseService service.DatabaseService, userService service.UserService) {
-	registerAdminIndexHandlers(mux, configService, databaseService, userService)
-	registerAdminFrontPageHandlers(mux, configService)
+	adminMux := http.NewServeMux()
+	registerAdminIndexHandlers(adminMux, configService, databaseService, userService)
+	registerAdminFrontPageHandlers(adminMux, configService)
+
+	wrappedAdminMux := middleware.WrapHandler(adminMux, middleware.CheckPermissions(perms.Admin_Gui_View))
+
+	mux.Handle("/admin", wrappedAdminMux)
+	mux.Handle("/admin/", wrappedAdminMux)
 }

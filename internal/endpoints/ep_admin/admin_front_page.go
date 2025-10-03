@@ -18,7 +18,7 @@ import (
 
 func registerAdminFrontPageHandlers(mux *http.ServeMux, configService service.ConfigService) {
 	getFrontPageHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if middleutil.RequestHasPermission(r, perms.Admin_Gui_View) == false || middleutil.RequestHasPermission(r, perms.Admin_FrontPage_Edit) == false {
+		if middleutil.RequestHasPermission(r, perms.Admin_FrontPage_Edit) == false {
 			genericpage.RenderErrorHttp403Forbidden(w, r)
 			return
 		}
@@ -43,7 +43,7 @@ func registerAdminFrontPageHandlers(mux *http.ServeMux, configService service.Co
 	mux.Handle("GET /admin/front_page", getFrontPageHandler)
 
 	postFrontPageWelcomeMessageHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if middleutil.RequestHasPermission(r, perms.Admin_Gui_View) == false || middleutil.RequestHasPermission(r, perms.Admin_FrontPage_Edit) == false {
+		if middleutil.RequestHasPermission(r, perms.Admin_FrontPage_Edit) == false {
 			genericpage.RenderErrorHttp403Forbidden(w, r)
 			return
 		}

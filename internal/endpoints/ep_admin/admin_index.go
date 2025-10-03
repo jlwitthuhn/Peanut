@@ -10,8 +10,6 @@ import (
 	"peanut/internal/endpoints/genericpage"
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/logger"
-	"peanut/internal/middleutil"
-	"peanut/internal/security/perms"
 	"peanut/internal/service"
 	"peanut/internal/template"
 	"runtime"
@@ -26,11 +24,6 @@ type adminIndexStringPair struct {
 
 func registerAdminIndexHandlers(mux *http.ServeMux, configService service.ConfigService, databaseService service.DatabaseService, userService service.UserService) {
 	getIndexHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if middleutil.RequestHasPermission(r, perms.Admin_Gui_View) == false {
-			genericpage.RenderErrorHttp403Forbidden(w, r)
-			return
-		}
-
 		initTime, err := configService.GetInt(nil, configkey.IntInitializedTime)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)

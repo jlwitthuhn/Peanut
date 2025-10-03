@@ -4,16 +4,6 @@
 
 package security
 
-import (
-	"crypto/rand"
-	"encoding/base64"
-)
-
 func GenerateSessionId() string {
-	idBytes := make([]byte, 24)
-	_, err := rand.Read(idBytes)
-	if err != nil {
-		panic(err)
-	}
-	return base64.StdEncoding.EncodeToString(idBytes)
+	return GenerateSecureBase64Token(32)
 }

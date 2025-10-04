@@ -31,7 +31,7 @@ type sessionDaoImpl struct{}
 
 var sqlCreateTableSessions = `
 	CREATE TABLE sessions (
-		id VARCHAR(63) PRIMARY KEY,
+		id VARCHAR(255) PRIMARY KEY,
 		user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 		valid_until TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (NOW() + INTERVAL '30 minutes'),
 		_created TIMESTAMP WITH TIME ZONE NOT NULL,

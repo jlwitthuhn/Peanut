@@ -5,8 +5,8 @@
 package endpoints
 
 import (
+	"database/sql"
 	"net/http"
-	"peanut/internal/data/datasource"
 	"peanut/internal/endpoints/genericpage"
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/logger"
@@ -54,31 +54,30 @@ func RegisterRegisterHandlers(mux *http.ServeMux, groupService service.GroupServ
 			return
 		}
 
-		tx, txErr := datasource.PostgresHandle().BeginTx(r.Context(), nil)
-		if txErr != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			genericpage.RenderSimpleMessage("Error", "Failed to begin database transaction.", w, r)
-			return
-		}
-		defer tx.Rollback()
-
-		userId, userCreateErr := userService.CreateUser(tx, username, email, password)
-		if userCreateErr != nil {
+		userId, err := userService.CreateUser(r, username, email, password)
+		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			genericpage.RenderSimpleMessage("Error", "Failed to crete user.", w, r)
 			return
 		}
-		groupErr := groupService.EnrollUserInGroup(r, tx, userId, permgroups.User)
-		if groupErr != nil {
+		err = groupService.EnrollUserInGroup(r, userId, permgroups.User)
+		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			genericpage.RenderSimpleMessage("Error", "Failed to add new user to default group.", w, r)
 			return
 		}
 
-		commitErr := tx.Commit()
-		if commitErr != nil {
+		tx, ok := r.Context().Value("tx").(*sql.Tx)
+		if !ok || tx == nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			genericpage.RenderSimpleMessage("Error", "Failed to commit transaction.", w, r)
+			genericpage.RenderSimpleMessage("Error", "Transaction does not exist.", w, r)
+			return
+		}
+
+		err = tx.Commit()
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			genericpage.RenderSimpleMessage("Error", "Transaction does not exist.", w, r)
 			return
 		}
 

@@ -7,15 +7,16 @@ package service
 import (
 	"database/sql"
 	"errors"
+	"net/http"
 	"peanut/internal/data"
 	"peanut/internal/security/passhash"
 )
 
 type UserService interface {
 	CountUsers(tx *sql.Tx) (int64, error)
-	CreateUser(tx *sql.Tx, name string, email string, plainPassword string) (string, error)
-	IsEmailTaken(tx *sql.Tx, email string) (bool, error)
-	IsNameTaken(tx *sql.Tx, username string) (bool, error)
+	CreateUser(req *http.Request, name string, email string, plainPassword string) (string, error)
+	IsEmailTaken(req *http.Request, email string) (bool, error)
+	IsNameTaken(req *http.Request, username string) (bool, error)
 }
 
 func NewUserService(sessionDao data.SessionDao, userDao data.UserDao) UserService {
@@ -31,15 +32,15 @@ func (this *userServiceImpl) CountUsers(tx *sql.Tx) (int64, error) {
 	return this.userDao.CountRows(tx)
 }
 
-func (this *userServiceImpl) CreateUser(tx *sql.Tx, name string, email string, plainPassword string) (string, error) {
-	nameTaken, nameErr := this.IsNameTaken(tx, name)
+func (this *userServiceImpl) CreateUser(req *http.Request, name string, email string, plainPassword string) (string, error) {
+	nameTaken, nameErr := this.IsNameTaken(req, name)
 	if nameErr != nil {
 		return "", nameErr
 	}
 	if nameTaken {
 		return "", errors.New("User name is already taken.")
 	}
-	emailTaken, emailErr := this.IsEmailTaken(tx, email)
+	emailTaken, emailErr := this.IsEmailTaken(req, email)
 	if emailErr != nil {
 		return "", emailErr
 	}
@@ -49,7 +50,7 @@ func (this *userServiceImpl) CreateUser(tx *sql.Tx, name string, email string, p
 
 	hashedPassword := passhash.GenerateDefaultPhcString(plainPassword)
 
-	newId, insertErr := this.userDao.InsertRow(tx, name, email, hashedPassword)
+	newId, insertErr := this.userDao.InsertRow(req, name, email, hashedPassword)
 	if insertErr != nil {
 		return "", insertErr
 	}
@@ -57,16 +58,16 @@ func (this *userServiceImpl) CreateUser(tx *sql.Tx, name string, email string, p
 	return newId, nil
 }
 
-func (this *userServiceImpl) IsEmailTaken(tx *sql.Tx, email string) (bool, error) {
-	count, err := this.userDao.CountRowsByEmail(tx, email)
+func (this *userServiceImpl) IsEmailTaken(req *http.Request, email string) (bool, error) {
+	count, err := this.userDao.CountRowsByEmail(req, email)
 	if err != nil {
 		return true, err
 	}
 	return count > 0, nil
 }
 
-func (this *userServiceImpl) IsNameTaken(tx *sql.Tx, username string) (bool, error) {
-	count, err := this.userDao.CountRowsByName(tx, username)
+func (this *userServiceImpl) IsNameTaken(req *http.Request, username string) (bool, error) {
+	count, err := this.userDao.CountRowsByName(req, username)
 	if err != nil {
 		return true, err
 	}

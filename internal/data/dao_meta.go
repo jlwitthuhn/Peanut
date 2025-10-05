@@ -6,12 +6,13 @@ package data
 
 import (
 	"database/sql"
+	"net/http"
 	"peanut/internal/data/datasource"
 	"peanut/internal/logger"
 )
 
 type MetaDao interface {
-	CreateDBObjects(*sql.Tx) error
+	CreateDBObjects(req *http.Request) error
 	DoesTableExist(tableName string) (bool, error)
 	SelectVersion() (string, error)
 }
@@ -27,12 +28,13 @@ func NewMetaDao() MetaDao {
 	return &metaDaoImpl{}
 }
 
-func (*metaDaoImpl) CreateDBObjects(tx *sql.Tx) error {
-	_, errInsert := tx.Exec(sqlCreatedUpdatedBeforeInsert)
+func (*metaDaoImpl) CreateDBObjects(req *http.Request) error {
+	sqlh := getSqlExecutorFromRequest(req)
+	_, errInsert := sqlh.Exec(sqlCreatedUpdatedBeforeInsert)
 	if errInsert != nil {
 		return errInsert
 	}
-	_, errUpdate := tx.Exec(sqlCreatedUpdatedBeforeUpdate)
+	_, errUpdate := sqlh.Exec(sqlCreatedUpdatedBeforeUpdate)
 	if errUpdate != nil {
 		return errUpdate
 	}

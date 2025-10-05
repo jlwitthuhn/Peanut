@@ -5,14 +5,13 @@
 package data
 
 import (
-	"database/sql"
-	"peanut/internal/data/datasource"
+	"net/http"
 	"peanut/internal/logger"
 )
 
 type GroupMembershipDao interface {
-	CreateDBObjects(tx *sql.Tx) error
-	InsertRow(tx *sql.Tx, userId string, groupId string) error
+	CreateDBObjects(req *http.Request) error
+	InsertRow(req *http.Request, userId string, groupId string) error
 }
 
 func NewGroupMembershipDao() GroupMembershipDao {
@@ -45,8 +44,8 @@ var sqlCreateTableGroupMembership = `
 		fn_created_updated_before_update();
 `
 
-func (*groupMembershipDaoImpl) CreateDBObjects(tx *sql.Tx) error {
-	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
+func (*groupMembershipDaoImpl) CreateDBObjects(req *http.Request) error {
+	sqlh := getSqlExecutorFromRequest(req)
 	_, err := sqlh.Exec(sqlCreateTableGroupMembership)
 	if err != nil {
 		logger.Error(nil, "Got error on GroupMembershipDao/CreateDBObjects query: ", err)
@@ -57,8 +56,8 @@ func (*groupMembershipDaoImpl) CreateDBObjects(tx *sql.Tx) error {
 
 var sqlInsertGroupMembershipRow = "INSERT INTO group_membership (user_id, group_id) VALUES ($1,$2)"
 
-func (*groupMembershipDaoImpl) InsertRow(tx *sql.Tx, userId string, groupId string) error {
-	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
+func (*groupMembershipDaoImpl) InsertRow(req *http.Request, userId string, groupId string) error {
+	sqlh := getSqlExecutorFromRequest(req)
 	_, err := sqlh.Exec(sqlInsertGroupMembershipRow, userId, groupId)
 	if err != nil {
 		logger.Error(nil, "Got error on GroupMembershipDao/InsertRow query: ", err)

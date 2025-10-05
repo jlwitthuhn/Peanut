@@ -5,13 +5,12 @@
 package data
 
 import (
-	"database/sql"
-	"peanut/internal/data/datasource"
+	"net/http"
 	"peanut/internal/logger"
 )
 
 type SessionStringDao interface {
-	CreateDBObjects(tx *sql.Tx) error
+	CreateDBObjects(req *http.Request) error
 }
 
 func NewSessionStringDao() SessionStringDao {
@@ -45,8 +44,8 @@ var sqlCreateTableSessionString = `
 		fn_created_updated_before_update();
 `
 
-func (*sessionStringDaoImpl) CreateDBObjects(tx *sql.Tx) error {
-	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
+func (*sessionStringDaoImpl) CreateDBObjects(req *http.Request) error {
+	sqlh := getSqlExecutorFromRequest(req)
 	_, err := sqlh.Exec(sqlCreateTableSessionString)
 	if err != nil {
 		logger.Error(nil, "Got error on SessionStringDao/CreateDBObjects query: ", err)

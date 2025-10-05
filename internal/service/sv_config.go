@@ -6,14 +6,15 @@ package service
 
 import (
 	"database/sql"
+	"net/http"
 	"peanut/internal/data"
 )
 
 type ConfigService interface {
 	GetInt(tx *sql.Tx, key string) (int64, error)
 	GetString(tx *sql.Tx, key string) (string, error)
-	SetInt(tx *sql.Tx, key string, value int64) error
-	SetString(tx *sql.Tx, key string, value string) error
+	SetInt(req *http.Request, key string, value int64) error
+	SetString(req *http.Request, key string, value string) error
 }
 
 func NewConfigService(configDao data.ConfigDao) ConfigService {
@@ -40,12 +41,12 @@ func (this *configServiceImpl) GetString(tx *sql.Tx, key string) (string, error)
 	return row.Value, nil
 }
 
-func (this *configServiceImpl) SetInt(tx *sql.Tx, name string, value int64) error {
-	err := this.configDao.UpsertIntByName(tx, name, value)
+func (this *configServiceImpl) SetInt(req *http.Request, name string, value int64) error {
+	err := this.configDao.UpsertIntByName(req, name, value)
 	return err
 }
 
-func (this *configServiceImpl) SetString(tx *sql.Tx, name string, value string) error {
-	err := this.configDao.UpsertStringByName(tx, name, value)
+func (this *configServiceImpl) SetString(req *http.Request, name string, value string) error {
+	err := this.configDao.UpsertStringByName(req, name, value)
 	return err
 }

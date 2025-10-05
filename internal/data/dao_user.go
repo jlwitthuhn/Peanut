@@ -6,6 +6,7 @@ package data
 
 import (
 	"database/sql"
+	"net/http"
 	"peanut/internal/data/datasource"
 	"peanut/internal/logger"
 )
@@ -18,11 +19,11 @@ type UserRow struct {
 }
 
 type UserDao interface {
-	CreateDBObjects(tx *sql.Tx) error
+	CreateDBObjects(req *http.Request) error
 	CountRows(tx *sql.Tx) (int64, error)
-	CountRowsByEmail(tx *sql.Tx, name string) (int64, error)
-	CountRowsByName(tx *sql.Tx, name string) (int64, error)
-	InsertRow(tx *sql.Tx, name string, email string, hashedPassword string) (string, error)
+	CountRowsByEmail(req *http.Request, name string) (int64, error)
+	CountRowsByName(req *http.Request, name string) (int64, error)
+	InsertRow(req *http.Request, name string, email string, hashedPassword string) (string, error)
 	SelectRowByName(tx *sql.Tx, name string) (*UserRow, error)
 }
 
@@ -57,8 +58,8 @@ var sqlCreateTableUsers = `
 		fn_created_updated_before_update();
 `
 
-func (*userDaoImpl) CreateDBObjects(tx *sql.Tx) error {
-	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
+func (*userDaoImpl) CreateDBObjects(req *http.Request) error {
+	sqlh := getSqlExecutorFromRequest(req)
 	_, err := sqlh.Exec(sqlCreateTableUsers)
 	if err != nil {
 		logger.Error(nil, "Got error on UserDao/CreateDBObjects query: ", err)
@@ -84,9 +85,8 @@ func (*userDaoImpl) CountRows(tx *sql.Tx) (int64, error) {
 
 var sqlCountUsersByEmail = "SELECT COUNT(*) FROM users WHERE email = $1;"
 
-func (*userDaoImpl) CountRowsByEmail(tx *sql.Tx, email string) (int64, error) {
-	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
-
+func (*userDaoImpl) CountRowsByEmail(req *http.Request, email string) (int64, error) {
+	sqlh := getSqlExecutorFromRequest(req)
 	var count int64
 	row := sqlh.QueryRow(sqlCountUsersByEmail, email)
 	err := row.Scan(&count)
@@ -99,9 +99,8 @@ func (*userDaoImpl) CountRowsByEmail(tx *sql.Tx, email string) (int64, error) {
 
 var sqlCountUsersByName = "SELECT COUNT(*) FROM users WHERE display_name = $1;"
 
-func (*userDaoImpl) CountRowsByName(tx *sql.Tx, name string) (int64, error) {
-	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
-
+func (*userDaoImpl) CountRowsByName(req *http.Request, name string) (int64, error) {
+	sqlh := getSqlExecutorFromRequest(req)
 	var count int64
 	row := sqlh.QueryRow(sqlCountUsersByName, name)
 	err := row.Scan(&count)
@@ -114,9 +113,8 @@ func (*userDaoImpl) CountRowsByName(tx *sql.Tx, name string) (int64, error) {
 
 var sqlInsertUsersRow = "INSERT INTO users (display_name, email, password) VALUES ($1, $2, $3) RETURNING id"
 
-func (*userDaoImpl) InsertRow(tx *sql.Tx, name string, email string, hashedPassword string) (string, error) {
-	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
-
+func (*userDaoImpl) InsertRow(req *http.Request, name string, email string, hashedPassword string) (string, error) {
+	sqlh := getSqlExecutorFromRequest(req)
 	row := sqlh.QueryRow(sqlInsertUsersRow, name, email, hashedPassword)
 	newId := ""
 	err := row.Scan(&newId)

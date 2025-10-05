@@ -6,6 +6,7 @@ package data
 
 import (
 	"database/sql"
+	"net/http"
 	"peanut/internal/data/datasource"
 	"peanut/internal/logger"
 )
@@ -16,7 +17,7 @@ type SessionRow struct {
 }
 
 type SessionDao interface {
-	CreateDBObjects(tx *sql.Tx) error
+	CreateDBObjects(req *http.Request) error
 	CountValidDedupeByUser(tx *sql.Tx) (int64, error)
 	DeleteRowById(tx *sql.Tx, sessionId string) error
 	InsertRow(tx *sql.Tx, sessionId string, userId string) error
@@ -53,8 +54,8 @@ var sqlCreateTableSessions = `
 		fn_created_updated_before_update();
 `
 
-func (*sessionDaoImpl) CreateDBObjects(tx *sql.Tx) error {
-	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
+func (*sessionDaoImpl) CreateDBObjects(req *http.Request) error {
+	sqlh := getSqlExecutorFromRequest(req)
 	_, err := sqlh.Exec(sqlCreateTableSessions)
 	if err != nil {
 		logger.Error(nil, "Got error on SessionDao/CreateDBObjects query: ", err)

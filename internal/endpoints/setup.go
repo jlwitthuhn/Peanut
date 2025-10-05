@@ -5,6 +5,7 @@
 package endpoints
 
 import (
+	"database/sql"
 	"net/http"
 	"peanut/internal/endpoints/genericpage"
 	"peanut/internal/endpoints/templatecontext"
@@ -66,11 +67,26 @@ func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService
 		}
 
 		logger.Info(r, "Input valid, initializing...")
-		initErr := setupService.InitializeDatabase(r, adminName, email, adminPassword)
-		if initErr != nil {
-			logger.Error(r, "Error initializing database:", initErr)
+		err := setupService.InitializeDatabase(r, adminName, email, adminPassword)
+		if err != nil {
+			logger.Error(r, "Error initializing database:", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			genericpage.RenderSimpleMessage("Error", "Failed to initialize database.", w, r)
+			return
+		}
+
+		logger.Info(r, "Committing transaction...")
+		tx, ok := r.Context().Value("tx").(*sql.Tx)
+		if !ok || tx == nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			genericpage.RenderSimpleMessage("Error", "Transaction does not exist.", w, r)
+			return
+		}
+
+		err = tx.Commit()
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			genericpage.RenderSimpleMessage("Error", "Transaction does not exist.", w, r)
 			return
 		}
 

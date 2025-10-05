@@ -6,6 +6,7 @@ package data
 
 import (
 	"database/sql"
+	"net/http"
 	"peanut/internal/data/datasource"
 	"peanut/internal/logger"
 )
@@ -21,11 +22,11 @@ type ConfigStringRow struct {
 }
 
 type ConfigDao interface {
-	CreateDBObjects(*sql.Tx) error
+	CreateDBObjects(req *http.Request) error
 	SelectIntRowByName(tx *sql.Tx, name string) (*ConfigIntRow, error)
 	SelectStringRowByName(tx *sql.Tx, name string) (*ConfigStringRow, error)
-	UpsertIntByName(tx *sql.Tx, name string, value int64) error
-	UpsertStringByName(tx *sql.Tx, name string, value string) error
+	UpsertIntByName(req *http.Request, name string, value int64) error
+	UpsertStringByName(req *http.Request, name string, value string) error
 }
 
 func NewConfigDao() ConfigDao {
@@ -80,13 +81,14 @@ var sqlCreateTableConfigString = `
 		fn_created_updated_before_update();
 `
 
-func (*configDaoImpl) CreateDBObjects(tx *sql.Tx) error {
-	_, err := tx.Exec(sqlCreateTableConfigInt)
+func (*configDaoImpl) CreateDBObjects(req *http.Request) error {
+	sqlh := getSqlExecutorFromRequest(req)
+	_, err := sqlh.Exec(sqlCreateTableConfigInt)
 	if err != nil {
 		logger.Error(nil, "Got error on ConfigDao/CreateDBObjects query: ", err)
 		return err
 	}
-	_, err = tx.Exec(sqlCreateTableConfigString)
+	_, err = sqlh.Exec(sqlCreateTableConfigString)
 	if err != nil {
 		logger.Error(nil, "Got error on ConfigDao/CreateDBObjects query: ", err)
 		return err
@@ -131,8 +133,8 @@ var sqlUpsertConfigIntByName = `
 		DO UPDATE SET value = EXCLUDED.value;
 `
 
-func (*configDaoImpl) UpsertIntByName(tx *sql.Tx, name string, value int64) error {
-	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
+func (*configDaoImpl) UpsertIntByName(req *http.Request, name string, value int64) error {
+	sqlh := getSqlExecutorFromRequest(req)
 	_, err := sqlh.Exec(sqlUpsertConfigIntByName, name, value)
 	if err != nil {
 		logger.Error(nil, "Got error on ConfigDao/UpsertIntByName query: ", err)
@@ -150,8 +152,8 @@ var sqlUpsertConfigStringByName = `
 		DO UPDATE SET value = EXCLUDED.value;
 `
 
-func (*configDaoImpl) UpsertStringByName(tx *sql.Tx, name string, value string) error {
-	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
+func (*configDaoImpl) UpsertStringByName(req *http.Request, name string, value string) error {
+	sqlh := getSqlExecutorFromRequest(req)
 	_, err := sqlh.Exec(sqlUpsertConfigStringByName, name, value)
 	if err != nil {
 		logger.Error(nil, "Got error on ConfigDao/UpsertStringByName query: ", err)

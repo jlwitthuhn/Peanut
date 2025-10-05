@@ -7,20 +7,13 @@ package service
 import (
 	"database/sql"
 	"errors"
-	"net/http"
 	"peanut/internal/data"
-	"peanut/internal/logger"
-	"peanut/internal/security"
 	"peanut/internal/security/passhash"
 )
 
 type UserService interface {
 	CountUsers(tx *sql.Tx) (int64, error)
-	CountUsersWithValidSession(tx *sql.Tx) (int64, error)
-	CreateSession(r *http.Request, tx *sql.Tx, username string, plainPassword string) (string, error)
 	CreateUser(tx *sql.Tx, name string, email string, plainPassword string) (string, error)
-	DestroySession(r *http.Request, tx *sql.Tx, sessionId string) error
-	GetLoggedInUserIdBySession(r *http.Request, tx *sql.Tx, sessionId string) (string, error)
 	IsEmailTaken(tx *sql.Tx, email string) (bool, error)
 	IsNameTaken(tx *sql.Tx, username string) (bool, error)
 }
@@ -36,30 +29,6 @@ type userServiceImpl struct {
 
 func (this *userServiceImpl) CountUsers(tx *sql.Tx) (int64, error) {
 	return this.userDao.CountRows(tx)
-}
-
-func (this *userServiceImpl) CountUsersWithValidSession(tx *sql.Tx) (int64, error) {
-	return this.sessionDao.CountValidDedupeByUser(tx)
-}
-
-func (this *userServiceImpl) CreateSession(r *http.Request, tx *sql.Tx, username string, plainPassword string) (string, error) {
-	userRow, userErr := this.userDao.SelectRowByName(tx, username)
-	if userErr != nil {
-		return "", userErr
-	}
-	if passhash.ValidatePassword(plainPassword, userRow.Password) == false {
-		return "", errors.New("Invalid password")
-	}
-
-	newSessionId := security.GenerateSessionId()
-	err := this.sessionDao.InsertRow(tx, newSessionId, userRow.Id)
-	if err != nil {
-		return "", err
-	}
-
-	logger.Info(r, "User logger in:", userRow.Id)
-
-	return newSessionId, nil
 }
 
 func (this *userServiceImpl) CreateUser(tx *sql.Tx, name string, email string, plainPassword string) (string, error) {
@@ -86,25 +55,6 @@ func (this *userServiceImpl) CreateUser(tx *sql.Tx, name string, email string, p
 	}
 
 	return newId, nil
-}
-
-func (this *userServiceImpl) DestroySession(r *http.Request, tx *sql.Tx, sessionId string) error {
-	err := this.sessionDao.DeleteRowById(tx, sessionId)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (this *userServiceImpl) GetLoggedInUserIdBySession(r *http.Request, tx *sql.Tx, sessionId string) (string, error) {
-	sessionRow, sessionErr := this.sessionDao.SelectValidRowBySessionId(tx, sessionId)
-	if sessionErr != nil {
-		return "", sessionErr
-	}
-	if sessionRow == nil {
-		return "", nil
-	}
-	return sessionRow.UserId, nil
 }
 
 func (this *userServiceImpl) IsEmailTaken(tx *sql.Tx, email string) (bool, error) {

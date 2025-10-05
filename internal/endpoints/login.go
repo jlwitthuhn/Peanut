@@ -15,7 +15,7 @@ import (
 	"peanut/internal/template"
 )
 
-func RegisterLoginHandlers(mux *http.ServeMux, userService service.UserService) {
+func RegisterLoginHandlers(mux *http.ServeMux, sessionService service.SessionService) {
 	getLoginHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if isAlreadyLoggedIn(r) {
 			http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -39,7 +39,7 @@ func RegisterLoginHandlers(mux *http.ServeMux, userService service.UserService) 
 
 		username := r.PostFormValue("username")
 		password := r.PostFormValue("password")
-		sessionId, err := userService.CreateSession(r, nil, username, password)
+		sessionId, err := sessionService.CreateSession(r, nil, username, password)
 		if err != nil {
 			logger.Error(r, "Error creating session:", err)
 			errMsg := fmt.Sprint("Error logging in: ", err)

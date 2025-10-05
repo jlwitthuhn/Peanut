@@ -22,7 +22,13 @@ type adminIndexStringPair struct {
 	B string
 }
 
-func registerAdminIndexHandlers(mux *http.ServeMux, configService service.ConfigService, databaseService service.DatabaseService, userService service.UserService) {
+func registerAdminIndexHandlers(
+	mux *http.ServeMux,
+	configService service.ConfigService,
+	databaseService service.DatabaseService,
+	sessionService service.SessionService,
+	userService service.UserService,
+) {
 	getIndexHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		initTime, err := configService.GetInt(nil, configkey.IntInitializedTime)
 		if err != nil {
@@ -45,7 +51,7 @@ func registerAdminIndexHandlers(mux *http.ServeMux, configService service.Config
 			return
 		}
 
-		userSessionCount, err := userService.CountUsersWithValidSession(nil)
+		userSessionCount, err := sessionService.CountUsersWithValidSession(nil)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			genericpage.RenderSimpleMessage("Error", "Failed to query user session count.", w, r)

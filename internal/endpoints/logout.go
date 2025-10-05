@@ -12,7 +12,7 @@ import (
 	"peanut/internal/service"
 )
 
-func RegisterLogoutHandlers(mux *http.ServeMux, userService service.UserService) {
+func RegisterLogoutHandlers(mux *http.ServeMux, sessionService service.SessionService) {
 	postLogoutHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sessionId := r.Context().Value("sessionId")
 		sessionIdString, ok := sessionId.(string)
@@ -22,7 +22,7 @@ func RegisterLogoutHandlers(mux *http.ServeMux, userService service.UserService)
 			genericpage.RenderSimpleMessage("Error", "Unable to log out: failed to read session id.", w, r)
 			return
 		}
-		err := userService.DestroySession(r, nil, sessionIdString)
+		err := sessionService.DestroySession(r, nil, sessionIdString)
 		if err != nil {
 			logger.Warn(r, "Failed to delete session, proceeding anyways.")
 		}

@@ -14,7 +14,7 @@ import (
 	"peanut/internal/service"
 )
 
-func Authentication(groupService service.GroupService, userService service.UserService) MiddlewareFunc {
+func Authentication(groupService service.GroupService, sessionService service.SessionService) MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
@@ -27,7 +27,7 @@ func Authentication(groupService service.GroupService, userService service.UserS
 			}
 			defer tx.Rollback()
 			for _, thisCookie := range cookies {
-				userId, sessionErr := userService.GetLoggedInUserIdBySession(r, nil, thisCookie.Value)
+				userId, sessionErr := sessionService.GetLoggedInUserIdBySessionId(r, nil, thisCookie.Value)
 				if sessionErr != nil {
 					continue
 				}

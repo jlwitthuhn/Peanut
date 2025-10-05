@@ -47,6 +47,7 @@ func main() {
 	template.LoadTemplates(justTemplates)
 
 	logger.Info(nil, "Initializing services...")
+
 	configDao := data.NewConfigDao()
 	groupDao := data.NewGroupDao()
 	groupMembershipDao := data.NewGroupMembershipDao()
@@ -55,9 +56,11 @@ func main() {
 	sessionDao := data.NewSessionDao()
 	sessionStringDao := data.NewSessionStringDao()
 	userDao := data.NewUserDao()
+
 	configService := service.NewConfigService(configDao)
 	dbService := service.NewDatabaseService(metaDao)
 	groupService := service.NewGroupService(groupDao, groupMembershipDao, multiTableDao)
+	sessionService := service.NewSessionService(sessionDao, userDao)
 	userService := service.NewUserService(sessionDao, userDao)
 	setupService := service.NewSetupService(
 		configDao, groupDao, groupMembershipDao, metaDao, sessionDao,
@@ -69,17 +72,17 @@ func main() {
 	endpoints.RegisterSetupHandlers(setupMux, dbService, setupService)
 
 	logger.Info(nil, "Registering routes...")
-	ep_admin.RegisterAdminHandlers(middlewareMux, configService, dbService, userService)
+	ep_admin.RegisterAdminHandlers(middlewareMux, configService, dbService, sessionService, userService)
 	endpoints.RegisterIndexHandlers(middlewareMux, configService)
-	endpoints.RegisterLoginHandlers(middlewareMux, userService)
-	endpoints.RegisterLogoutHandlers(middlewareMux, userService)
+	endpoints.RegisterLoginHandlers(middlewareMux, sessionService)
+	endpoints.RegisterLogoutHandlers(middlewareMux, sessionService)
 	endpoints.RegisterRegisterHandlers(middlewareMux, groupService, userService)
 	wrappedMiddlewareMux := middleware.WrapHandler(middlewareMux,
 		middleware.RequestId(),
 		middleware.RequestLog(),
 		middleware.RequestTimer(),
 		middleware.DatabaseInitCheck(dbService, setupMux),
-		middleware.Authentication(groupService, userService),
+		middleware.Authentication(groupService, sessionService),
 		middleware.SecurityHeaders(),
 	)
 	rootMux.Handle("/", wrappedMiddlewareMux)

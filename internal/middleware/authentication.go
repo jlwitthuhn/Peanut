@@ -8,8 +8,6 @@ import (
 	"context"
 	"net/http"
 	"peanut/internal/cookie"
-	"peanut/internal/data/datasource"
-	"peanut/internal/endpoints/genericpage"
 	"peanut/internal/security/perms"
 	"peanut/internal/service"
 )
@@ -19,13 +17,6 @@ func Authentication(groupService service.GroupService, sessionService service.Se
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
 			cookies := r.CookiesNamed(cookie.SessionCookieName)
-			tx, txErr := datasource.PostgresHandle().BeginTx(r.Context(), nil)
-			if txErr != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				genericpage.RenderSimpleMessage("Authentication Error", "Failed to create database transaction.", w, r)
-				return
-			}
-			defer tx.Rollback()
 			for _, thisCookie := range cookies {
 				userId, sessionErr := sessionService.GetLoggedInUserIdBySessionId(r, nil, thisCookie.Value)
 				if sessionErr != nil {
@@ -34,7 +25,7 @@ func Authentication(groupService service.GroupService, sessionService service.Se
 				if userId == "" {
 					continue
 				}
-				groups, groupsErr := groupService.GetGroupsByUserId(tx, userId)
+				groups, groupsErr := groupService.GetGroupsByUserId(r, userId)
 				if groupsErr != nil {
 					continue
 				}

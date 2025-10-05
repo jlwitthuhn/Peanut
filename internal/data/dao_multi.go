@@ -5,12 +5,11 @@
 package data
 
 import (
-	"database/sql"
-	"peanut/internal/data/datasource"
+	"net/http"
 )
 
 type MultiTableDao interface {
-	SelectGroupNamesByUserId(tx *sql.Tx, userId string) ([]string, error)
+	SelectGroupNamesByUserId(r *http.Request, userId string) ([]string, error)
 }
 
 func NewMultiTableDao() MultiTableDao {
@@ -28,8 +27,8 @@ var sqlSelectGroupNamesByUserId = `
 	    group_membership.user_id = $1
 `
 
-func (*multiTableDaoImpl) SelectGroupNamesByUserId(tx *sql.Tx, userId string) ([]string, error) {
-	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
+func (*multiTableDaoImpl) SelectGroupNamesByUserId(r *http.Request, userId string) ([]string, error) {
+	sqlh := getSqlExecutorFromRequest(r)
 
 	rows, err := sqlh.Query(sqlSelectGroupNamesByUserId, userId)
 	if err != nil {

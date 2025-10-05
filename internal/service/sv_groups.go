@@ -14,7 +14,7 @@ import (
 
 type GroupService interface {
 	CreateGroup(tx *sql.Tx, name string, desc string, systemOwned bool) error
-	GetGroupsByUserId(tx *sql.Tx, userId string) ([]string, error)
+	GetGroupsByUserId(r *http.Request, userId string) ([]string, error)
 	EnrollUserInGroup(r *http.Request, tx *sql.Tx, userId string, groupName string) error
 }
 
@@ -33,8 +33,8 @@ func (this *groupServiceImpl) CreateGroup(tx *sql.Tx, name string, desc string, 
 	return err
 }
 
-func (this *groupServiceImpl) GetGroupsByUserId(tx *sql.Tx, userId string) ([]string, error) {
-	groupNames, err := this.multiTableDao.SelectGroupNamesByUserId(tx, userId)
+func (this *groupServiceImpl) GetGroupsByUserId(r *http.Request, userId string) ([]string, error) {
+	groupNames, err := this.multiTableDao.SelectGroupNamesByUserId(r, userId)
 	if err != nil {
 		return nil, err
 	}

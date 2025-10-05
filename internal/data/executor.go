@@ -4,12 +4,24 @@
 
 package data
 
-import "database/sql"
+import (
+	"database/sql"
+	"net/http"
+	"peanut/internal/data/datasource"
+)
 
 type sqlExecutor interface {
 	Exec(query string, args ...any) (sql.Result, error)
 	Query(query string, args ...any) (*sql.Rows, error)
 	QueryRow(query string, args ...any) *sql.Row
+}
+
+func getSqlExecutorFromRequest(r *http.Request) sqlExecutor {
+	tx, ok := r.Context().Value("tx").(*sql.Tx)
+	if !ok || tx == nil {
+		return datasource.PostgresHandle()
+	}
+	return tx
 }
 
 func selectExecutor(db *sql.DB, tx *sql.Tx) sqlExecutor {

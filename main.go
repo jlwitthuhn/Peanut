@@ -82,6 +82,7 @@ func main() {
 		middleware.RequestLog(),
 		middleware.RequestTimer(),
 		middleware.DatabaseInitCheck(dbService, setupMux),
+		middleware.PostgresTransaction(),
 		middleware.Authentication(groupService, sessionService),
 		middleware.SecurityHeaders(),
 	)

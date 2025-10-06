@@ -5,9 +5,9 @@
 package endpoints
 
 import (
-	"database/sql"
 	"net/http"
 	"peanut/internal/endpoints/genericpage"
+	"peanut/internal/endpoints/requtil"
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/logger"
 	"peanut/internal/service"
@@ -76,17 +76,10 @@ func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService
 		}
 
 		logger.Info(r, "Committing transaction...")
-		tx, ok := r.Context().Value("tx").(*sql.Tx)
-		if !ok || tx == nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			genericpage.RenderSimpleMessage("Error", "Transaction does not exist.", w, r)
-			return
-		}
 
-		err = tx.Commit()
+		err = requtil.CommitTransactionForRequest(r)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			genericpage.RenderSimpleMessage("Error", "Failed to commit transaction.", w, r)
+			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to commit transaction.", w, r)
 			return
 		}
 

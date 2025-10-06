@@ -5,10 +5,10 @@
 package ep_admin
 
 import (
-	"database/sql"
 	"net/http"
 	"peanut/internal/data/configkey"
 	"peanut/internal/endpoints/genericpage"
+	"peanut/internal/endpoints/requtil"
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/logger"
 	"peanut/internal/middleutil"
@@ -65,17 +65,9 @@ func registerAdminFrontPageHandlers(mux *http.ServeMux, configService service.Co
 			return
 		}
 
-		tx, ok := r.Context().Value("tx").(*sql.Tx)
-		if !ok || tx == nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			genericpage.RenderSimpleMessage("Error", "Transaction does not exist.", w, r)
-			return
-		}
-
-		err = tx.Commit()
+		err = requtil.CommitTransactionForRequest(r)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			genericpage.RenderSimpleMessage("Error", "Failed to commit transaction.", w, r)
+			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to commit transaction.", w, r)
 			return
 		}
 

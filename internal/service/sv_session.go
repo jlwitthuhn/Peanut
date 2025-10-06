@@ -20,13 +20,14 @@ type SessionService interface {
 	GetLoggedInUserIdBySessionId(r *http.Request, sessionId string) (string, error)
 }
 
-func NewSessionService(sessionDao data.SessionDao, userDao data.UserDao) SessionService {
-	return &sessionServiceImpl{sessionDao: sessionDao, userDao: userDao}
+func NewSessionService(sessionDao data.SessionDao, sessionStringDao data.SessionStringDao, userDao data.UserDao) SessionService {
+	return &sessionServiceImpl{sessionDao: sessionDao, sessionStringDao: sessionStringDao, userDao: userDao}
 }
 
 type sessionServiceImpl struct {
-	sessionDao data.SessionDao
-	userDao    data.UserDao
+	sessionDao       data.SessionDao
+	sessionStringDao data.SessionStringDao
+	userDao          data.UserDao
 }
 
 func (this *sessionServiceImpl) CountUsersWithValidSession(req *http.Request) (int64, error) {
@@ -44,6 +45,12 @@ func (this *sessionServiceImpl) CreateSession(req *http.Request, username string
 
 	newSessionId := security.GenerateSessionId()
 	err := this.sessionDao.InsertRow(req, newSessionId, userRow.Id)
+	if err != nil {
+		return "", err
+	}
+
+	newCsrfToken := security.GenerateCsrfToken()
+	err = this.sessionStringDao.UpsertString(req, newSessionId, "csrfToken", newCsrfToken)
 	if err != nil {
 		return "", err
 	}

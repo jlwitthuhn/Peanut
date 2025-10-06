@@ -60,7 +60,7 @@ func main() {
 	configService := service.NewConfigService(configDao)
 	dbService := service.NewDatabaseService(metaDao)
 	groupService := service.NewGroupService(groupDao, groupMembershipDao, multiTableDao)
-	sessionService := service.NewSessionService(sessionDao, userDao)
+	sessionService := service.NewSessionService(sessionDao, sessionStringDao, userDao)
 	userService := service.NewUserService(sessionDao, userDao)
 	setupService := service.NewSetupService(
 		configDao, groupDao, groupMembershipDao, metaDao, sessionDao,

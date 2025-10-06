@@ -11,6 +11,7 @@ import (
 
 type SessionStringDao interface {
 	CreateDBObjects(req *http.Request) error
+	UpsertString(req *http.Request, sessionId string, name string, value string) error
 }
 
 func NewSessionStringDao() SessionStringDao {
@@ -48,7 +49,26 @@ func (*sessionStringDaoImpl) CreateDBObjects(req *http.Request) error {
 	sqlh := getSqlExecutorFromRequest(req)
 	_, err := sqlh.Exec(sqlCreateTableSessionString)
 	if err != nil {
-		logger.Error(nil, "Got error on SessionStringDao/CreateDBObjects query: ", err)
+		logger.Error(req, "Got error on SessionStringDao/CreateDBObjects query: ", err)
+		return err
+	}
+	return nil
+}
+
+var sqlUpsertSessionStringByName = `
+	INSERT INTO
+		session_string (session_id, name, value)
+	VALUES
+		($1, $2, $3)
+	ON CONFLICT (session_id, name)
+		DO UPDATE SET value = EXCLUDED.value;
+`
+
+func (*sessionStringDaoImpl) UpsertString(req *http.Request, sessionId string, name string, value string) error {
+	sqlh := getSqlExecutorFromRequest(req)
+	_, err := sqlh.Exec(sqlUpsertSessionStringByName, sessionId, name, value)
+	if err != nil {
+		logger.Error(req, "Got error on SessionStringDao/UpsertString query: ", err)
 		return err
 	}
 	return nil

@@ -8,11 +8,12 @@ import (
 	"database/sql"
 	"errors"
 	"net/http"
+	"peanut/internal/keynames/contextkeys"
 	"peanut/internal/logger"
 )
 
 func CommitTransactionForRequest(req *http.Request) error {
-	tx, ok := req.Context().Value("tx").(*sql.Tx)
+	tx, ok := req.Context().Value(contextkeys.PostgresTx).(*sql.Tx)
 	if !ok || tx == nil {
 		logger.Error(req, "Attempted to commit transaction with no transaction.")
 		return errors.New("No transaction to commit.")

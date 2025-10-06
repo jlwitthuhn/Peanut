@@ -11,6 +11,7 @@ import (
 	"peanut/internal/endpoints/genericpage"
 	"peanut/internal/endpoints/requtil"
 	"peanut/internal/endpoints/templatecontext"
+	"peanut/internal/keynames/contextkeys"
 	"peanut/internal/logger"
 	"peanut/internal/service"
 	"peanut/internal/template"
@@ -62,5 +63,5 @@ func RegisterLoginHandlers(mux *http.ServeMux, sessionService service.SessionSer
 }
 
 func isAlreadyLoggedIn(r *http.Request) bool {
-	return r.Context().Value("loggedIn") == true
+	return r.Context().Value(contextkeys.LoggedIn) == true
 }

@@ -7,15 +7,16 @@ package templatecontext
 import (
 	"fmt"
 	"net/http"
+	"peanut/internal/keynames/contextkeys"
 	"peanut/internal/middleutil"
 	"strings"
 )
 
 func GetStandardTemplateContext(r *http.Request) map[string]any {
 	result := make(map[string]any)
-	result["LoggedIn"] = r.Context().Value("loggedIn")
+	result["LoggedIn"] = r.Context().Value(contextkeys.LoggedIn)
 
-	permSlice, ok := r.Context().Value("userPerms").([]string)
+	permSlice, ok := r.Context().Value(contextkeys.UserPerms).([]string)
 	if ok {
 		for _, perm := range permSlice {
 			fullPerm := "Perm_" + strings.ReplaceAll(perm, "/", "_")

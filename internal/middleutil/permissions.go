@@ -6,11 +6,12 @@ package middleutil
 
 import (
 	"net/http"
+	"peanut/internal/keynames/contextkeys"
 	"slices"
 )
 
 func RequestHasPermission(r *http.Request, permission string) bool {
-	permissionsAny := r.Context().Value("userPerms")
+	permissionsAny := r.Context().Value(contextkeys.UserPerms)
 	permissions := permissionsAny.([]string)
 	return slices.Contains(permissions, permission)
 }

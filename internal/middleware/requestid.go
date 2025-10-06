@@ -9,20 +9,20 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"net/http"
-	"peanut/internal/middleutil"
+	"peanut/internal/keynames/contextkeys"
 )
 
 func RequestId() MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
-			ctx = context.WithValue(ctx, middleutil.RequestIdKey, generateRandomId())
+			ctx = context.WithValue(ctx, contextkeys.RequestId, generateRandomRequestId())
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
 }
 
-func generateRandomId() string {
+func generateRandomRequestId() string {
 	bytes := make([]byte, 4)
 	_, err := rand.Read(bytes)
 	if err != nil {

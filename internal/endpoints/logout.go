@@ -9,13 +9,14 @@ import (
 	"peanut/internal/cookie"
 	"peanut/internal/endpoints/genericpage"
 	"peanut/internal/endpoints/requtil"
+	"peanut/internal/keynames/contextkeys"
 	"peanut/internal/logger"
 	"peanut/internal/service"
 )
 
 func RegisterLogoutHandlers(mux *http.ServeMux, sessionService service.SessionService) {
 	postLogoutHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		sessionId := r.Context().Value("sessionId")
+		sessionId := r.Context().Value(contextkeys.SessionId)
 		sessionIdString, ok := sessionId.(string)
 		if ok == false {
 			logger.Error(r, "'sessionId' is not a string while logging out.")

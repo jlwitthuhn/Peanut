@@ -6,13 +6,12 @@ package middleutil
 
 import (
 	"net/http"
+	"peanut/internal/keynames/contextkeys"
 	"time"
 )
 
-var RequestTimerBeginKey string = "requestTimerBegin"
-
 func RequestTimerFinish(req *http.Request) float64 {
-	requestBegin := req.Context().Value(RequestTimerBeginKey).(time.Time)
+	requestBegin := req.Context().Value(contextkeys.RequestTimerBegin).(time.Time)
 	requestDurationUs := time.Now().Sub(requestBegin).Microseconds()
 	return float64(requestDurationUs) / 1000.0
 }

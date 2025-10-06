@@ -4,13 +4,14 @@
 
 package middleutil
 
-import "net/http"
-
-var RequestIdKey = "requestId"
+import (
+	"net/http"
+	"peanut/internal/keynames/contextkeys"
+)
 
 func RetrieveRequestId(r *http.Request) string {
 	if r != nil {
-		return r.Context().Value(RequestIdKey).(string)
+		return r.Context().Value(contextkeys.RequestId).(string)
 	} else {
 		return "--------"
 	}

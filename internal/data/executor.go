@@ -8,6 +8,7 @@ import (
 	"database/sql"
 	"net/http"
 	"peanut/internal/data/datasource"
+	"peanut/internal/keynames/contextkeys"
 )
 
 type sqlExecutor interface {
@@ -17,7 +18,7 @@ type sqlExecutor interface {
 }
 
 func getSqlExecutorFromRequest(r *http.Request) sqlExecutor {
-	tx, ok := r.Context().Value("tx").(*sql.Tx)
+	tx, ok := r.Context().Value(contextkeys.PostgresTx).(*sql.Tx)
 	if !ok || tx == nil {
 		return datasource.PostgresHandle()
 	}

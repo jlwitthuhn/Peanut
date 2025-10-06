@@ -7,13 +7,14 @@ package middleware
 import (
 	"net/http"
 	"peanut/internal/endpoints/genericpage"
+	"peanut/internal/keynames/contextkeys"
 	"slices"
 )
 
 func CheckPermissions(requiredPerms ...string) MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			userPerms, ok := r.Context().Value("userPerms").([]string)
+			userPerms, ok := r.Context().Value(contextkeys.UserPerms).([]string)
 			if !ok {
 				genericpage.RenderErrorHttp403Forbidden(w, r)
 				return

@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"peanut/internal/data/datasource"
 	"peanut/internal/endpoints/genericpage"
+	"peanut/internal/keynames/contextkeys"
 )
 
 func PostgresTransaction() MiddlewareFunc {
@@ -20,7 +21,7 @@ func PostgresTransaction() MiddlewareFunc {
 				return
 			}
 			defer tx.Rollback()
-			ctx := context.WithValue(r.Context(), "tx", tx)
+			ctx := context.WithValue(r.Context(), contextkeys.PostgresTx, tx)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

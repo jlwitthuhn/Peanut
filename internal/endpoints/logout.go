@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"peanut/internal/cookie"
 	"peanut/internal/endpoints/genericpage"
+	"peanut/internal/endpoints/requtil"
 	"peanut/internal/logger"
 	"peanut/internal/service"
 )
@@ -25,6 +26,12 @@ func RegisterLogoutHandlers(mux *http.ServeMux, sessionService service.SessionSe
 		err := sessionService.DestroySession(r, sessionIdString)
 		if err != nil {
 			logger.Warn(r, "Failed to delete session, proceeding anyways.")
+		}
+
+		err = requtil.CommitTransactionForRequest(r)
+		if err != nil {
+			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to commit transaction.", w, r)
+			return
 		}
 
 		emptyCookie := cookie.CreateSessionCookie("There was a session id here. It is gone now.")

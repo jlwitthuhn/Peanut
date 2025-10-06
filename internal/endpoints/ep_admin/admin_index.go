@@ -44,7 +44,7 @@ func registerAdminIndexHandlers(
 			return
 		}
 
-		userCount, err := userService.CountUsers(nil)
+		userCount, err := userService.CountUsers(r)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			genericpage.RenderSimpleMessage("Error", "Failed to query user count.", w, r)

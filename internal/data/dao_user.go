@@ -5,9 +5,7 @@
 package data
 
 import (
-	"database/sql"
 	"net/http"
-	"peanut/internal/data/datasource"
 	"peanut/internal/logger"
 )
 
@@ -20,7 +18,7 @@ type UserRow struct {
 
 type UserDao interface {
 	CreateDBObjects(req *http.Request) error
-	CountRows(tx *sql.Tx) (int64, error)
+	CountRows(req *http.Request) (int64, error)
 	CountRowsByEmail(req *http.Request, name string) (int64, error)
 	CountRowsByName(req *http.Request, name string) (int64, error)
 	InsertRow(req *http.Request, name string, email string, hashedPassword string) (string, error)
@@ -70,9 +68,8 @@ func (*userDaoImpl) CreateDBObjects(req *http.Request) error {
 
 var sqlCountUsers = "SELECT COUNT(*) FROM users;"
 
-func (*userDaoImpl) CountRows(tx *sql.Tx) (int64, error) {
-	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
-
+func (*userDaoImpl) CountRows(req *http.Request) (int64, error) {
+	sqlh := getSqlExecutorFromRequest(req)
 	var count int64
 	row := sqlh.QueryRow(sqlCountUsers)
 	err := row.Scan(&count)

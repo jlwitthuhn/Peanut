@@ -5,7 +5,6 @@
 package service
 
 import (
-	"database/sql"
 	"errors"
 	"net/http"
 	"peanut/internal/data"
@@ -13,7 +12,7 @@ import (
 )
 
 type UserService interface {
-	CountUsers(tx *sql.Tx) (int64, error)
+	CountUsers(req *http.Request) (int64, error)
 	CreateUser(req *http.Request, name string, email string, plainPassword string) (string, error)
 	IsEmailTaken(req *http.Request, email string) (bool, error)
 	IsNameTaken(req *http.Request, username string) (bool, error)
@@ -28,8 +27,8 @@ type userServiceImpl struct {
 	userDao    data.UserDao
 }
 
-func (this *userServiceImpl) CountUsers(tx *sql.Tx) (int64, error) {
-	return this.userDao.CountRows(tx)
+func (this *userServiceImpl) CountUsers(req *http.Request) (int64, error) {
+	return this.userDao.CountRows(req)
 }
 
 func (this *userServiceImpl) CreateUser(req *http.Request, name string, email string, plainPassword string) (string, error) {

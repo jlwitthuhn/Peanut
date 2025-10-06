@@ -23,11 +23,3 @@ func getSqlExecutorFromRequest(r *http.Request) sqlExecutor {
 	}
 	return tx
 }
-
-func selectExecutor(db *sql.DB, tx *sql.Tx) sqlExecutor {
-	if tx == nil {
-		return db
-	} else {
-		return tx
-	}
-}

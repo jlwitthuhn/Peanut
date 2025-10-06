@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"peanut/internal/cookie"
 	"peanut/internal/endpoints/genericpage"
+	"peanut/internal/endpoints/requtil"
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/logger"
 	"peanut/internal/service"
@@ -47,6 +48,13 @@ func RegisterLoginHandlers(mux *http.ServeMux, sessionService service.SessionSer
 			genericpage.RenderSimpleMessage("Error", errMsg, w, r)
 			return
 		}
+
+		err = requtil.CommitTransactionForRequest(r)
+		if err != nil {
+			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to commit transaction.", w, r)
+			return
+		}
+
 		sesssionCookie := cookie.CreateSessionCookie(sessionId)
 		http.SetCookie(w, &sesssionCookie)
 		genericpage.RenderSimpleMessage("Success", "You have logged in.", w, r)

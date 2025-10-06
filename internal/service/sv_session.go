@@ -8,6 +8,7 @@ import (
 	"errors"
 	"net/http"
 	"peanut/internal/data"
+	"peanut/internal/keynames/sessionkeys"
 	"peanut/internal/logger"
 	"peanut/internal/security"
 	"peanut/internal/security/passhash"
@@ -50,7 +51,7 @@ func (this *sessionServiceImpl) CreateSession(req *http.Request, username string
 	}
 
 	newCsrfToken := security.GenerateCsrfToken()
-	err = this.sessionStringDao.UpsertString(req, newSessionId, "csrfToken", newCsrfToken)
+	err = this.sessionStringDao.UpsertString(req, newSessionId, sessionkeys.CsrfToken, newCsrfToken)
 	if err != nil {
 		return "", err
 	}

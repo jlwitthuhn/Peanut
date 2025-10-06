@@ -24,7 +24,7 @@ type UserDao interface {
 	CountRowsByEmail(req *http.Request, name string) (int64, error)
 	CountRowsByName(req *http.Request, name string) (int64, error)
 	InsertRow(req *http.Request, name string, email string, hashedPassword string) (string, error)
-	SelectRowByName(tx *sql.Tx, name string) (*UserRow, error)
+	SelectRowByName(req *http.Request, name string) (*UserRow, error)
 }
 
 func NewUserDao() UserDao {
@@ -127,9 +127,8 @@ func (*userDaoImpl) InsertRow(req *http.Request, name string, email string, hash
 
 var sqlSelectUsersRowByName = "SELECT id, display_name, email, password FROM users WHERE display_name = $1"
 
-func (*userDaoImpl) SelectRowByName(tx *sql.Tx, name string) (*UserRow, error) {
-	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
-
+func (*userDaoImpl) SelectRowByName(req *http.Request, name string) (*UserRow, error) {
+	sqlh := getSqlExecutorFromRequest(req)
 	result := &UserRow{}
 	row := sqlh.QueryRow(sqlSelectUsersRowByName, name)
 	err := row.Scan(&result.Id, &result.DisplayName, &result.Email, &result.Password)

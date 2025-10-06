@@ -18,7 +18,7 @@ func Authentication(groupService service.GroupService, sessionService service.Se
 			ctx := r.Context()
 			cookies := r.CookiesNamed(cookie.SessionCookieName)
 			for _, thisCookie := range cookies {
-				userId, sessionErr := sessionService.GetLoggedInUserIdBySessionId(r, nil, thisCookie.Value)
+				userId, sessionErr := sessionService.GetLoggedInUserIdBySessionId(r, thisCookie.Value)
 				if sessionErr != nil {
 					continue
 				}

@@ -7,7 +7,6 @@ package data
 import (
 	"database/sql"
 	"net/http"
-	"peanut/internal/data/datasource"
 	"peanut/internal/logger"
 )
 
@@ -18,10 +17,10 @@ type SessionRow struct {
 
 type SessionDao interface {
 	CreateDBObjects(req *http.Request) error
-	CountValidDedupeByUser(tx *sql.Tx) (int64, error)
-	DeleteRowById(tx *sql.Tx, sessionId string) error
-	InsertRow(tx *sql.Tx, sessionId string, userId string) error
-	SelectValidRowBySessionId(tx *sql.Tx, sessionId string) (*SessionRow, error)
+	CountValidDedupeByUser(req *http.Request) (int64, error)
+	DeleteRowById(req *http.Request, sessionId string) error
+	InsertRow(req *http.Request, sessionId string, userId string) error
+	SelectValidRowBySessionId(req *http.Request, sessionId string) (*SessionRow, error)
 }
 
 func NewSessionDao() SessionDao {
@@ -66,9 +65,8 @@ func (*sessionDaoImpl) CreateDBObjects(req *http.Request) error {
 
 var sqlCountValidSessionsDedupeByUser = "SELECT COUNT(DISTINCT user_id) FROM sessions WHERE valid_until >= NOW();"
 
-func (*sessionDaoImpl) CountValidDedupeByUser(tx *sql.Tx) (int64, error) {
-	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
-
+func (*sessionDaoImpl) CountValidDedupeByUser(req *http.Request) (int64, error) {
+	sqlh := getSqlExecutorFromRequest(req)
 	var count int64
 	row := sqlh.QueryRow(sqlCountValidSessionsDedupeByUser)
 	err := row.Scan(&count)
@@ -81,9 +79,8 @@ func (*sessionDaoImpl) CountValidDedupeByUser(tx *sql.Tx) (int64, error) {
 
 var sqlDeleteSessionsRowById = "DELETE FROM sessions WHERE id = $1"
 
-func (*sessionDaoImpl) DeleteRowById(tx *sql.Tx, sessionId string) error {
-	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
-
+func (*sessionDaoImpl) DeleteRowById(req *http.Request, sessionId string) error {
+	sqlh := getSqlExecutorFromRequest(req)
 	_, err := sqlh.Exec(sqlDeleteSessionsRowById, sessionId)
 	if err != nil {
 		logger.Error(nil, "Got error on SessionDao/DeleteRowById query: ", err)
@@ -94,9 +91,8 @@ func (*sessionDaoImpl) DeleteRowById(tx *sql.Tx, sessionId string) error {
 
 var sqlInsertSessionsRow = "INSERT INTO sessions (id, user_id) VALUES ($1, $2::uuid)"
 
-func (*sessionDaoImpl) InsertRow(tx *sql.Tx, sessionId string, userId string) error {
-	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
-
+func (*sessionDaoImpl) InsertRow(req *http.Request, sessionId string, userId string) error {
+	sqlh := getSqlExecutorFromRequest(req)
 	_, err := sqlh.Exec(sqlInsertSessionsRow, sessionId, userId)
 	if err != nil {
 		logger.Error(nil, "Got error on SessionDao/InsertRow query: ", err)
@@ -107,9 +103,8 @@ func (*sessionDaoImpl) InsertRow(tx *sql.Tx, sessionId string, userId string) er
 
 var sqlSelectSessionsRowById = "SELECT id, user_id FROM sessions WHERE id = $1 AND valid_until >= NOW()"
 
-func (*sessionDaoImpl) SelectValidRowBySessionId(tx *sql.Tx, sessionId string) (*SessionRow, error) {
-	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
-
+func (*sessionDaoImpl) SelectValidRowBySessionId(req *http.Request, sessionId string) (*SessionRow, error) {
+	sqlh := getSqlExecutorFromRequest(req)
 	result := &SessionRow{}
 	row := sqlh.QueryRow(sqlSelectSessionsRowById, sessionId)
 	err := row.Scan(&result.Id, &result.UserId)

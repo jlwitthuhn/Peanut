@@ -22,7 +22,7 @@ func RegisterLogoutHandlers(mux *http.ServeMux, sessionService service.SessionSe
 			genericpage.RenderSimpleMessage("Error", "Unable to log out: failed to read session id.", w, r)
 			return
 		}
-		err := sessionService.DestroySession(r, nil, sessionIdString)
+		err := sessionService.DestroySession(r, sessionIdString)
 		if err != nil {
 			logger.Warn(r, "Failed to delete session, proceeding anyways.")
 		}

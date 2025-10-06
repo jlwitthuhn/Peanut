@@ -5,7 +5,6 @@
 package service
 
 import (
-	"database/sql"
 	"errors"
 	"net/http"
 	"peanut/internal/data"
@@ -15,10 +14,10 @@ import (
 )
 
 type SessionService interface {
-	CountUsersWithValidSession(tx *sql.Tx) (int64, error)
-	CreateSession(r *http.Request, tx *sql.Tx, username string, plainPassword string) (string, error)
-	DestroySession(r *http.Request, tx *sql.Tx, sessionId string) error
-	GetLoggedInUserIdBySessionId(r *http.Request, tx *sql.Tx, sessionId string) (string, error)
+	CountUsersWithValidSession(req *http.Request) (int64, error)
+	CreateSession(req *http.Request, username string, plainPassword string) (string, error)
+	DestroySession(req *http.Request, sessionId string) error
+	GetLoggedInUserIdBySessionId(r *http.Request, sessionId string) (string, error)
 }
 
 func NewSessionService(sessionDao data.SessionDao, userDao data.UserDao) SessionService {
@@ -30,12 +29,12 @@ type sessionServiceImpl struct {
 	userDao    data.UserDao
 }
 
-func (this *sessionServiceImpl) CountUsersWithValidSession(tx *sql.Tx) (int64, error) {
-	return this.sessionDao.CountValidDedupeByUser(tx)
+func (this *sessionServiceImpl) CountUsersWithValidSession(req *http.Request) (int64, error) {
+	return this.sessionDao.CountValidDedupeByUser(req)
 }
 
-func (this *sessionServiceImpl) CreateSession(r *http.Request, tx *sql.Tx, username string, plainPassword string) (string, error) {
-	userRow, userErr := this.userDao.SelectRowByName(tx, username)
+func (this *sessionServiceImpl) CreateSession(req *http.Request, username string, plainPassword string) (string, error) {
+	userRow, userErr := this.userDao.SelectRowByName(req, username)
 	if userErr != nil {
 		return "", userErr
 	}
@@ -44,26 +43,26 @@ func (this *sessionServiceImpl) CreateSession(r *http.Request, tx *sql.Tx, usern
 	}
 
 	newSessionId := security.GenerateSessionId()
-	err := this.sessionDao.InsertRow(tx, newSessionId, userRow.Id)
+	err := this.sessionDao.InsertRow(req, newSessionId, userRow.Id)
 	if err != nil {
 		return "", err
 	}
 
-	logger.Info(r, "User logger in:", userRow.Id)
+	logger.Info(req, "User logger in:", userRow.Id)
 
 	return newSessionId, nil
 }
 
-func (this *sessionServiceImpl) DestroySession(r *http.Request, tx *sql.Tx, sessionId string) error {
-	err := this.sessionDao.DeleteRowById(tx, sessionId)
+func (this *sessionServiceImpl) DestroySession(req *http.Request, sessionId string) error {
+	err := this.sessionDao.DeleteRowById(req, sessionId)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (this *sessionServiceImpl) GetLoggedInUserIdBySessionId(r *http.Request, tx *sql.Tx, sessionId string) (string, error) {
-	sessionRow, sessionErr := this.sessionDao.SelectValidRowBySessionId(tx, sessionId)
+func (this *sessionServiceImpl) GetLoggedInUserIdBySessionId(req *http.Request, sessionId string) (string, error) {
+	sessionRow, sessionErr := this.sessionDao.SelectValidRowBySessionId(req, sessionId)
 	if sessionErr != nil {
 		return "", sessionErr
 	}

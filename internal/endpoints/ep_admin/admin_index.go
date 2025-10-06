@@ -51,7 +51,7 @@ func registerAdminIndexHandlers(
 			return
 		}
 
-		userSessionCount, err := sessionService.CountUsersWithValidSession(nil)
+		userSessionCount, err := sessionService.CountUsersWithValidSession(r)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			genericpage.RenderSimpleMessage("Error", "Failed to query user session count.", w, r)

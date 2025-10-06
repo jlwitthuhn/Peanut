@@ -39,7 +39,7 @@ func RegisterLoginHandlers(mux *http.ServeMux, sessionService service.SessionSer
 
 		username := r.PostFormValue("username")
 		password := r.PostFormValue("password")
-		sessionId, err := sessionService.CreateSession(r, nil, username, password)
+		sessionId, err := sessionService.CreateSession(r, username, password)
 		if err != nil {
 			logger.Error(r, "Error creating session:", err)
 			errMsg := fmt.Sprint("Error logging in: ", err)

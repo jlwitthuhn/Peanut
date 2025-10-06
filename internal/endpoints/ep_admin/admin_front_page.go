@@ -5,6 +5,7 @@
 package ep_admin
 
 import (
+	"database/sql"
 	"net/http"
 	"peanut/internal/data/configkey"
 	"peanut/internal/endpoints/genericpage"
@@ -23,7 +24,7 @@ func registerAdminFrontPageHandlers(mux *http.ServeMux, configService service.Co
 			return
 		}
 
-		welcomeMessage, err := configService.GetString(nil, configkey.StringWelcomeMessage)
+		welcomeMessage, err := configService.GetString(r, configkey.StringWelcomeMessage)
 		if err != nil {
 			logger.Error(r, "Error retrieving welcome message.", err)
 			genericpage.RenderErrorHttp403Forbidden(w, r)
@@ -57,10 +58,24 @@ func registerAdminFrontPageHandlers(mux *http.ServeMux, configService service.Co
 			return
 		}
 
-		err := configService.SetString(nil, configkey.StringWelcomeMessage, newMessage)
+		err := configService.SetString(r, configkey.StringWelcomeMessage, newMessage)
 		if err != nil {
 			logger.Error(r, "Failed to set new welcome message.", err)
 			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to set new welcome message.", w, r)
+			return
+		}
+
+		tx, ok := r.Context().Value("tx").(*sql.Tx)
+		if !ok || tx == nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			genericpage.RenderSimpleMessage("Error", "Transaction does not exist.", w, r)
+			return
+		}
+
+		err = tx.Commit()
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			genericpage.RenderSimpleMessage("Error", "Failed to commit transaction.", w, r)
 			return
 		}
 

@@ -16,7 +16,7 @@ import (
 func RegisterIndexHandlers(mux *http.ServeMux, configService service.ConfigService) {
 
 	getIndexHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		welcomeMessage, err := configService.GetString(nil, configkey.StringWelcomeMessage)
+		welcomeMessage, err := configService.GetString(r, configkey.StringWelcomeMessage)
 		if err != nil {
 			logger.Error(r, "Error retrieving welcome message, using error message.", err)
 			welcomeMessage = "Error: unable to retrieve welcome message."

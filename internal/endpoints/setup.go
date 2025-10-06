@@ -86,7 +86,7 @@ func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService
 		err = tx.Commit()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			genericpage.RenderSimpleMessage("Error", "Transaction does not exist.", w, r)
+			genericpage.RenderSimpleMessage("Error", "Failed to commit transaction.", w, r)
 			return
 		}
 

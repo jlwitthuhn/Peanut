@@ -5,9 +5,7 @@
 package data
 
 import (
-	"database/sql"
 	"net/http"
-	"peanut/internal/data/datasource"
 	"peanut/internal/logger"
 )
 
@@ -23,8 +21,8 @@ type ConfigStringRow struct {
 
 type ConfigDao interface {
 	CreateDBObjects(req *http.Request) error
-	SelectIntRowByName(tx *sql.Tx, name string) (*ConfigIntRow, error)
-	SelectStringRowByName(tx *sql.Tx, name string) (*ConfigStringRow, error)
+	SelectIntRowByName(req *http.Request, name string) (*ConfigIntRow, error)
+	SelectStringRowByName(req *http.Request, name string) (*ConfigStringRow, error)
 	UpsertIntByName(req *http.Request, name string, value int64) error
 	UpsertStringByName(req *http.Request, name string, value string) error
 }
@@ -98,9 +96,8 @@ func (*configDaoImpl) CreateDBObjects(req *http.Request) error {
 
 var sqlSelectConfigIntRowByName = "SELECT name, value FROM config_int WHERE name = $1"
 
-func (*configDaoImpl) SelectIntRowByName(tx *sql.Tx, name string) (*ConfigIntRow, error) {
-	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
-
+func (*configDaoImpl) SelectIntRowByName(req *http.Request, name string) (*ConfigIntRow, error) {
+	sqlh := getSqlExecutorFromRequest(req)
 	result := &ConfigIntRow{}
 	row := sqlh.QueryRow(sqlSelectConfigIntRowByName, name)
 	err := row.Scan(&result.Name, &result.Value)
@@ -112,9 +109,8 @@ func (*configDaoImpl) SelectIntRowByName(tx *sql.Tx, name string) (*ConfigIntRow
 
 var sqlSelectConfigStringRowByName = "SELECT name, value FROM config_string WHERE name = $1"
 
-func (*configDaoImpl) SelectStringRowByName(tx *sql.Tx, name string) (*ConfigStringRow, error) {
-	sqlh := selectExecutor(datasource.PostgresHandle(), tx)
-
+func (*configDaoImpl) SelectStringRowByName(req *http.Request, name string) (*ConfigStringRow, error) {
+	sqlh := getSqlExecutorFromRequest(req)
 	result := &ConfigStringRow{}
 	row := sqlh.QueryRow(sqlSelectConfigStringRowByName, name)
 	err := row.Scan(&result.Name, &result.Value)

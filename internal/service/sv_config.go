@@ -5,14 +5,13 @@
 package service
 
 import (
-	"database/sql"
 	"net/http"
 	"peanut/internal/data"
 )
 
 type ConfigService interface {
-	GetInt(tx *sql.Tx, key string) (int64, error)
-	GetString(tx *sql.Tx, key string) (string, error)
+	GetInt(req *http.Request, key string) (int64, error)
+	GetString(req *http.Request, key string) (string, error)
 	SetInt(req *http.Request, key string, value int64) error
 	SetString(req *http.Request, key string, value string) error
 }
@@ -25,16 +24,16 @@ type configServiceImpl struct {
 	configDao data.ConfigDao
 }
 
-func (this *configServiceImpl) GetInt(tx *sql.Tx, key string) (int64, error) {
-	row, err := this.configDao.SelectIntRowByName(tx, key)
+func (this *configServiceImpl) GetInt(req *http.Request, key string) (int64, error) {
+	row, err := this.configDao.SelectIntRowByName(req, key)
 	if err != nil {
 		return 0, err
 	}
 	return row.Value, nil
 }
 
-func (this *configServiceImpl) GetString(tx *sql.Tx, key string) (string, error) {
-	row, err := this.configDao.SelectStringRowByName(tx, key)
+func (this *configServiceImpl) GetString(req *http.Request, key string) (string, error) {
+	row, err := this.configDao.SelectStringRowByName(req, key)
 	if err != nil {
 		return "", err
 	}

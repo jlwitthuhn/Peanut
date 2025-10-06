@@ -30,7 +30,7 @@ func registerAdminIndexHandlers(
 	userService service.UserService,
 ) {
 	getIndexHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		initTime, err := configService.GetInt(nil, configkey.IntInitializedTime)
+		initTime, err := configService.GetInt(r, configkey.IntInitializedTime)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			genericpage.RenderSimpleMessage("Error", "Failed to query init time.", w, r)

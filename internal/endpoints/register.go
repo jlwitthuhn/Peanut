@@ -34,36 +34,30 @@ func RegisterRegisterHandlers(mux *http.ServeMux, groupService service.GroupServ
 		password2 := r.PostFormValue("password2")
 
 		if err := validator.ValidateUsername(username); err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			genericpage.RenderSimpleMessage("Error", "Username is not valid: "+err.Error(), w, r)
+			genericpage.RenderErrorHttp400BadRequestWithMessage("Username is not valid: "+err.Error(), w, r)
 			return
 		}
 		if err := validator.ValidateEmail(email); err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			genericpage.RenderSimpleMessage("Error", "Email is not valid: "+err.Error(), w, r)
+			genericpage.RenderErrorHttp400BadRequestWithMessage("Email is not valid: "+err.Error(), w, r)
 			return
 		}
 		if password != password2 {
-			w.WriteHeader(http.StatusBadRequest)
-			genericpage.RenderSimpleMessage("Error", "Passwords must match.", w, r)
+			genericpage.RenderErrorHttp400BadRequestWithMessage("Passwords must match.", w, r)
 			return
 		}
 		if err := validator.ValidatePassword(password); err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			genericpage.RenderSimpleMessage("Error", "Password is not valid: "+err.Error(), w, r)
+			genericpage.RenderErrorHttp400BadRequestWithMessage("Password is not valid: "+err.Error(), w, r)
 			return
 		}
 
 		userId, err := userService.CreateUser(r, username, email, password)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			genericpage.RenderSimpleMessage("Error", "Failed to crete user.", w, r)
+			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to create user.", w, r)
 			return
 		}
 		err = groupService.EnrollUserInGroup(r, userId, permgroups.User)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			genericpage.RenderSimpleMessage("Error", "Failed to add new user to default group.", w, r)
+			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to add new user to default group.", w, r)
 			return
 		}
 

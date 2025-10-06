@@ -30,8 +30,7 @@ func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService
 	postSetupHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		configTableExists, configTableErr := dbService.DoesTableExist(r, "config_int")
 		if configTableErr != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			genericpage.RenderSimpleMessage("Error", "Failed to query data.", w, r)
+			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query data.", w, r)
 			return
 		}
 		if configTableExists {
@@ -46,23 +45,19 @@ func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService
 		adminPassword2 := r.PostFormValue("admin-pass-2")
 
 		if err := validator.ValidateUsername(adminName); err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			genericpage.RenderSimpleMessage("Error", "Username is not valid: "+err.Error(), w, r)
+			genericpage.RenderErrorHttp400BadRequestWithMessage("Username is not valid: "+err.Error(), w, r)
 			return
 		}
 		if err := validator.ValidateEmail(email); err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			genericpage.RenderSimpleMessage("Error", "Email is not valid: "+err.Error(), w, r)
+			genericpage.RenderErrorHttp400BadRequestWithMessage("Email is not valid: "+err.Error(), w, r)
 			return
 		}
 		if adminPassword != adminPassword2 {
-			w.WriteHeader(http.StatusBadRequest)
-			genericpage.RenderSimpleMessage("Error", "Passwords must match.", w, r)
+			genericpage.RenderErrorHttp400BadRequestWithMessage("Passwords must match.", w, r)
 			return
 		}
 		if err := validator.ValidatePassword(adminPassword); err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			genericpage.RenderSimpleMessage("Error", "Passwords is not valid: "+err.Error(), w, r)
+			genericpage.RenderErrorHttp400BadRequestWithMessage("Password is not valid: "+err.Error(), w, r)
 			return
 		}
 
@@ -70,8 +65,7 @@ func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService
 		err := setupService.InitializeDatabase(r, adminName, email, adminPassword)
 		if err != nil {
 			logger.Error(r, "Error initializing database:", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			genericpage.RenderSimpleMessage("Error", "Failed to initialize database.", w, r)
+			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to initialize database.", w, r)
 			return
 		}
 

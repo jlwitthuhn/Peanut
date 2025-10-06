@@ -32,29 +32,25 @@ func registerAdminIndexHandlers(
 	getIndexHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		initTime, err := configService.GetInt(r, configkey.IntInitializedTime)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			genericpage.RenderSimpleMessage("Error", "Failed to query init time.", w, r)
+			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query init time.", w, r)
 			return
 		}
 
 		dbVersion, err := databaseService.GetPostgresVersion(r)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			genericpage.RenderSimpleMessage("Error", "Failed to query postgres version.", w, r)
+			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query postgres version.", w, r)
 			return
 		}
 
 		userCount, err := userService.CountUsers(r)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			genericpage.RenderSimpleMessage("Error", "Failed to query user count.", w, r)
+			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query user count.", w, r)
 			return
 		}
 
 		userSessionCount, err := sessionService.CountUsersWithValidSession(r)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			genericpage.RenderSimpleMessage("Error", "Failed to query user session count.", w, r)
+			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query user session count.", w, r)
 			return
 		}
 

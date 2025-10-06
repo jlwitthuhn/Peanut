@@ -26,8 +26,8 @@ func registerAdminFrontPageHandlers(mux *http.ServeMux, configService service.Co
 
 		welcomeMessage, err := configService.GetString(r, configkey.StringWelcomeMessage)
 		if err != nil {
-			logger.Error(r, "Error retrieving welcome message.", err)
-			genericpage.RenderErrorHttp403Forbidden(w, r)
+			logger.Error(r, "Error retrieving welcome message:", err)
+			genericpage.RenderErrorHttp500InternalServerError(w, r)
 			return
 		}
 
@@ -53,14 +53,12 @@ func registerAdminFrontPageHandlers(mux *http.ServeMux, configService service.Co
 		confirm := r.PostFormValue("confirm")
 
 		if confirm != "on" {
-			w.WriteHeader(http.StatusBadRequest)
-			genericpage.RenderSimpleMessage("Error", "You must check the 'Confirm' box to set the welcome message.", w, r)
+			genericpage.RenderErrorHttp400BadRequestWithMessage("You must check the 'Confirm' box to set the welcome message.", w, r)
 			return
 		}
 
 		err := configService.SetString(r, configkey.StringWelcomeMessage, newMessage)
 		if err != nil {
-			logger.Error(r, "Failed to set new welcome message.", err)
 			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to set new welcome message.", w, r)
 			return
 		}

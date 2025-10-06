@@ -11,6 +11,11 @@ import (
 	"peanut/internal/template"
 )
 
+func RenderErrorHttp400BadRequestWithMessage(message string, w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusBadRequest)
+	RenderSimpleMessage("400 - Bad Request", message, w, r)
+}
+
 func RenderErrorHttp403Forbidden(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusForbidden)
 	RenderSimpleMessage("403 - Forbidden", "You do not have permission to access this page.", w, r)

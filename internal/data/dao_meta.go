@@ -7,14 +7,13 @@ package data
 import (
 	"database/sql"
 	"net/http"
-	"peanut/internal/data/datasource"
 	"peanut/internal/logger"
 )
 
 type MetaDao interface {
 	CreateDBObjects(req *http.Request) error
-	DoesTableExist(tableName string) (bool, error)
-	SelectVersion() (string, error)
+	DoesTableExist(req *http.Request, tableName string) (bool, error)
+	SelectVersion(req *http.Request) (string, error)
 }
 
 type metaDaoImpl struct{}
@@ -41,8 +40,9 @@ func (*metaDaoImpl) CreateDBObjects(req *http.Request) error {
 	return nil
 }
 
-func (*metaDaoImpl) DoesTableExist(tableName string) (bool, error) {
-	sqlh := selectExecutor(datasource.PostgresHandle(), nil)
+func (*metaDaoImpl) DoesTableExist(req *http.Request, tableName string) (bool, error) {
+	sqlh := getSqlExecutorFromRequest(req)
+
 	rows, err := sqlh.Query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = $1", tableName)
 	if err != nil {
 		logger.Warn(nil, "Error querying in data_meta.DoesTableExist:", tableName, err)
@@ -70,9 +70,8 @@ func (*metaDaoImpl) DoesTableExist(tableName string) (bool, error) {
 
 var sqlShowServerVersion = "SHOW server_version;"
 
-func (*metaDaoImpl) SelectVersion() (string, error) {
-	sqlh := selectExecutor(datasource.PostgresHandle(), nil)
-
+func (*metaDaoImpl) SelectVersion(req *http.Request) (string, error) {
+	sqlh := getSqlExecutorFromRequest(req)
 	var version string
 	row := sqlh.QueryRow(sqlShowServerVersion)
 	err := row.Scan(&version)

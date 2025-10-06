@@ -5,12 +5,13 @@
 package service
 
 import (
+	"net/http"
 	"peanut/internal/data"
 )
 
 type DatabaseService interface {
-	DoesTableExist(tableName string) (bool, error)
-	GetPostgresVersion() (string, error)
+	DoesTableExist(req *http.Request, tableName string) (bool, error)
+	GetPostgresVersion(req *http.Request) (string, error)
 }
 
 func NewDatabaseService(metaDao data.MetaDao) DatabaseService {
@@ -21,10 +22,10 @@ type databaseServiceImpl struct {
 	metaDao data.MetaDao
 }
 
-func (this *databaseServiceImpl) DoesTableExist(tableName string) (bool, error) {
-	return this.metaDao.DoesTableExist(tableName)
+func (this *databaseServiceImpl) DoesTableExist(req *http.Request, tableName string) (bool, error) {
+	return this.metaDao.DoesTableExist(req, tableName)
 }
 
-func (this *databaseServiceImpl) GetPostgresVersion() (string, error) {
-	return this.metaDao.SelectVersion()
+func (this *databaseServiceImpl) GetPostgresVersion(req *http.Request) (string, error) {
+	return this.metaDao.SelectVersion(req)
 }

@@ -14,7 +14,7 @@ import (
 func DatabaseInitCheck(dbService service.DatabaseService, setupHandler http.Handler) MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			tableExists, err := dbService.DoesTableExist("config_int")
+			tableExists, err := dbService.DoesTableExist(r, "config_int")
 			if err != nil {
 				logger.Fatal(r, err)
 			}

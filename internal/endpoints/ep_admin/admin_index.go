@@ -37,7 +37,7 @@ func registerAdminIndexHandlers(
 			return
 		}
 
-		dbVersion, err := databaseService.GetPostgresVersion()
+		dbVersion, err := databaseService.GetPostgresVersion(r)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			genericpage.RenderSimpleMessage("Error", "Failed to query postgres version.", w, r)

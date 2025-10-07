@@ -4,6 +4,7 @@
 
 package contextkeys
 
+var CsrfToken = "csrfToken"
 var LoggedIn = "loggedIn"
 var PostgresTx = "postgresTx"
 var RequestId = "requestId"

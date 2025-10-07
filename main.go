@@ -81,10 +81,11 @@ func main() {
 		middleware.RequestId(),
 		middleware.RequestLog(),
 		middleware.RequestTimer(),
+		middleware.SecurityHeaders(),
 		middleware.PostgresTransaction(),
 		middleware.DatabaseInitCheck(dbService, setupMux),
 		middleware.Authentication(groupService, sessionService),
-		middleware.SecurityHeaders(),
+		middleware.CsrfProtection(sessionService),
 	)
 	rootMux.Handle("/", wrappedMiddlewareMux)
 

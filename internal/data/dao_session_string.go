@@ -7,10 +7,20 @@ package data
 import (
 	"net/http"
 	"peanut/internal/logger"
+	"time"
 )
+
+type SessionStringRow struct {
+	SessionId string
+	Name      string
+	Value     string
+	Created   time.Time
+	Updated   time.Time
+}
 
 type SessionStringDao interface {
 	CreateDBObjects(req *http.Request) error
+	SelectRow(req *http.Request, sessionId string, name string) (*SessionStringRow, error)
 	UpsertString(req *http.Request, sessionId string, name string, value string) error
 }
 
@@ -55,6 +65,27 @@ func (*sessionStringDaoImpl) CreateDBObjects(req *http.Request) error {
 	return nil
 }
 
+var sqlSelectSessionString = `
+	SELECT
+		session_id, name, value, _created, _updated
+	FROM
+		session_string
+	WHERE
+	    session_id = $1 AND name = $2;
+`
+
+func (*sessionStringDaoImpl) SelectRow(req *http.Request, sessionId string, name string) (*SessionStringRow, error) {
+	sqlh := getSqlExecutorFromRequest(req)
+	result := &SessionStringRow{}
+	row := sqlh.QueryRow(sqlSelectSessionString, sessionId, name)
+	err := row.Scan(&result.SessionId, &result.Name, &result.Value, &result.Created, &result.Updated)
+	if err != nil {
+		logger.Error(req, "Got error on SessionStringDao/SelectString query:", err)
+		return nil, err
+	}
+	return result, nil
+}
+
 var sqlUpsertSessionStringByName = `
 	INSERT INTO
 		session_string (session_id, name, value)
@@ -68,7 +99,7 @@ func (*sessionStringDaoImpl) UpsertString(req *http.Request, sessionId string, n
 	sqlh := getSqlExecutorFromRequest(req)
 	_, err := sqlh.Exec(sqlUpsertSessionStringByName, sessionId, name, value)
 	if err != nil {
-		logger.Error(req, "Got error on SessionStringDao/UpsertString query: ", err)
+		logger.Error(req, "Got error on SessionStringDao/UpsertString query:", err)
 		return err
 	}
 	return nil

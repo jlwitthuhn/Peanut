@@ -18,7 +18,8 @@ type SessionService interface {
 	CountUsersWithValidSession(req *http.Request) (int64, error)
 	CreateSession(req *http.Request, username string, plainPassword string) (string, error)
 	DestroySession(req *http.Request, sessionId string) error
-	GetLoggedInUserIdBySessionId(r *http.Request, sessionId string) (string, error)
+	GetLoggedInUserIdBySessionId(req *http.Request, sessionId string) (string, error)
+	GetString(req *http.Request, sessionId string, key string) (string, error)
 }
 
 func NewSessionService(sessionDao data.SessionDao, sessionStringDao data.SessionStringDao, userDao data.UserDao) SessionService {
@@ -78,4 +79,12 @@ func (this *sessionServiceImpl) GetLoggedInUserIdBySessionId(req *http.Request, 
 		return "", nil
 	}
 	return sessionRow.UserId, nil
+}
+
+func (this *sessionServiceImpl) GetString(req *http.Request, sessionId string, key string) (string, error) {
+	row, err := this.sessionStringDao.SelectRow(req, sessionId, key)
+	if err != nil {
+		return "", err
+	}
+	return row.Value, nil
 }

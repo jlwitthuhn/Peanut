@@ -9,6 +9,7 @@
 			<input type="text" id="input_username" name="username">
 			<label for="input_password">Password:</label>
 			<input type="password" id="input_password" name="password">
+			<input type="hidden" name="csrf" value="{{ .CsrfToken }}">
 			<input type="submit" value="Log in">
 		</form>
 		<p>or</p>

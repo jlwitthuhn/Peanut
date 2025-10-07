@@ -12,6 +12,7 @@
 				<input type="password" id="admin-pass" name="admin-pass"><br><br>
 				<label for="admin-pass-2">Admin password (repeat):</label><br>
 				<input type="password" id="admin-pass-2" name="admin-pass-2"><br><br>
+				<input type="hidden" name="csrf" value="{{ .CsrfToken }}">
 				<input type="submit" value="Submit">
 			</form>
 		</div>

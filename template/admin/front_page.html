@@ -20,6 +20,7 @@
 					<label for="message_box">Message:</label>
 					<textarea id="message_box" name="message">{{ .WelcomeMessage }}</textarea>
 					<div><input id="confirm_check" type="checkbox" name="confirm"><label for="confirm_check">Confirm</label></div>
+					<input type="hidden" name="csrf" value="{{ .CsrfToken }}">
 					<input id="submit_button" type="submit" value="Update">
 				</div>
 			</form>

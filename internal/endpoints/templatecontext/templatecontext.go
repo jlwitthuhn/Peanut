@@ -16,6 +16,10 @@ func GetStandardTemplateContext(r *http.Request) map[string]any {
 	result := make(map[string]any)
 	result["LoggedIn"] = r.Context().Value(contextkeys.LoggedIn)
 
+	// CSRF
+	result["CsrfToken"] = r.Context().Value(contextkeys.CsrfToken)
+
+	// Permissions
 	permSlice, ok := r.Context().Value(contextkeys.UserPerms).([]string)
 	if ok {
 		for _, perm := range permSlice {

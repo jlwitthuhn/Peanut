@@ -27,13 +27,21 @@ func CsrfProtection(sessionService service.SessionService) MiddlewareFunc {
 				genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to read session id.", w, r)
 				return
 			}
-
 			token, err := sessionService.GetString(r, sessionId, sessionkeys.CsrfToken)
 			if err != nil {
 				genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Database does not contain a valid CSRF token for this session.", w, r)
+				return
 			}
 			ctx := r.Context()
 			ctx = context.WithValue(ctx, contextkeys.CsrfToken, token)
+
+			if r.Method == http.MethodPost {
+				submittedToken := r.PostFormValue("csrf")
+				if submittedToken != token {
+					genericpage.RenderErrorHttp400BadRequestWithMessage("Invalid CSRF token.", w, r)
+					return
+				}
+			}
 
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})

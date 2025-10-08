@@ -4,7 +4,10 @@
 
 package cookie
 
-import "net/http"
+import (
+	"net/http"
+	"strings"
+)
 
 var SessionCookieName = "session"
 
@@ -17,4 +20,31 @@ func CreateSessionCookie(sessionId string) http.Cookie {
 		Secure:   true,
 		SameSite: http.SameSiteLaxMode,
 	}
+}
+
+var unauthenticatedCsrfCookieName = "unauthenticatedCsrf"
+var unauthenticatedCsrfTokenLimit = 5
+
+func CreateUnauthenticatedCsrfCookie(req *http.Request, newToken string) http.Cookie {
+	tokenList := GetUnauthenticatedCsrfTokens(req)
+	tokenList = append([]string{newToken}, tokenList...)
+	outLength := min(len(tokenList), unauthenticatedCsrfTokenLimit)
+	tokenList = tokenList[:outLength]
+	content := strings.Join(tokenList, "|")
+	return http.Cookie{
+		Name:     unauthenticatedCsrfCookieName,
+		Value:    content,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+	}
+}
+
+func GetUnauthenticatedCsrfTokens(req *http.Request) []string {
+	cookies := req.CookiesNamed(unauthenticatedCsrfCookieName)
+	for _, thisCookie := range cookies {
+		return strings.Split(thisCookie.Value, "|")
+	}
+	return []string{}
 }

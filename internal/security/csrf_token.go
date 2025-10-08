@@ -4,6 +4,10 @@
 
 package security
 
+func GenerateCsrfSmallToken() string {
+	return GenerateSecureBase64Token(8)
+}
+
 func GenerateCsrfToken() string {
 	return GenerateSecureBase64Token(16)
 }

@@ -7,8 +7,7 @@ package ep_admin
 import (
 	"net/http"
 	"peanut/internal/data/configkey"
-	"peanut/internal/endpoints/genericpage"
-	"peanut/internal/endpoints/requtil"
+	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/logger"
 	"peanut/internal/middleutil"
@@ -20,14 +19,14 @@ import (
 func registerAdminFrontPageHandlers(mux *http.ServeMux, configService service.ConfigService) {
 	getFrontPageHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if middleutil.RequestHasPermission(r, perms.Admin_FrontPage_Edit) == false {
-			genericpage.RenderErrorHttp403Forbidden(w, r)
+			ep_util.RenderErrorHttp403Forbidden(w, r)
 			return
 		}
 
 		welcomeMessage, err := configService.GetString(r, configkey.StringWelcomeMessage)
 		if err != nil {
 			logger.Error(r, "Error retrieving welcome message:", err)
-			genericpage.RenderErrorHttp500InternalServerError(w, r)
+			ep_util.RenderErrorHttp500InternalServerError(w, r)
 			return
 		}
 
@@ -37,7 +36,7 @@ func registerAdminFrontPageHandlers(mux *http.ServeMux, configService service.Co
 		err = theTemplate.Execute(w, templateCtx)
 		if err != nil {
 			logger.Error(r, "Error executing template:", err)
-			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to execute template.", w, r)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to execute template.", w, r)
 			return
 		}
 	})
@@ -45,7 +44,7 @@ func registerAdminFrontPageHandlers(mux *http.ServeMux, configService service.Co
 
 	postFrontPageWelcomeMessageHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if middleutil.RequestHasPermission(r, perms.Admin_FrontPage_Edit) == false {
-			genericpage.RenderErrorHttp403Forbidden(w, r)
+			ep_util.RenderErrorHttp403Forbidden(w, r)
 			return
 		}
 
@@ -53,23 +52,23 @@ func registerAdminFrontPageHandlers(mux *http.ServeMux, configService service.Co
 		confirm := r.PostFormValue("confirm")
 
 		if confirm != "on" {
-			genericpage.RenderErrorHttp400BadRequestWithMessage("You must check the 'Confirm' box to set the welcome message.", w, r)
+			ep_util.RenderErrorHttp400BadRequestWithMessage("You must check the 'Confirm' box to set the welcome message.", w, r)
 			return
 		}
 
 		err := configService.SetString(r, configkey.StringWelcomeMessage, newMessage)
 		if err != nil {
-			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to set new welcome message.", w, r)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to set new welcome message.", w, r)
 			return
 		}
 
-		err = requtil.CommitTransactionForRequest(r)
+		err = ep_util.CommitTransactionForRequest(r)
 		if err != nil {
-			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to commit transaction.", w, r)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to commit transaction.", w, r)
 			return
 		}
 
-		genericpage.RenderSimpleMessage("Success", "New welcome message has been set: "+newMessage, w, r)
+		ep_util.RenderSimpleMessage("Success", "New welcome message has been set: "+newMessage, w, r)
 	})
 	mux.Handle("POST /admin/front_page/welcome_message", postFrontPageWelcomeMessageHandler)
 }

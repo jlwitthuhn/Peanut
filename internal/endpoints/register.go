@@ -6,8 +6,7 @@ package endpoints
 
 import (
 	"net/http"
-	"peanut/internal/endpoints/genericpage"
-	"peanut/internal/endpoints/requtil"
+	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/logger"
 	"peanut/internal/security/perms/permgroups"
@@ -34,40 +33,40 @@ func RegisterRegisterHandlers(mux *http.ServeMux, groupService service.GroupServ
 		password2 := r.PostFormValue("password2")
 
 		if err := validator.ValidateUsername(username); err != nil {
-			genericpage.RenderErrorHttp400BadRequestWithMessage("Username is not valid: "+err.Error(), w, r)
+			ep_util.RenderErrorHttp400BadRequestWithMessage("Username is not valid: "+err.Error(), w, r)
 			return
 		}
 		if err := validator.ValidateEmail(email); err != nil {
-			genericpage.RenderErrorHttp400BadRequestWithMessage("Email is not valid: "+err.Error(), w, r)
+			ep_util.RenderErrorHttp400BadRequestWithMessage("Email is not valid: "+err.Error(), w, r)
 			return
 		}
 		if password != password2 {
-			genericpage.RenderErrorHttp400BadRequestWithMessage("Passwords must match.", w, r)
+			ep_util.RenderErrorHttp400BadRequestWithMessage("Passwords must match.", w, r)
 			return
 		}
 		if err := validator.ValidatePassword(password); err != nil {
-			genericpage.RenderErrorHttp400BadRequestWithMessage("Password is not valid: "+err.Error(), w, r)
+			ep_util.RenderErrorHttp400BadRequestWithMessage("Password is not valid: "+err.Error(), w, r)
 			return
 		}
 
 		userId, err := userService.CreateUser(r, username, email, password)
 		if err != nil {
-			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to create user.", w, r)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to create user.", w, r)
 			return
 		}
 		err = groupService.EnrollUserInGroup(r, userId, permgroups.User)
 		if err != nil {
-			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to add new user to default group.", w, r)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to add new user to default group.", w, r)
 			return
 		}
 
-		err = requtil.CommitTransactionForRequest(r)
+		err = ep_util.CommitTransactionForRequest(r)
 		if err != nil {
-			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to commit transaction.", w, r)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to commit transaction.", w, r)
 			return
 		}
 
-		genericpage.RenderSimpleMessage("Success", "New user has been successfully registered.", w, r)
+		ep_util.RenderSimpleMessage("Success", "New user has been successfully registered.", w, r)
 		logger.Info(r, "Registered user:", userId)
 	})
 	mux.Handle("POST /register", postRegisterHandler)

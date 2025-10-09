@@ -7,7 +7,7 @@ package ep_admin
 import (
 	"net/http"
 	"peanut/internal/data/configkey"
-	"peanut/internal/endpoints/genericpage"
+	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/logger"
 	"peanut/internal/service"
@@ -32,25 +32,25 @@ func registerAdminIndexHandlers(
 	getIndexHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		initTime, err := configService.GetInt(r, configkey.IntInitializedTime)
 		if err != nil {
-			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query init time.", w, r)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query init time.", w, r)
 			return
 		}
 
 		dbVersion, err := databaseService.GetPostgresVersion(r)
 		if err != nil {
-			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query postgres version.", w, r)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query postgres version.", w, r)
 			return
 		}
 
 		userCount, err := userService.CountUsers(r)
 		if err != nil {
-			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query user count.", w, r)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query user count.", w, r)
 			return
 		}
 
 		userSessionCount, err := sessionService.CountUsersWithValidSession(r)
 		if err != nil {
-			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query user session count.", w, r)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query user session count.", w, r)
 			return
 		}
 

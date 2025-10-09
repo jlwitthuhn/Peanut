@@ -6,7 +6,7 @@ package ep_admin
 
 import (
 	"net/http"
-	"peanut/internal/endpoints/genericpage"
+	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/logger"
 	"peanut/internal/service"
@@ -17,7 +17,7 @@ func registerAdminUsersHandlers(mux *http.ServeMux, groupService service.GroupSe
 	getHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		groupList, err := groupService.GetAllGroupNames(r)
 		if err != nil {
-			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query group names.", w, r)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query group names.", w, r)
 			return
 		}
 
@@ -28,7 +28,7 @@ func registerAdminUsersHandlers(mux *http.ServeMux, groupService service.GroupSe
 		err = theTemplate.Execute(w, templateCtx)
 		if err != nil {
 			logger.Error(r, "Error executing template:", err)
-			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to execute template.", w, r)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to execute template.", w, r)
 			return
 		}
 	})

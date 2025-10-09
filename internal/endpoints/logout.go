@@ -7,8 +7,7 @@ package endpoints
 import (
 	"net/http"
 	"peanut/internal/cookie"
-	"peanut/internal/endpoints/genericpage"
-	"peanut/internal/endpoints/requtil"
+	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/keynames/contextkeys"
 	"peanut/internal/logger"
 	"peanut/internal/service"
@@ -20,7 +19,7 @@ func RegisterLogoutHandlers(mux *http.ServeMux, sessionService service.SessionSe
 		sessionIdString, ok := sessionId.(string)
 		if ok == false {
 			logger.Error(r, "'sessionId' is not a string while logging out.")
-			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Unable to log out: failed to read session id.", w, r)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Unable to log out: failed to read session id.", w, r)
 			return
 		}
 		err := sessionService.DestroySession(r, sessionIdString)
@@ -28,15 +27,15 @@ func RegisterLogoutHandlers(mux *http.ServeMux, sessionService service.SessionSe
 			logger.Warn(r, "Failed to delete session, proceeding anyways.")
 		}
 
-		err = requtil.CommitTransactionForRequest(r)
+		err = ep_util.CommitTransactionForRequest(r)
 		if err != nil {
-			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to commit transaction.", w, r)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to commit transaction.", w, r)
 			return
 		}
 
 		emptyCookie := cookie.CreateSessionCookie("There was a session id here. It is gone now.")
 		http.SetCookie(w, &emptyCookie)
-		genericpage.RenderSimpleMessage("Success", "You have been logged out.", w, r)
+		ep_util.RenderSimpleMessage("Success", "You have been logged out.", w, r)
 	})
 	mux.Handle("POST /logout", postLogoutHandler)
 }

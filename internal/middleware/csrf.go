@@ -8,7 +8,7 @@ import (
 	"context"
 	"net/http"
 	"peanut/internal/cookie"
-	"peanut/internal/endpoints/genericpage"
+	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/keynames/contextkeys"
 	"peanut/internal/keynames/sessionkeys"
 	"peanut/internal/security"
@@ -21,7 +21,7 @@ func CsrfProtection(sessionService service.SessionService) MiddlewareFunc {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			loggedIn, ok := r.Context().Value(contextkeys.LoggedIn).(bool)
 			if !ok {
-				genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to read logged in status.", w, r)
+				ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to read logged in status.", w, r)
 				return
 			}
 
@@ -29,12 +29,12 @@ func CsrfProtection(sessionService service.SessionService) MiddlewareFunc {
 			if loggedIn {
 				sessionId, ok := r.Context().Value(contextkeys.SessionId).(string)
 				if !ok {
-					genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to read session id.", w, r)
+					ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to read session id.", w, r)
 					return
 				}
 				token, err := sessionService.GetString(r, sessionId, sessionkeys.CsrfToken)
 				if err != nil {
-					genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Database does not contain a valid CSRF token for this session.", w, r)
+					ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Database does not contain a valid CSRF token for this session.", w, r)
 					return
 				}
 				ctx = context.WithValue(ctx, contextkeys.CsrfToken, token)
@@ -42,21 +42,21 @@ func CsrfProtection(sessionService service.SessionService) MiddlewareFunc {
 				if r.Method == http.MethodPost {
 					submittedToken := r.PostFormValue("csrf")
 					if submittedToken != token {
-						genericpage.RenderErrorHttp400BadRequestWithMessage("Invalid CSRF token.", w, r)
+						ep_util.RenderErrorHttp400BadRequestWithMessage("Invalid CSRF token.", w, r)
 						return
 					}
 				}
 			} else {
 				existingTokens := cookie.GetUnauthenticatedCsrfTokens(r)
 				if len(existingTokens) == 1 && len(existingTokens[0]) == 0 {
-					genericpage.RenderErrorHttp400BadRequestWithMessage("No valid CSRF token in cookies.", w, r)
+					ep_util.RenderErrorHttp400BadRequestWithMessage("No valid CSRF token in cookies.", w, r)
 					return
 				}
 
 				if r.Method == http.MethodPost {
 					submittedToken := r.PostFormValue("csrf")
 					if !slices.Contains(existingTokens, submittedToken) {
-						genericpage.RenderErrorHttp400BadRequestWithMessage("Invalid CSRF token.", w, r)
+						ep_util.RenderErrorHttp400BadRequestWithMessage("Invalid CSRF token.", w, r)
 						return
 					}
 				}

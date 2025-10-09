@@ -8,7 +8,7 @@ import (
 	"context"
 	"net/http"
 	"peanut/internal/data/datasource"
-	"peanut/internal/endpoints/genericpage"
+	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/keynames/contextkeys"
 )
 
@@ -17,7 +17,7 @@ func PostgresTransaction() MiddlewareFunc {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			tx, err := datasource.PostgresHandle().BeginTx(r.Context(), nil)
 			if err != nil {
-				genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to create database transaction.", w, r)
+				ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to create database transaction.", w, r)
 				return
 			}
 			defer tx.Rollback()

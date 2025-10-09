@@ -6,8 +6,7 @@ package endpoints
 
 import (
 	"net/http"
-	"peanut/internal/endpoints/genericpage"
-	"peanut/internal/endpoints/requtil"
+	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/logger"
 	"peanut/internal/service"
@@ -30,12 +29,12 @@ func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService
 	postSetupHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		configTableExists, configTableErr := dbService.DoesTableExist(r, "config_int")
 		if configTableErr != nil {
-			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query data.", w, r)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query data.", w, r)
 			return
 		}
 		if configTableExists {
 			w.WriteHeader(http.StatusConflict)
-			genericpage.RenderSimpleMessage("Error", "Database has already been initialized.", w, r)
+			ep_util.RenderSimpleMessage("Error", "Database has already been initialized.", w, r)
 			return
 		}
 
@@ -45,19 +44,19 @@ func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService
 		adminPassword2 := r.PostFormValue("admin-pass-2")
 
 		if err := validator.ValidateUsername(adminName); err != nil {
-			genericpage.RenderErrorHttp400BadRequestWithMessage("Username is not valid: "+err.Error(), w, r)
+			ep_util.RenderErrorHttp400BadRequestWithMessage("Username is not valid: "+err.Error(), w, r)
 			return
 		}
 		if err := validator.ValidateEmail(email); err != nil {
-			genericpage.RenderErrorHttp400BadRequestWithMessage("Email is not valid: "+err.Error(), w, r)
+			ep_util.RenderErrorHttp400BadRequestWithMessage("Email is not valid: "+err.Error(), w, r)
 			return
 		}
 		if adminPassword != adminPassword2 {
-			genericpage.RenderErrorHttp400BadRequestWithMessage("Passwords must match.", w, r)
+			ep_util.RenderErrorHttp400BadRequestWithMessage("Passwords must match.", w, r)
 			return
 		}
 		if err := validator.ValidatePassword(adminPassword); err != nil {
-			genericpage.RenderErrorHttp400BadRequestWithMessage("Password is not valid: "+err.Error(), w, r)
+			ep_util.RenderErrorHttp400BadRequestWithMessage("Password is not valid: "+err.Error(), w, r)
 			return
 		}
 
@@ -65,20 +64,20 @@ func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService
 		err := setupService.InitializeDatabase(r, adminName, email, adminPassword)
 		if err != nil {
 			logger.Error(r, "Error initializing database:", err)
-			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to initialize database.", w, r)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to initialize database.", w, r)
 			return
 		}
 
 		logger.Info(r, "Committing transaction...")
 
-		err = requtil.CommitTransactionForRequest(r)
+		err = ep_util.CommitTransactionForRequest(r)
 		if err != nil {
-			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to commit transaction.", w, r)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to commit transaction.", w, r)
 			return
 		}
 
 		logger.Info(r, "Peanut initialization complete.")
-		genericpage.RenderSimpleMessage("Complete", "Peanut has been initialized.", w, r)
+		ep_util.RenderSimpleMessage("Complete", "Peanut has been initialized.", w, r)
 	})
 	mux.Handle("POST /setup", postSetupHandler)
 }

@@ -8,8 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"peanut/internal/cookie"
-	"peanut/internal/endpoints/genericpage"
-	"peanut/internal/endpoints/requtil"
+	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/keynames/contextkeys"
 	"peanut/internal/logger"
@@ -45,19 +44,19 @@ func RegisterLoginHandlers(mux *http.ServeMux, sessionService service.SessionSer
 		if err != nil {
 			logger.Error(r, "Error creating session:", err)
 			errMsg := fmt.Sprint("Error logging in: ", err)
-			genericpage.RenderErrorHttp400BadRequestWithMessage(errMsg, w, r)
+			ep_util.RenderErrorHttp400BadRequestWithMessage(errMsg, w, r)
 			return
 		}
 
-		err = requtil.CommitTransactionForRequest(r)
+		err = ep_util.CommitTransactionForRequest(r)
 		if err != nil {
-			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to commit transaction.", w, r)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to commit transaction.", w, r)
 			return
 		}
 
 		sesssionCookie := cookie.CreateSessionCookie(sessionId)
 		http.SetCookie(w, &sesssionCookie)
-		genericpage.RenderSimpleMessage("Success", "You have logged in.", w, r)
+		ep_util.RenderSimpleMessage("Success", "You have logged in.", w, r)
 	})
 	mux.Handle("POST /login", postLoginHandler)
 }

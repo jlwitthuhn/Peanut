@@ -6,7 +6,7 @@ package middleware
 
 import (
 	"net/http"
-	"peanut/internal/endpoints/genericpage"
+	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/logger"
 	"peanut/internal/service"
 )
@@ -24,7 +24,7 @@ func DatabaseInitCheck(dbService service.DatabaseService, setupHandler http.Hand
 					setupHandler.ServeHTTP(w, r)
 				} else {
 					w.WriteHeader(http.StatusNotFound)
-					genericpage.RenderSimpleMessage("Database Not Initialized", "The data must be configured before Peanut can be used.", w, r)
+					ep_util.RenderSimpleMessage("Database Not Initialized", "The data must be configured before Peanut can be used.", w, r)
 				}
 				return
 			}

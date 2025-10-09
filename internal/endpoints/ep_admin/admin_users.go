@@ -4,11 +4,33 @@
 
 package ep_admin
 
-import "net/http"
+import (
+	"net/http"
+	"peanut/internal/endpoints/genericpage"
+	"peanut/internal/endpoints/templatecontext"
+	"peanut/internal/logger"
+	"peanut/internal/service"
+	"peanut/internal/template"
+)
 
-func registerAdminUsersHandlers(mux *http.ServeMux) {
+func registerAdminUsersHandlers(mux *http.ServeMux, groupService service.GroupService) {
 	getHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		RenderSimpleAdminMessage("Users", "View and edit user information here.", w, r)
+		groupList, err := groupService.GetAllGroupNames(r)
+		if err != nil {
+			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query group names.", w, r)
+			return
+		}
+
+		templateCtx := templatecontext.GetStandardTemplateContext(r)
+		templateCtx["Groups"] = groupList
+
+		theTemplate := template.GetTemplate("_admin/users")
+		err = theTemplate.Execute(w, templateCtx)
+		if err != nil {
+			logger.Error(r, "Error executing template:", err)
+			genericpage.RenderErrorHttp500InternalServerErrorWithMessage("Failed to execute template.", w, r)
+			return
+		}
 	})
 	mux.Handle("GET /admin/users", getHandler)
 }

@@ -19,6 +19,7 @@ type GroupRow struct {
 type GroupDao interface {
 	CreateDBObjects(req *http.Request) error
 	InsertRow(req *http.Request, name string, desc string, systemOwned bool) error
+	SelectRowAll(req *http.Request) ([]GroupRow, error)
 	SelectRowByName(req *http.Request, name string) (*GroupRow, error)
 }
 
@@ -73,6 +74,27 @@ func (*groupDaoImpl) InsertRow(req *http.Request, name string, desc string, syst
 		return err
 	}
 	return nil
+}
+
+var sqlSelectGroupsRowAll = "SELECT id, name, description, system_owned FROM groups ORDER BY name"
+
+func (*groupDaoImpl) SelectRowAll(req *http.Request) ([]GroupRow, error) {
+	sqlh := getSqlExecutorFromRequest(req)
+	rows, err := sqlh.Query(sqlSelectGroupsRowAll)
+	if err != nil {
+		logger.Error(nil, "Got error on GroupDao/SelectRowAll query: ", err)
+		return nil, err
+	}
+	var result []GroupRow
+	for rows.Next() {
+		thisRow := GroupRow{}
+		scanErr := rows.Scan(&thisRow.Id, &thisRow.Name, &thisRow.Description, &thisRow.SystemOwned)
+		if scanErr != nil {
+			return nil, scanErr
+		}
+		result = append(result, thisRow)
+	}
+	return result, nil
 }
 
 var sqlSelectGroupsRowByName = "SELECT id, name, description, system_owned FROM groups WHERE name = $1"

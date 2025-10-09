@@ -14,12 +14,19 @@ import (
 	"peanut/internal/template"
 )
 
-func RegisterAdminHandlers(mux *http.ServeMux, configService service.ConfigService, databaseService service.DatabaseService, sessionService service.SessionService, userService service.UserService) {
+func RegisterAdminHandlers(
+	mux *http.ServeMux,
+	configService service.ConfigService,
+	databaseService service.DatabaseService,
+	groupService service.GroupService,
+	sessionService service.SessionService,
+	userService service.UserService,
+) {
 	adminMux := http.NewServeMux()
 	registerAdminIndexHandlers(adminMux, configService, databaseService, sessionService, userService)
 	registerAdminFrontPageHandlers(adminMux, configService)
 	registerAdminGroupsHandlers(adminMux)
-	registerAdminUsersHandlers(adminMux)
+	registerAdminUsersHandlers(adminMux, groupService)
 
 	wrappedAdminMux := middleware.WrapHandler(adminMux, middleware.CheckPermissions(perms.Admin_Gui_View))
 

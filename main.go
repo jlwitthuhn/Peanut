@@ -72,7 +72,7 @@ func main() {
 	endpoints.RegisterSetupHandlers(setupMux, dbService, setupService)
 
 	logger.Info(nil, "Registering routes...")
-	ep_admin.RegisterAdminHandlers(middlewareMux, configService, dbService, sessionService, userService)
+	ep_admin.RegisterAdminHandlers(middlewareMux, configService, dbService, groupService, sessionService, userService)
 	endpoints.RegisterIndexHandlers(middlewareMux, configService)
 	endpoints.RegisterLoginHandlers(middlewareMux, sessionService)
 	endpoints.RegisterLogoutHandlers(middlewareMux, sessionService)

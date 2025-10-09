@@ -1,0 +1,36 @@
+{{ define "admin_content" }}
+<div class="vertical-flex-container">
+	<div class="simple-panel">
+		<div class="simple-panel-header"><h1>List Users</h1></div>
+		<div class="simple-panel-content">
+			<div class="simple-column simple-center-60">
+				<p><a href="/admin/users/list/all">List all users</a></p>
+				<hr class="fullwidth">
+				<div class="simple-form">
+					<br>
+					<form action="/admin/users/list" method="post">
+						<label for="input_pattern">Display name (% for wildcard):</label>
+						<input type="text" id="input_pattern" name="pattern">
+						<input type="hidden" name="csrf" value="{{ .CsrfToken }}">
+						<input type="submit" value="Search by username">
+					</form>
+				</div>
+				<hr class="fullwidth">
+				<div class="simple-form">
+					<br>
+					<form action="/admin/users/list" method="post">
+						<label for="group_name_in">Group name:</label>
+						<select id="group_name_in" name="groupName">
+							{{ range $group := .Groups }}
+								<option value="{{ $group }}">{{ $group }}</option>
+							{{ end }}
+						</select>
+						<input type="hidden" name="csrf" value="{{ .CsrfToken  }}">
+						<input type="submit" value="List by group">
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{{ end }}

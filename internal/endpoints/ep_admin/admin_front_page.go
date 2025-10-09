@@ -13,7 +13,6 @@ import (
 	"peanut/internal/middleutil"
 	"peanut/internal/security/perms"
 	"peanut/internal/service"
-	"peanut/internal/template"
 )
 
 func registerAdminFrontPageHandlers(mux *http.ServeMux, configService service.ConfigService) {
@@ -32,13 +31,7 @@ func registerAdminFrontPageHandlers(mux *http.ServeMux, configService service.Co
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["WelcomeMessage"] = welcomeMessage
-		theTemplate := template.GetTemplate("_admin/front_page")
-		err = theTemplate.Execute(w, templateCtx)
-		if err != nil {
-			logger.Error(r, "Error executing template:", err)
-			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to execute template.", w, r)
-			return
-		}
+		ep_util.RenderTemplate("_admin/front_page", templateCtx, w, r)
 	})
 	mux.Handle("GET /admin/front_page", getFrontPageHandler)
 

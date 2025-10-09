@@ -8,9 +8,7 @@ import (
 	"net/http"
 	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
-	"peanut/internal/logger"
 	"peanut/internal/service"
-	"peanut/internal/template"
 )
 
 func registerAdminUsersHandlers(mux *http.ServeMux, groupService service.GroupService) {
@@ -23,14 +21,7 @@ func registerAdminUsersHandlers(mux *http.ServeMux, groupService service.GroupSe
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["Groups"] = groupList
-
-		theTemplate := template.GetTemplate("_admin/users")
-		err = theTemplate.Execute(w, templateCtx)
-		if err != nil {
-			logger.Error(r, "Error executing template:", err)
-			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to execute template.", w, r)
-			return
-		}
+		ep_util.RenderTemplate("_admin/users", templateCtx, w, r)
 	})
 	mux.Handle("GET /admin/users", getHandler)
 }

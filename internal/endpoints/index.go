@@ -7,10 +7,10 @@ package endpoints
 import (
 	"net/http"
 	"peanut/internal/data/configkey"
+	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/logger"
 	"peanut/internal/service"
-	"peanut/internal/template"
 )
 
 func RegisterIndexHandlers(mux *http.ServeMux, configService service.ConfigService) {
@@ -24,11 +24,7 @@ func RegisterIndexHandlers(mux *http.ServeMux, configService service.ConfigServi
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["WelcomeMessage"] = welcomeMessage
-		theTemplate := template.GetTemplate("_index")
-		err = theTemplate.Execute(w, templateCtx)
-		if err != nil {
-			logger.Error(r, "Error executing template:", err)
-		}
+		ep_util.RenderTemplate("_index", templateCtx, w, r)
 	})
 	mux.Handle("GET /{$}", getIndexHandler)
 }

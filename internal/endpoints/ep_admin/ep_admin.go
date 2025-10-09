@@ -6,12 +6,11 @@ package ep_admin
 
 import (
 	"net/http"
+	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
-	"peanut/internal/logger"
 	"peanut/internal/middleware"
 	"peanut/internal/security/perms"
 	"peanut/internal/service"
-	"peanut/internal/template"
 )
 
 func RegisterAdminHandlers(
@@ -38,10 +37,5 @@ func RenderSimpleAdminMessage(title string, message string, w http.ResponseWrite
 	templateCtx := templatecontext.GetStandardTemplateContext(r)
 	templateCtx["MessageBody"] = message
 	templateCtx["MessageTitle"] = title
-
-	theTemplate := template.GetTemplate("_admin/simple_message")
-	err := theTemplate.Execute(w, templateCtx)
-	if err != nil {
-		logger.Error(r, "Error executing simple message template:", err)
-	}
+	ep_util.RenderTemplate("_admin/simple_message", templateCtx, w, r)
 }

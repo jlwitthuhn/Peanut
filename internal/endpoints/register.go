@@ -11,18 +11,13 @@ import (
 	"peanut/internal/logger"
 	"peanut/internal/security/perms/permgroups"
 	"peanut/internal/service"
-	"peanut/internal/template"
 	"peanut/internal/validator"
 )
 
 func RegisterRegisterHandlers(mux *http.ServeMux, groupService service.GroupService, userService service.UserService) {
 	getRegisterHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
-		theTemplate := template.GetTemplate("_register")
-		err := theTemplate.Execute(w, templateCtx)
-		if err != nil {
-			logger.Error(r, "Error executing template:", err)
-		}
+		ep_util.RenderTemplate("_register", templateCtx, w, r)
 	})
 	mux.Handle("GET /register", getRegisterHandler)
 

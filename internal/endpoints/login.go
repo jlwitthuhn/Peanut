@@ -13,7 +13,6 @@ import (
 	"peanut/internal/keynames/contextkeys"
 	"peanut/internal/logger"
 	"peanut/internal/service"
-	"peanut/internal/template"
 )
 
 func RegisterLoginHandlers(mux *http.ServeMux, sessionService service.SessionService) {
@@ -24,11 +23,7 @@ func RegisterLoginHandlers(mux *http.ServeMux, sessionService service.SessionSer
 		}
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
-		theTemplate := template.GetTemplate("_login")
-		err := theTemplate.Execute(w, templateCtx)
-		if err != nil {
-			logger.Error(r, "Error executing template:", err)
-		}
+		ep_util.RenderTemplate("_login", templateCtx, w, r)
 	})
 	mux.Handle("GET /login", getLoginHandler)
 

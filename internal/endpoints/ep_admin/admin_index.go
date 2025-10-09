@@ -9,9 +9,7 @@ import (
 	"peanut/internal/data/configkey"
 	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
-	"peanut/internal/logger"
 	"peanut/internal/service"
-	"peanut/internal/template"
 	"runtime"
 	"strconv"
 	"time"
@@ -71,11 +69,7 @@ func registerAdminIndexHandlers(
 		templateCtx["WebsiteInfo"] = websiteInfo
 		templateCtx["EnvironmentInfo"] = envInfo
 
-		theTemplate := template.GetTemplate("_admin/index")
-		err = theTemplate.Execute(w, templateCtx)
-		if err != nil {
-			logger.Error(r, "Error executing template:", err)
-		}
+		ep_util.RenderTemplate("_admin/index", templateCtx, w, r)
 	})
 	mux.Handle("GET /admin", getIndexHandler)
 }

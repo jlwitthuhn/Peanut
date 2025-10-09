@@ -7,8 +7,6 @@ package ep_util
 import (
 	"net/http"
 	"peanut/internal/endpoints/templatecontext"
-	"peanut/internal/logger"
-	"peanut/internal/template"
 )
 
 func RenderErrorHttp400BadRequestWithMessage(message string, w http.ResponseWriter, r *http.Request) {
@@ -34,10 +32,5 @@ func RenderSimpleMessage(title string, message string, w http.ResponseWriter, r 
 	templateCtx := templatecontext.GetStandardTemplateContext(r)
 	templateCtx["MessageBody"] = message
 	templateCtx["MessageTitle"] = title
-
-	theTemplate := template.GetTemplate("_simple_message")
-	err := theTemplate.Execute(w, templateCtx)
-	if err != nil {
-		logger.Error(r, "Error executing simple message template:", err)
-	}
+	RenderTemplate("_simple_message", templateCtx, w, r)
 }

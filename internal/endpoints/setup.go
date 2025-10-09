@@ -10,7 +10,6 @@ import (
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/logger"
 	"peanut/internal/service"
-	"peanut/internal/template"
 	"peanut/internal/validator"
 )
 
@@ -18,11 +17,7 @@ func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService
 
 	getSetupHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
-		theTemplate := template.GetTemplate("_setup")
-		err := theTemplate.Execute(w, templateCtx)
-		if err != nil {
-			logger.Error(r, "Error executing setup template:", err)
-		}
+		ep_util.RenderTemplate("_setup", templateCtx, w, r)
 	})
 	mux.Handle("GET /setup", getSetupHandler)
 

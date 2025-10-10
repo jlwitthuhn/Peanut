@@ -7,8 +7,6 @@ package template
 import (
 	"html/template"
 	"io/fs"
-	"log"
-
 	"peanut/internal/logger"
 )
 
@@ -34,6 +32,9 @@ func LoadTemplates(fs fs.FS) {
 	adminUsersFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/users.html"}
 	loadTemplateOrDie(fs, "_admin/users", adminUsersFiles...)
 
+	adminUsersListFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/users_list.html"}
+	loadTemplateOrDie(fs, "_admin/users_list", adminUsersListFiles...)
+
 	indexFiles := []string{"base.html", "css/common.css", "index.html"}
 	loadTemplateOrDie(fs, "_index", indexFiles...)
 
@@ -57,7 +58,7 @@ func loadTemplateOrDie(fs fs.FS, name string, files ...string) {
 	}
 	theTemplate, err := template.ParseFS(fs, files...)
 	if err != nil {
-		log.Fatal("Error parsing template: ", err)
+		logger.Fatal(nil, "Error parsing template: ", err)
 	}
 	templatesByName[name] = theTemplate
 	logger.Trace(nil, "Template loaded: "+name)

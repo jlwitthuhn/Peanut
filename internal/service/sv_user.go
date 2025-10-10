@@ -14,6 +14,7 @@ import (
 type UserService interface {
 	CountUsers(req *http.Request) (int64, error)
 	CreateUser(req *http.Request, name string, email string, plainPassword string) (string, error)
+	GetAllUserRows(req *http.Request) ([]data.UserRow, error)
 	IsEmailTaken(req *http.Request, email string) (bool, error)
 	IsNameTaken(req *http.Request, username string) (bool, error)
 }
@@ -55,6 +56,10 @@ func (this *userServiceImpl) CreateUser(req *http.Request, name string, email st
 	}
 
 	return newId, nil
+}
+
+func (this *userServiceImpl) GetAllUserRows(req *http.Request) ([]data.UserRow, error) {
+	return this.userDao.SelectRowAll(req)
 }
 
 func (this *userServiceImpl) IsEmailTaken(req *http.Request, email string) (bool, error) {

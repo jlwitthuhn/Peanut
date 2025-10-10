@@ -11,7 +11,7 @@ import (
 	"peanut/internal/service"
 )
 
-func registerAdminUsersHandlers(mux *http.ServeMux, groupService service.GroupService) {
+func registerAdminUsersHandlers(mux *http.ServeMux, groupService service.GroupService, userService service.UserService) {
 	getHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		groupList, err := groupService.GetAllGroupNames(r)
 		if err != nil {
@@ -24,4 +24,22 @@ func registerAdminUsersHandlers(mux *http.ServeMux, groupService service.GroupSe
 		ep_util.RenderTemplate("_admin/users", templateCtx, w, r)
 	})
 	mux.Handle("GET /admin/users", getHandler)
+
+	getListAllHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userRows, err := userService.GetAllUserRows(r)
+		if err != nil {
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query user display names.", w, r)
+			return
+		}
+
+		// Truncate IDs so they don't take up the whole width of the page
+		for i := range userRows {
+			userRows[i].Id = userRows[i].Id[:13] + "..."
+		}
+
+		templateCtx := templatecontext.GetStandardTemplateContext(r)
+		templateCtx["Users"] = userRows
+		ep_util.RenderTemplate("_admin/users_list", templateCtx, w, r)
+	})
+	mux.Handle("GET /admin/users/list/all", getListAllHandler)
 }

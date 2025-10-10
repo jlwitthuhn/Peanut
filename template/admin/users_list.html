@@ -1,0 +1,23 @@
+{{ define "admin_content" }}
+<div class="vertical-flex-container">
+	<div class="simple-panel">
+		<div class="simple-panel-header"><h1>List Users</h1></div>
+		<div class="simple-panel-content horizontal-space-evenly">
+			<table>
+				<tr>
+					<th>ID</th>
+					<th>Username</th>
+					<th>Created</th>
+				</tr>
+				{{ range $user := .Users }}
+					<tr>
+						<td>{{ $user.Id }}</td>
+						<td>{{ $user.DisplayName }}</a></td>
+						<td>{{ $user.Created }}</td>
+					</tr>
+				{{ end }}
+			</table>
+		</div>
+	</div>
+</div>
+{{ end }}

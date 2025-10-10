@@ -7,6 +7,7 @@ package data
 import (
 	"net/http"
 	"peanut/internal/logger"
+	"time"
 )
 
 type UserRow struct {
@@ -14,6 +15,8 @@ type UserRow struct {
 	DisplayName string
 	Email       string
 	Password    string
+	Created     time.Time
+	Updated     time.Time
 }
 
 type UserDao interface {
@@ -22,6 +25,7 @@ type UserDao interface {
 	CountRowsByEmail(req *http.Request, name string) (int64, error)
 	CountRowsByName(req *http.Request, name string) (int64, error)
 	InsertRow(req *http.Request, name string, email string, hashedPassword string) (string, error)
+	SelectRowAll(req *http.Request) ([]UserRow, error)
 	SelectRowByName(req *http.Request, name string) (*UserRow, error)
 }
 
@@ -122,13 +126,34 @@ func (*userDaoImpl) InsertRow(req *http.Request, name string, email string, hash
 	return newId, nil
 }
 
-var sqlSelectUsersRowByName = "SELECT id, display_name, email, password FROM users WHERE display_name = $1"
+var sqlSelectUsersRowAll = "SELECT id, display_name, email, password, _created, _updated FROM users ORDER BY _created"
+
+func (*userDaoImpl) SelectRowAll(req *http.Request) ([]UserRow, error) {
+	sqlh := getSqlExecutorFromRequest(req)
+	rows, err := sqlh.Query(sqlSelectUsersRowAll)
+	if err != nil {
+		logger.Error(nil, "Got error on UserDao/SelectRowAll query: ", err)
+		return nil, err
+	}
+	var result []UserRow
+	for rows.Next() {
+		thisRow := UserRow{}
+		err = rows.Scan(&thisRow.Id, &thisRow.DisplayName, &thisRow.Email, &thisRow.Password, &thisRow.Created, &thisRow.Updated)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, thisRow)
+	}
+	return result, nil
+}
+
+var sqlSelectUsersRowByName = "SELECT id, display_name, email, password, _created, _updated FROM users WHERE display_name = $1"
 
 func (*userDaoImpl) SelectRowByName(req *http.Request, name string) (*UserRow, error) {
 	sqlh := getSqlExecutorFromRequest(req)
 	result := &UserRow{}
 	row := sqlh.QueryRow(sqlSelectUsersRowByName, name)
-	err := row.Scan(&result.Id, &result.DisplayName, &result.Email, &result.Password)
+	err := row.Scan(&result.Id, &result.DisplayName, &result.Email, &result.Password, &result.Created, &result.Updated)
 	if err != nil {
 		logger.Error(nil, "Got error on UserDao/SelectRowByName query: ", err)
 		return nil, err

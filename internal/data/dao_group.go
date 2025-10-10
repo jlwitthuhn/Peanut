@@ -88,9 +88,9 @@ func (*groupDaoImpl) SelectRowAll(req *http.Request) ([]GroupRow, error) {
 	var result []GroupRow
 	for rows.Next() {
 		thisRow := GroupRow{}
-		scanErr := rows.Scan(&thisRow.Id, &thisRow.Name, &thisRow.Description, &thisRow.SystemOwned)
-		if scanErr != nil {
-			return nil, scanErr
+		err = rows.Scan(&thisRow.Id, &thisRow.Name, &thisRow.Description, &thisRow.SystemOwned)
+		if err != nil {
+			return nil, err
 		}
 		result = append(result, thisRow)
 	}

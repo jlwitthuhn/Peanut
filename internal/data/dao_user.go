@@ -25,8 +25,9 @@ type UserDao interface {
 	CountRowsByEmail(req *http.Request, name string) (int64, error)
 	CountRowsByName(req *http.Request, name string) (int64, error)
 	InsertRow(req *http.Request, name string, email string, hashedPassword string) (string, error)
-	SelectRowsAll(req *http.Request) ([]UserRow, error)
 	SelectRowByName(req *http.Request, name string) (*UserRow, error)
+	SelectRowsAll(req *http.Request) ([]UserRow, error)
+	SelectRowsLikeName(req *http.Request, namePattern string) ([]UserRow, error)
 }
 
 func NewUserDao() UserDao {
@@ -126,11 +127,25 @@ func (*userDaoImpl) InsertRow(req *http.Request, name string, email string, hash
 	return newId, nil
 }
 
-var sqlSelectUsersRowAll = "SELECT id, display_name, email, password, _created, _updated FROM users ORDER BY _created"
+var sqlSelectUsersRowByName = "SELECT id, display_name, email, password, _created, _updated FROM users WHERE display_name = $1"
+
+func (*userDaoImpl) SelectRowByName(req *http.Request, name string) (*UserRow, error) {
+	sqlh := getSqlExecutorFromRequest(req)
+	result := &UserRow{}
+	row := sqlh.QueryRow(sqlSelectUsersRowByName, name)
+	err := row.Scan(&result.Id, &result.DisplayName, &result.Email, &result.Password, &result.Created, &result.Updated)
+	if err != nil {
+		logger.Error(nil, "Got error on UserDao/SelectRowByName query: ", err)
+		return nil, err
+	}
+	return result, nil
+}
+
+var sqlSelectUsersRowsAll = "SELECT id, display_name, email, password, _created, _updated FROM users ORDER BY _created"
 
 func (*userDaoImpl) SelectRowsAll(req *http.Request) ([]UserRow, error) {
 	sqlh := getSqlExecutorFromRequest(req)
-	rows, err := sqlh.Query(sqlSelectUsersRowAll)
+	rows, err := sqlh.Query(sqlSelectUsersRowsAll)
 	if err != nil {
 		logger.Error(nil, "Got error on UserDao/SelectRowAll query: ", err)
 		return nil, err
@@ -147,16 +162,32 @@ func (*userDaoImpl) SelectRowsAll(req *http.Request) ([]UserRow, error) {
 	return result, nil
 }
 
-var sqlSelectUsersRowByName = "SELECT id, display_name, email, password, _created, _updated FROM users WHERE display_name = $1"
+var sqlSelectUsersRowsLikeName = `
+	SELECT
+		id, display_name, email, password, _created, _updated
+	FROM
+		users
+	WHERE
+	    display_name LIKE $1
+	ORDER BY
+	    _created
+`
 
-func (*userDaoImpl) SelectRowByName(req *http.Request, name string) (*UserRow, error) {
+func (*userDaoImpl) SelectRowsLikeName(req *http.Request, namePattern string) ([]UserRow, error) {
 	sqlh := getSqlExecutorFromRequest(req)
-	result := &UserRow{}
-	row := sqlh.QueryRow(sqlSelectUsersRowByName, name)
-	err := row.Scan(&result.Id, &result.DisplayName, &result.Email, &result.Password, &result.Created, &result.Updated)
+	rows, err := sqlh.Query(sqlSelectUsersRowsLikeName, namePattern)
 	if err != nil {
-		logger.Error(nil, "Got error on UserDao/SelectRowByName query: ", err)
+		logger.Error(nil, "Got error on UserDao/SelectRowsLikeName query: ", err)
 		return nil, err
+	}
+	var result []UserRow
+	for rows.Next() {
+		thisRow := UserRow{}
+		err = rows.Scan(&thisRow.Id, &thisRow.DisplayName, &thisRow.Email, &thisRow.Password, &thisRow.Created, &thisRow.Updated)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, thisRow)
 	}
 	return result, nil
 }

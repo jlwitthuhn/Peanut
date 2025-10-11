@@ -26,9 +26,9 @@ func registerAdminUsersHandlers(mux *http.ServeMux, groupService service.GroupSe
 	mux.Handle("GET /admin/users", getHandler)
 
 	getListAllHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		userRows, err := userService.GetAllUserRows(r)
+		userRows, err := userService.GetUserRowsAll(r)
 		if err != nil {
-			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query user display names.", w, r)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query user names.", w, r)
 			return
 		}
 
@@ -42,4 +42,21 @@ func registerAdminUsersHandlers(mux *http.ServeMux, groupService service.GroupSe
 		ep_util.RenderTemplate("_admin/users_list", templateCtx, w, r)
 	})
 	mux.Handle("GET /admin/users/list/all", getListAllHandler)
+
+	postListByNamePatternHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		pattern := r.PostFormValue("pattern")
+		userRows, err := userService.GetUserRowsLikeName(r, pattern)
+		if err != nil {
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query user names.", w, r)
+		}
+
+		// Truncate IDs so they don't take up the whole width of the page
+		for i := range userRows {
+			userRows[i].Id = userRows[i].Id[:13] + "..."
+		}
+		templateCtx := templatecontext.GetStandardTemplateContext(r)
+		templateCtx["Users"] = userRows
+		ep_util.RenderTemplate("_admin/users_list", templateCtx, w, r)
+	})
+	mux.Handle("POST /admin/users/list/by_name", postListByNamePatternHandler)
 }

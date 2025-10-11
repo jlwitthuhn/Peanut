@@ -8,7 +8,7 @@
 				<hr class="fullwidth">
 				<div class="simple-form">
 					<br>
-					<form action="/admin/users/list" method="post">
+					<form action="/admin/users/list/by_name" method="post">
 						<label for="input_pattern">Display name (% for wildcard):</label>
 						<input type="text" id="input_pattern" name="pattern">
 						<input type="hidden" name="csrf" value="{{ .CsrfToken }}">
@@ -18,7 +18,7 @@
 				<hr class="fullwidth">
 				<div class="simple-form">
 					<br>
-					<form action="/admin/users/list" method="post">
+					<form action="/admin/users/list/by_group" method="post">
 						<label for="group_name_in">Group name:</label>
 						<select id="group_name_in" name="groupName">
 							{{ range $group := .Groups }}

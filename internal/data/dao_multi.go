@@ -6,10 +6,12 @@ package data
 
 import (
 	"net/http"
+	"peanut/internal/logger"
 )
 
 type MultiTableDao interface {
 	SelectGroupNamesByUserId(r *http.Request, userId string) ([]string, error)
+	SelectUserRowsByGroupName(r *http.Request, groupName string) ([]UserRow, error)
 }
 
 func NewMultiTableDao() MultiTableDao {
@@ -44,6 +46,55 @@ func (*multiTableDaoImpl) SelectGroupNamesByUserId(r *http.Request, userId strin
 			return nil, scanErr
 		}
 		result = append(result, thisGroup)
+	}
+	return result, nil
+}
+
+var sqlSelectUsersByGroupName = `
+WITH
+	q_group_ids AS (
+		SELECT
+			id
+		FROM
+			groups
+		WHERE
+			name = $1
+	),
+
+	q_user_ids AS (
+		SELECT
+			user_id
+		FROM
+			group_membership
+		WHERE
+			group_id IN (SELECT id FROM q_group_ids)
+	)
+
+	SELECT
+		id, display_name, email, password, _created, _updated
+	FROM
+		users
+	WHERE
+	    id IN (SELECT user_id FROM q_user_ids)
+	ORDER BY
+	    _created
+`
+
+func (*multiTableDaoImpl) SelectUserRowsByGroupName(req *http.Request, groupName string) ([]UserRow, error) {
+	sqlh := getSqlExecutorFromRequest(req)
+	rows, err := sqlh.Query(sqlSelectUsersByGroupName, groupName)
+	if err != nil {
+		logger.Error(nil, "Got error on MultiTableDao/SelectRowsLikeName query: ", err)
+		return nil, err
+	}
+	var result []UserRow
+	for rows.Next() {
+		thisRow := UserRow{}
+		err = rows.Scan(&thisRow.Id, &thisRow.DisplayName, &thisRow.Email, &thisRow.Password, &thisRow.Created, &thisRow.Updated)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, thisRow)
 	}
 	return result, nil
 }

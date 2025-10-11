@@ -7,6 +7,7 @@ package data
 import (
 	"net/http"
 	"peanut/internal/logger"
+	"time"
 )
 
 type GroupRow struct {
@@ -14,6 +15,8 @@ type GroupRow struct {
 	Name        string
 	Description string
 	SystemOwned bool
+	Created     time.Time
+	Updated     time.Time
 }
 
 type GroupDao interface {
@@ -76,7 +79,7 @@ func (*groupDaoImpl) InsertRow(req *http.Request, name string, desc string, syst
 	return nil
 }
 
-var sqlSelectGroupsRowAll = "SELECT id, name, description, system_owned FROM groups ORDER BY name"
+var sqlSelectGroupsRowAll = "SELECT id, name, description, system_owned, _created, _updated FROM groups ORDER BY name"
 
 func (*groupDaoImpl) SelectRowAll(req *http.Request) ([]GroupRow, error) {
 	sqlh := getSqlExecutorFromRequest(req)
@@ -88,7 +91,7 @@ func (*groupDaoImpl) SelectRowAll(req *http.Request) ([]GroupRow, error) {
 	var result []GroupRow
 	for rows.Next() {
 		thisRow := GroupRow{}
-		err = rows.Scan(&thisRow.Id, &thisRow.Name, &thisRow.Description, &thisRow.SystemOwned)
+		err = rows.Scan(&thisRow.Id, &thisRow.Name, &thisRow.Description, &thisRow.SystemOwned, &thisRow.Created, &thisRow.Updated)
 		if err != nil {
 			return nil, err
 		}

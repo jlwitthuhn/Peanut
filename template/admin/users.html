@@ -19,8 +19,8 @@
 				<div class="simple-form">
 					<br>
 					<form action="/admin/users/list/by_group" method="post">
-						<label for="group_name_in">Group name:</label>
-						<select id="group_name_in" name="groupName">
+						<label for="group_name">Group name:</label>
+						<select id="group_name" name="group">
 							{{ range $group := .Groups }}
 								<option value="{{ $group }}">{{ $group }}</option>
 							{{ end }}

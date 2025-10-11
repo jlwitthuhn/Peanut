@@ -25,7 +25,7 @@ type UserDao interface {
 	CountRowsByEmail(req *http.Request, name string) (int64, error)
 	CountRowsByName(req *http.Request, name string) (int64, error)
 	InsertRow(req *http.Request, name string, email string, hashedPassword string) (string, error)
-	SelectRowAll(req *http.Request) ([]UserRow, error)
+	SelectRowsAll(req *http.Request) ([]UserRow, error)
 	SelectRowByName(req *http.Request, name string) (*UserRow, error)
 }
 
@@ -128,7 +128,7 @@ func (*userDaoImpl) InsertRow(req *http.Request, name string, email string, hash
 
 var sqlSelectUsersRowAll = "SELECT id, display_name, email, password, _created, _updated FROM users ORDER BY _created"
 
-func (*userDaoImpl) SelectRowAll(req *http.Request) ([]UserRow, error) {
+func (*userDaoImpl) SelectRowsAll(req *http.Request) ([]UserRow, error) {
 	sqlh := getSqlExecutorFromRequest(req)
 	rows, err := sqlh.Query(sqlSelectUsersRowAll)
 	if err != nil {

@@ -59,7 +59,7 @@ func (this *userServiceImpl) CreateUser(req *http.Request, name string, email st
 }
 
 func (this *userServiceImpl) GetAllUserRows(req *http.Request) ([]data.UserRow, error) {
-	return this.userDao.SelectRowAll(req)
+	return this.userDao.SelectRowsAll(req)
 }
 
 func (this *userServiceImpl) IsEmailTaken(req *http.Request, email string) (bool, error) {

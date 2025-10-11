@@ -7,7 +7,6 @@ package main
 import (
 	"embed"
 	"io/fs"
-	"log"
 	"net/http"
 	"peanut/internal/data"
 	"peanut/internal/data/datasource"
@@ -42,7 +41,7 @@ func main() {
 	logger.Info(nil, "Preparing templates...")
 	justTemplates, err := fs.Sub(templateFs, "template")
 	if err != nil {
-		log.Fatal("Failed to find embedded template directory: ", err)
+		logger.Fatal(nil, "Failed to find embedded template directory: ", err)
 	}
 	template.LoadTemplates(justTemplates)
 

@@ -1,0 +1,35 @@
+{{ define "admin_content" }}
+<div class="vertical-flex-container">
+	<div class="simple-panel">
+		<div class="simple-panel-header"><h1>List Groups</h1></div>
+		<div class="simple-panel-content horizontal-space-evenly">
+			<table>
+				<tr>
+					<th>ID</th>
+					<th>Name</th>
+					<th>Description</th>
+					<th>System</th>
+					<th>Created</th>
+					<th>Users</th>
+				</tr>
+				{{ range .Groups }}
+				<tr>
+					<td>{{ .Id }}</td>
+					<td>{{ .Name }}</td>
+					<td>{{ .Description }}</td>
+					<td>{{ .SystemOwned }}</td>
+					<td>{{ .Created }}</td>
+					<td>
+						<form action="/admin/users/list/by_group" method="post">
+							<input type="hidden" name="group" value="{{ .Name }}">
+							<input type="hidden" name="csrf" value="{{ $.CsrfToken }}">
+							<input type="submit" value="List">
+						</form>
+					</td>
+				</tr>
+				{{ end }}
+			</table>
+		</div>
+	</div>
+</div>
+{{ end }}

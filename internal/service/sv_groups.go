@@ -12,6 +12,7 @@ import (
 type GroupService interface {
 	CreateGroup(req *http.Request, name string, desc string, systemOwned bool) error
 	GetAllGroupNames(req *http.Request) ([]string, error)
+	GetAllGroupRows(req *http.Request) ([]data.GroupRow, error)
 	GetGroupsByUserId(req *http.Request, userId string) ([]string, error)
 	GetUserRowsByGroupName(req *http.Request, groupName string) ([]data.UserRow, error)
 	EnrollUserInGroup(req *http.Request, userId string, groupName string) error
@@ -42,6 +43,10 @@ func (this *groupServiceImpl) GetAllGroupNames(req *http.Request) ([]string, err
 		result = append(result, row.Name)
 	}
 	return result, nil
+}
+
+func (this *groupServiceImpl) GetAllGroupRows(req *http.Request) ([]data.GroupRow, error) {
+	return this.groupDao.SelectRowAll(req)
 }
 
 func (this *groupServiceImpl) GetGroupsByUserId(req *http.Request, userId string) ([]string, error) {

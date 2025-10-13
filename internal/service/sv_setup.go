@@ -22,6 +22,7 @@ func NewSetupService(
 	groupDao data.GroupDao,
 	groupMembershipDao data.GroupMembershipDao,
 	metaDao data.MetaDao,
+	scheduledJobDao data.ScheduledJobDao,
 	sessionDao data.SessionDao,
 	sessionStringDao data.SessionStringDao,
 	userDao data.UserDao,
@@ -34,6 +35,7 @@ func NewSetupService(
 		groupDao:           groupDao,
 		groupMembershipDao: groupMembershipDao,
 		metaDao:            metaDao,
+		scheduledJobDao:    scheduledJobDao,
 		sessionDao:         sessionDao,
 		sessionStringDao:   sessionStringDao,
 		userDao:            userDao,
@@ -48,6 +50,7 @@ type setupServiceImpl struct {
 	groupDao           data.GroupDao
 	groupMembershipDao data.GroupMembershipDao
 	metaDao            data.MetaDao
+	scheduledJobDao    data.ScheduledJobDao
 	sessionDao         data.SessionDao
 	sessionStringDao   data.SessionStringDao
 	userDao            data.UserDao
@@ -68,6 +71,10 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName stri
 			return err
 		}
 		err = this.groupDao.CreateDBObjects(r)
+		if err != nil {
+			return err
+		}
+		err = this.scheduledJobDao.CreateDBObjects(r)
 		if err != nil {
 			return err
 		}

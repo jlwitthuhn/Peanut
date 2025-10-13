@@ -25,6 +25,7 @@ func RegisterAdminHandlers(
 	registerAdminIndexHandlers(adminMux, configService, databaseService, sessionService, userService)
 	registerAdminFrontPageHandlers(adminMux, configService)
 	registerAdminGroupsHandlers(adminMux, groupService)
+	registerAdminScheduledJobHandlers(adminMux)
 	registerAdminUsersHandlers(adminMux, groupService, userService)
 
 	wrappedAdminMux := middleware.WrapHandler(adminMux, middleware.CheckPermissions(perms.Admin_Gui_View))

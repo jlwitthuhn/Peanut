@@ -28,35 +28,38 @@ func NewSetupService(
 	userDao data.UserDao,
 	configService ConfigService,
 	groupService GroupService,
+	scheduledJobService ScheduledJobService,
 	userService UserService,
 ) SetupService {
 	return &setupServiceImpl{
-		configDao:          configDao,
-		groupDao:           groupDao,
-		groupMembershipDao: groupMembershipDao,
-		metaDao:            metaDao,
-		scheduledJobDao:    scheduledJobDao,
-		sessionDao:         sessionDao,
-		sessionStringDao:   sessionStringDao,
-		userDao:            userDao,
-		configService:      configService,
-		groupService:       groupService,
-		userService:        userService,
+		configDao:           configDao,
+		groupDao:            groupDao,
+		groupMembershipDao:  groupMembershipDao,
+		metaDao:             metaDao,
+		scheduledJobDao:     scheduledJobDao,
+		sessionDao:          sessionDao,
+		sessionStringDao:    sessionStringDao,
+		userDao:             userDao,
+		configService:       configService,
+		groupService:        groupService,
+		scheduledJobService: scheduledJobService,
+		userService:         userService,
 	}
 }
 
 type setupServiceImpl struct {
-	configDao          data.ConfigDao
-	groupDao           data.GroupDao
-	groupMembershipDao data.GroupMembershipDao
-	metaDao            data.MetaDao
-	scheduledJobDao    data.ScheduledJobDao
-	sessionDao         data.SessionDao
-	sessionStringDao   data.SessionStringDao
-	userDao            data.UserDao
-	configService      ConfigService
-	groupService       GroupService
-	userService        UserService
+	configDao           data.ConfigDao
+	groupDao            data.GroupDao
+	groupMembershipDao  data.GroupMembershipDao
+	metaDao             data.MetaDao
+	scheduledJobDao     data.ScheduledJobDao
+	sessionDao          data.SessionDao
+	sessionStringDao    data.SessionStringDao
+	userDao             data.UserDao
+	configService       ConfigService
+	groupService        GroupService
+	scheduledJobService ScheduledJobService
+	userService         UserService
 }
 
 func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName string, adminEmail string, adminPlainPassword string) error {
@@ -96,6 +99,11 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName stri
 	}
 
 	logger.Debug(r, "Populating data...")
+
+	err = this.scheduledJobService.AddJobDefinition(r, "DeleteExpiredSessions", time.Hour)
+	if err != nil {
+		return err
+	}
 
 	err = this.configService.SetInt(r, configkey.IntInitializedTime, time.Now().Unix())
 	if err != nil {

@@ -6,11 +6,14 @@ package data
 
 import (
 	"net/http"
+	"peanut/internal/data/dataformat"
 	"peanut/internal/logger"
+	"time"
 )
 
 type ScheduledJobDao interface {
 	CreateDBObjects(req *http.Request) error
+	InsertRow(req *http.Request, name string, runInterval time.Duration) error
 }
 
 func NewScheduledJobDao() ScheduledJobDao {
@@ -47,6 +50,19 @@ func (this *scheduledJobDaoImpl) CreateDBObjects(req *http.Request) error {
 	_, err := sqlh.Exec(sqlCreateTableScheduledJobs)
 	if err != nil {
 		logger.Error(nil, "Got error on ScheduledJobDao/CreateDBObjects query: ", err)
+		return err
+	}
+	return nil
+}
+
+var sqlInsertScheduledJobsRow = "INSERT INTO scheduled_jobs(name, run_interval) VALUES ($1, $2)"
+
+func (this *scheduledJobDaoImpl) InsertRow(req *http.Request, name string, runInterval time.Duration) error {
+	sqlh := getSqlExecutorFromRequest(req)
+	formattedInterval := dataformat.FormatDurationAsPostgresInterval(runInterval)
+	_, err := sqlh.Exec(sqlInsertScheduledJobsRow, name, formattedInterval)
+	if err != nil {
+		logger.Error(nil, "Got error on ScheduledJobDao/InsertRow query: ", err)
 		return err
 	}
 	return nil

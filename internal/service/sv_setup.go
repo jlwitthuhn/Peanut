@@ -61,43 +61,43 @@ type setupServiceImpl struct {
 
 func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName string, adminEmail string, adminPlainPassword string) error {
 	logger.Debug(r, "Creating tables...")
-	{
-		err := this.metaDao.CreateDBObjects(r)
-		if err != nil {
-			return err
-		}
-		err = this.configDao.CreateDBObjects(r)
-		if err != nil {
-			return err
-		}
-		err = this.groupDao.CreateDBObjects(r)
-		if err != nil {
-			return err
-		}
-		err = this.scheduledJobDao.CreateDBObjects(r)
-		if err != nil {
-			return err
-		}
-		err = this.userDao.CreateDBObjects(r)
-		if err != nil {
-			return err
-		}
-		err = this.groupMembershipDao.CreateDBObjects(r)
-		if err != nil {
-			return err
-		}
-		err = this.sessionDao.CreateDBObjects(r)
-		if err != nil {
-			return err
-		}
-		err = this.sessionStringDao.CreateDBObjects(r)
-		if err != nil {
-			return err
-		}
+
+	err := this.metaDao.CreateDBObjects(r)
+	if err != nil {
+		return err
+	}
+	err = this.configDao.CreateDBObjects(r)
+	if err != nil {
+		return err
+	}
+	err = this.groupDao.CreateDBObjects(r)
+	if err != nil {
+		return err
+	}
+	err = this.scheduledJobDao.CreateDBObjects(r)
+	if err != nil {
+		return err
+	}
+	err = this.userDao.CreateDBObjects(r)
+	if err != nil {
+		return err
+	}
+	err = this.groupMembershipDao.CreateDBObjects(r)
+	if err != nil {
+		return err
+	}
+	err = this.sessionDao.CreateDBObjects(r)
+	if err != nil {
+		return err
+	}
+	err = this.sessionStringDao.CreateDBObjects(r)
+	if err != nil {
+		return err
 	}
 
 	logger.Debug(r, "Populating data...")
-	err := this.configService.SetInt(r, configkey.IntInitializedTime, time.Now().Unix())
+
+	err = this.configService.SetInt(r, configkey.IntInitializedTime, time.Now().Unix())
 	if err != nil {
 		return err
 	}
@@ -105,37 +105,35 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName stri
 	if err != nil {
 		return err
 	}
-	{
-		err := this.groupService.CreateGroup(r, permgroups.TurboAdmin, "Full control over everything.", true)
-		if err != nil {
-			return err
-		}
-		err = this.groupService.CreateGroup(r, permgroups.Admin, "Full control over everything except mass database updates and exports.", true)
-		if err != nil {
-			return err
-		}
-		err = this.groupService.CreateGroup(r, permgroups.User, "Ordinary registered user.", true)
-		if err != nil {
-			return err
-		}
+
+	err = this.groupService.CreateGroup(r, permgroups.TurboAdmin, "Full control over everything.", true)
+	if err != nil {
+		return err
 	}
+	err = this.groupService.CreateGroup(r, permgroups.Admin, "Full control over everything except mass database updates and exports.", true)
+	if err != nil {
+		return err
+	}
+	err = this.groupService.CreateGroup(r, permgroups.User, "Ordinary registered user.", true)
+	if err != nil {
+		return err
+	}
+
 	userId, err := this.userService.CreateUser(r, adminName, adminEmail, adminPlainPassword)
 	if err != nil {
 		return err
 	}
-	{
-		err := this.groupService.EnrollUserInGroup(r, userId, permgroups.TurboAdmin)
-		if err != nil {
-			return err
-		}
-		err = this.groupService.EnrollUserInGroup(r, userId, permgroups.Admin)
-		if err != nil {
-			return err
-		}
-		err = this.groupService.EnrollUserInGroup(r, userId, permgroups.User)
-		if err != nil {
-			return err
-		}
+	err = this.groupService.EnrollUserInGroup(r, userId, permgroups.TurboAdmin)
+	if err != nil {
+		return err
+	}
+	err = this.groupService.EnrollUserInGroup(r, userId, permgroups.Admin)
+	if err != nil {
+		return err
+	}
+	err = this.groupService.EnrollUserInGroup(r, userId, permgroups.User)
+	if err != nil {
+		return err
 	}
 
 	return nil

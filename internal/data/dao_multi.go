@@ -9,7 +9,13 @@ import (
 	"peanut/internal/logger"
 )
 
+type ScheduledJobSummary struct {
+	Name        string
+	RunInterval string
+}
+
 type MultiTableDao interface {
+	SelectAllScheduledJobSummaries(req *http.Request) ([]ScheduledJobSummary, error)
 	SelectGroupNamesByUserId(r *http.Request, userId string) ([]string, error)
 	SelectUserRowsByGroupName(r *http.Request, groupName string) ([]UserRow, error)
 }
@@ -20,6 +26,36 @@ func NewMultiTableDao() MultiTableDao {
 
 type multiTableDaoImpl struct{}
 
+var sqlSelectAllScheduledJobSummaries = `
+	SELECT
+		name, run_interval
+	FROM
+	    scheduled_jobs
+	ORDER BY
+	    name
+`
+
+func (*multiTableDaoImpl) SelectAllScheduledJobSummaries(req *http.Request) ([]ScheduledJobSummary, error) {
+	sqlh := getSqlExecutorFromRequest(req)
+	rows, err := sqlh.Query(sqlSelectAllScheduledJobSummaries)
+	if err != nil {
+		logger.Error(nil, "Got error on SelectAllScheduledJobSummaries query:", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var result []ScheduledJobSummary
+	for rows.Next() {
+		thisSummary := ScheduledJobSummary{}
+		scanErr := rows.Scan(&thisSummary.Name, &thisSummary.RunInterval)
+		if scanErr != nil {
+			return nil, scanErr
+		}
+		result = append(result, thisSummary)
+	}
+	return result, nil
+}
+
 var sqlSelectGroupNamesByUserId = `
 	SELECT
 		groups.name
@@ -29,9 +65,8 @@ var sqlSelectGroupNamesByUserId = `
 	    group_membership.user_id = $1
 `
 
-func (*multiTableDaoImpl) SelectGroupNamesByUserId(r *http.Request, userId string) ([]string, error) {
-	sqlh := getSqlExecutorFromRequest(r)
-
+func (*multiTableDaoImpl) SelectGroupNamesByUserId(req *http.Request, userId string) ([]string, error) {
+	sqlh := getSqlExecutorFromRequest(req)
 	rows, err := sqlh.Query(sqlSelectGroupNamesByUserId, userId)
 	if err != nil {
 		return nil, err
@@ -84,7 +119,7 @@ func (*multiTableDaoImpl) SelectUserRowsByGroupName(req *http.Request, groupName
 	sqlh := getSqlExecutorFromRequest(req)
 	rows, err := sqlh.Query(sqlSelectUsersByGroupName, groupName)
 	if err != nil {
-		logger.Error(nil, "Got error on MultiTableDao/SelectRowsLikeName query: ", err)
+		logger.Error(nil, "Got error on MultiTableDao/SelectRowsLikeName query:", err)
 		return nil, err
 	}
 	var result []UserRow

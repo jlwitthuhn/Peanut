@@ -60,7 +60,7 @@ func main() {
 	configService := service.NewConfigService(configDao)
 	dbService := service.NewDatabaseService(metaDao)
 	groupService := service.NewGroupService(groupDao, groupMembershipDao, multiTableDao)
-	scheduledJobService := service.NewScheduledJobService(scheduledJobDao)
+	scheduledJobService := service.NewScheduledJobService(multiTableDao, scheduledJobDao)
 	sessionService := service.NewSessionService(sessionDao, sessionStringDao, userDao)
 	userService := service.NewUserService(sessionDao, userDao)
 
@@ -74,7 +74,14 @@ func main() {
 	endpoints.RegisterSetupHandlers(setupMux, dbService, setupService)
 
 	logger.Info(nil, "Registering routes...")
-	ep_admin.RegisterAdminHandlers(middlewareMux, configService, dbService, groupService, sessionService, userService)
+	ep_admin.RegisterAdminHandlers(
+		middlewareMux,
+		configService,
+		dbService,
+		groupService,
+		scheduledJobService,
+		sessionService,
+		userService)
 	endpoints.RegisterIndexHandlers(middlewareMux, configService)
 	endpoints.RegisterLoginHandlers(middlewareMux, sessionService)
 	endpoints.RegisterLogoutHandlers(middlewareMux, sessionService)

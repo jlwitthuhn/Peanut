@@ -35,7 +35,7 @@ type configDaoImpl struct{}
 
 var sqlCreateTableConfigInt = `
 	CREATE TABLE config_int (
-		name VARCHAR(255) PRIMARY KEY,
+		name VARCHAR(100) PRIMARY KEY,
 		value BIGINT NOT NULL,
 		_created TIMESTAMP WITH TIME ZONE NOT NULL,
 		_updated TIMESTAMP WITH TIME ZONE NOT NULL
@@ -58,8 +58,8 @@ var sqlCreateTableConfigInt = `
 
 var sqlCreateTableConfigString = `
 	CREATE TABLE config_string (
-		name VARCHAR(255) PRIMARY KEY,
-		value VARCHAR(4096) NOT NULL,
+		name VARCHAR(100) PRIMARY KEY,
+		value VARCHAR(2000) NOT NULL,
 		_created TIMESTAMP WITH TIME ZONE NOT NULL,
 		_updated TIMESTAMP WITH TIME ZONE NOT NULL
 	);

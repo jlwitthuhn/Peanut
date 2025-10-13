@@ -32,9 +32,9 @@ type sessionStringDaoImpl struct{}
 
 var sqlCreateTableSessionString = `
 	CREATE TABLE session_string (
-	    session_id VARCHAR(255) REFERENCES sessions(id) ON DELETE CASCADE,
-	    name VARCHAR(255) NOT NULL,
-	    value VARCHAR(255) NOT NULL,
+	    session_id VARCHAR REFERENCES sessions(id) ON DELETE CASCADE,
+	    name VARCHAR(100) NOT NULL,
+	    value VARCHAR(2000) NOT NULL,
 		_created TIMESTAMP WITH TIME ZONE NOT NULL,
 		_updated TIMESTAMP WITH TIME ZONE NOT NULL,
 		PRIMARY KEY (session_id, name)

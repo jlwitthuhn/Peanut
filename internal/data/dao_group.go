@@ -35,8 +35,8 @@ type groupDaoImpl struct{}
 var sqlCreateTableGroups = `
 	CREATE TABLE groups (
 		id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-		name VARCHAR(127) UNIQUE NOT NULL,
-		description VARCHAR(255) NOT NULL,
+		name VARCHAR(100) UNIQUE NOT NULL,
+		description VARCHAR(500) NOT NULL,
 		system_owned BOOLEAN NOT NULL,
 		_created TIMESTAMP WITH TIME ZONE NOT NULL,
 		_updated TIMESTAMP WITH TIME ZONE NOT NULL

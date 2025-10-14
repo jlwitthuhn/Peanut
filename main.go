@@ -53,6 +53,7 @@ func main() {
 	metaDao := data.NewMetaDao()
 	multiTableDao := data.NewMultiTableDao()
 	scheduledJobDao := data.NewScheduledJobDao()
+	scheduledJobRunDao := data.NewScheduledJobRunDao()
 	sessionDao := data.NewSessionDao()
 	sessionStringDao := data.NewSessionStringDao()
 	userDao := data.NewUserDao()
@@ -65,7 +66,7 @@ func main() {
 	userService := service.NewUserService(sessionDao, userDao)
 
 	setupService := service.NewSetupService(
-		configDao, groupDao, groupMembershipDao, metaDao, scheduledJobDao, sessionDao,
+		configDao, groupDao, groupMembershipDao, metaDao, scheduledJobDao, scheduledJobRunDao, sessionDao,
 		sessionStringDao, userDao, configService, groupService, scheduledJobService, userService,
 	)
 

@@ -5,13 +5,31 @@
 package data
 
 import (
+	"database/sql"
 	"net/http"
 	"peanut/internal/logger"
 )
 
 type ScheduledJobSummary struct {
-	Name        string
-	RunInterval string
+	Name             string
+	RunInterval      string
+	LastRunTime      string
+	LastRunResult    bool
+	LastRunTimeRaw   sql.NullTime
+	LastRunResultRaw sql.NullBool
+}
+
+func (this *ScheduledJobSummary) populateStrings() {
+	if this.LastRunTimeRaw.Valid {
+		this.LastRunTime = this.LastRunTimeRaw.Time.Format("2006-01-02 15:04:05 MST")
+	} else {
+		this.LastRunTime = "Never"
+	}
+	if this.LastRunResultRaw.Valid {
+		this.LastRunResult = this.LastRunResultRaw.Bool
+	} else {
+		this.LastRunResult = false
+	}
 }
 
 type MultiTableDao interface {
@@ -27,10 +45,20 @@ func NewMultiTableDao() MultiTableDao {
 type multiTableDaoImpl struct{}
 
 var sqlSelectAllScheduledJobSummaries = `
+	WITH last_run AS (
+		SELECT
+			DISTINCT ON (job_id)
+			job_id, success, _created
+		FROM
+			scheduled_job_runs
+		ORDER BY
+			job_id, _created DESC
+	)
+	
 	SELECT
-		name, run_interval
+		name, run_interval, last_run._created, last_run.success
 	FROM
-	    scheduled_jobs
+	    scheduled_jobs LEFT JOIN last_run ON scheduled_jobs.id = last_run.job_id
 	ORDER BY
 	    name
 `
@@ -47,10 +75,11 @@ func (*multiTableDaoImpl) SelectAllScheduledJobSummaries(req *http.Request) ([]S
 	var result []ScheduledJobSummary
 	for rows.Next() {
 		thisSummary := ScheduledJobSummary{}
-		scanErr := rows.Scan(&thisSummary.Name, &thisSummary.RunInterval)
+		scanErr := rows.Scan(&thisSummary.Name, &thisSummary.RunInterval, &thisSummary.LastRunTimeRaw, &thisSummary.LastRunResultRaw)
 		if scanErr != nil {
 			return nil, scanErr
 		}
+		thisSummary.populateStrings()
 		result = append(result, thisSummary)
 	}
 	return result, nil
@@ -86,7 +115,7 @@ func (*multiTableDaoImpl) SelectGroupNamesByUserId(req *http.Request, userId str
 }
 
 var sqlSelectUsersByGroupName = `
-WITH
+	WITH
 	q_group_ids AS (
 		SELECT
 			id
@@ -110,9 +139,9 @@ WITH
 	FROM
 		users
 	WHERE
-	    id IN (SELECT user_id FROM q_user_ids)
+		id IN (SELECT user_id FROM q_user_ids)
 	ORDER BY
-	    _created
+		_created
 `
 
 func (*multiTableDaoImpl) SelectUserRowsByGroupName(req *http.Request, groupName string) ([]UserRow, error) {

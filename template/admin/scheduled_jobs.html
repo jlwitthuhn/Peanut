@@ -7,11 +7,15 @@
 				<tr>
 					<th>Name</th>
 					<th>Run Interval</th>
+					<th>Last Run</th>
+					<th>Success</th>
 				</tr>
 				{{ range .Jobs }}
 				<tr>
 					<td>{{ .Name }}</td>
 					<td>{{ .RunInterval }}</td>
+					<td>{{ .LastRunTime }}</td>
+					<td>{{ .LastRunResult }}</td>
 				</tr>
 				{{ end }}
 			</table>

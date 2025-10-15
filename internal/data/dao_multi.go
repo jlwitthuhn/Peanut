@@ -151,6 +151,8 @@ func (*multiTableDaoImpl) SelectUserRowsByGroupName(req *http.Request, groupName
 		logger.Error(nil, "Got error on MultiTableDao/SelectRowsLikeName query:", err)
 		return nil, err
 	}
+	defer rows.Close()
+
 	var result []UserRow
 	for rows.Next() {
 		thisRow := UserRow{}

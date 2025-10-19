@@ -9,6 +9,7 @@
 					<th>Run Interval</th>
 					<th>Last Run</th>
 					<th>Success</th>
+					<th>Run Now</th>
 				</tr>
 				{{ range .Jobs }}
 				<tr>
@@ -16,6 +17,13 @@
 					<td>{{ .RunInterval }}</td>
 					<td>{{ .LastRunTime }}</td>
 					<td>{{ .LastRunResult }}</td>
+					<td>
+						<form method="POST" action="/admin/scheduled_jobs/run">
+							<input type="hidden" name="name" value="{{ .Name }}">
+							<input type="hidden" name="csrf" value="{{ $.CsrfToken }}">
+							<input type="submit" value="Run">
+						</form>
+					</td>
 				</tr>
 				{{ end }}
 			</table>

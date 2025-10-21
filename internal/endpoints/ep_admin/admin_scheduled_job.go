@@ -9,6 +9,8 @@ import (
 	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/logger"
+	"peanut/internal/middleutil"
+	"peanut/internal/security/perms"
 	"peanut/internal/service"
 )
 
@@ -24,5 +26,15 @@ func registerAdminScheduledJobHandlers(mux *http.ServeMux, scheduledJobService s
 		templateCtx["Jobs"] = jobs
 		ep_util.RenderTemplate("_admin/scheduled_jobs", templateCtx, w, r)
 	})
-	mux.HandleFunc("/admin/scheduled_jobs", getScheduledJobHandler)
+	mux.HandleFunc("GET /admin/scheduled_jobs", getScheduledJobHandler)
+
+	postScheduledJobRunHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if middleutil.RequestHasPermission(r, perms.Admin_ScheduledJob_Run) == false {
+			ep_util.RenderErrorHttp403Forbidden(w, r)
+			return
+		}
+
+		RenderSimpleAdminMessage("TODO", "Not implemented.", w, r)
+	})
+	mux.HandleFunc("POST /admin/scheduled_jobs/run", postScheduledJobRunHandler)
 }

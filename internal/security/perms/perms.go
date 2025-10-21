@@ -12,6 +12,7 @@ import (
 
 const Admin_Gui_View = "Admin/Gui/View"
 const Admin_FrontPage_Edit = "Admin/FrontPage/Edit"
+const Admin_ScheduledJob_Run = "Admin/ScheduledJob/Run"
 
 func GetPermissionsForGroup(group string) map[string]struct{} {
 	result := make(map[string]struct{})
@@ -21,6 +22,7 @@ func GetPermissionsForGroup(group string) map[string]struct{} {
 	case permgroups.Admin:
 		result[Admin_Gui_View] = struct{}{}
 		result[Admin_FrontPage_Edit] = struct{}{}
+		result[Admin_ScheduledJob_Run] = struct{}{}
 		fallthrough
 	case permgroups.User:
 	case permgroups.Guest:

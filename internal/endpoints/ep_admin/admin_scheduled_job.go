@@ -35,14 +35,21 @@ func registerAdminScheduledJobHandlers(mux *http.ServeMux, scheduledJobService s
 		}
 
 		id := r.PostFormValue("id")
-		_, err := scheduledJobService.GetJobNameById(r, id)
+		jobName, err := scheduledJobService.GetJobNameById(r, id)
 		if err != nil {
 			logger.Error(r, "Failed to query scheduled job:", err)
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query scheduled job.", w, r)
 			return
 		}
 
-		RenderSimpleAdminMessage("TODO", "Not implemented.", w, r)
+		err = scheduledJobService.RunJob(r, jobName)
+		if err != nil {
+			logger.Error(r, "Failed to run scheduled job:", err)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to run scheduled job.", w, r)
+			return
+		}
+
+		RenderSimpleAdminMessage("Success", "Job has completed.", w, r)
 	})
 	mux.HandleFunc("POST /admin/scheduled_jobs/run", postScheduledJobRunHandler)
 }

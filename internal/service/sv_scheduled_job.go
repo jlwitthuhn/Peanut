@@ -5,6 +5,7 @@
 package service
 
 import (
+	"errors"
 	"net/http"
 	"peanut/internal/data"
 	"time"
@@ -14,6 +15,7 @@ type ScheduledJobService interface {
 	AddJobDefinition(req *http.Request, jobName string, runInterval time.Duration) error
 	GetAllJobSummaries(req *http.Request) ([]data.ScheduledJobSummary, error)
 	GetJobNameById(req *http.Request, id string) (string, error)
+	RunJob(req *http.Request, jobName string) error
 }
 
 func NewScheduledJobService(multiTableDao data.MultiTableDao, scheduledJobDao data.ScheduledJobDao) ScheduledJobService {
@@ -39,4 +41,8 @@ func (this *scheduledJobServiceImpl) GetJobNameById(req *http.Request, id string
 		return "", err
 	}
 	return row.Name, nil
+}
+
+func (this *scheduledJobServiceImpl) RunJob(req *http.Request, jobName string) error {
+	return errors.New("not implemented")
 }

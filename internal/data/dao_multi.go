@@ -11,6 +11,7 @@ import (
 )
 
 type ScheduledJobSummary struct {
+	JobId            string
 	Name             string
 	RunInterval      string
 	LastRunTime      string
@@ -56,7 +57,7 @@ var sqlSelectAllScheduledJobSummaries = `
 	)
 	
 	SELECT
-		name, run_interval, last_run._created, last_run.success
+		scheduled_jobs.id, name, run_interval, last_run._created, last_run.success
 	FROM
 	    scheduled_jobs LEFT JOIN last_run ON scheduled_jobs.id = last_run.job_id
 	ORDER BY
@@ -75,7 +76,7 @@ func (*multiTableDaoImpl) SelectAllScheduledJobSummaries(req *http.Request) ([]S
 	var result []ScheduledJobSummary
 	for rows.Next() {
 		thisSummary := ScheduledJobSummary{}
-		scanErr := rows.Scan(&thisSummary.Name, &thisSummary.RunInterval, &thisSummary.LastRunTimeRaw, &thisSummary.LastRunResultRaw)
+		scanErr := rows.Scan(&thisSummary.JobId, &thisSummary.Name, &thisSummary.RunInterval, &thisSummary.LastRunTimeRaw, &thisSummary.LastRunResultRaw)
 		if scanErr != nil {
 			return nil, scanErr
 		}

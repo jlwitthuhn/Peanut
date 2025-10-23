@@ -13,6 +13,7 @@ import (
 type ScheduledJobService interface {
 	AddJobDefinition(req *http.Request, jobName string, runInterval time.Duration) error
 	GetAllJobSummaries(req *http.Request) ([]data.ScheduledJobSummary, error)
+	GetJobNameById(req *http.Request, id string) (string, error)
 }
 
 func NewScheduledJobService(multiTableDao data.MultiTableDao, scheduledJobDao data.ScheduledJobDao) ScheduledJobService {
@@ -30,4 +31,12 @@ func (this *scheduledJobServiceImpl) AddJobDefinition(req *http.Request, jobName
 
 func (this *scheduledJobServiceImpl) GetAllJobSummaries(req *http.Request) ([]data.ScheduledJobSummary, error) {
 	return this.multiTableDao.SelectAllScheduledJobSummaries(req)
+}
+
+func (this *scheduledJobServiceImpl) GetJobNameById(req *http.Request, id string) (string, error) {
+	row, err := this.scheduledJobDao.SelectRowById(req, id)
+	if err != nil {
+		return "", err
+	}
+	return row.Name, nil
 }

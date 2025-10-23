@@ -19,7 +19,7 @@
 					<td>{{ .LastRunResult }}</td>
 					<td>
 						<form method="POST" action="/admin/scheduled_jobs/run">
-							<input type="hidden" name="name" value="{{ .Name }}">
+							<input type="hidden" name="id" value="{{ .JobId }}">
 							<input type="hidden" name="csrf" value="{{ $.CsrfToken }}">
 							<input type="submit" value="Run">
 						</form>

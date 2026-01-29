@@ -8,6 +8,9 @@ import (
 	"errors"
 	"net/http"
 	"peanut/internal/data"
+	"peanut/internal/middleutil"
+	"peanut/internal/sched_job"
+	"peanut/internal/security/perms"
 	"time"
 )
 
@@ -44,5 +47,12 @@ func (this *scheduledJobServiceImpl) GetJobNameById(req *http.Request, id string
 }
 
 func (this *scheduledJobServiceImpl) RunJob(req *http.Request, jobName string) error {
+	if middleutil.RequestHasPermission(req, perms.Admin_ScheduledJob_Run) == false {
+		return errors.New("permission denied")
+	}
+	if jobName == "DeleteExpiredSessions" {
+		scheduled_job.RunExpiredSessionsJob()
+		return nil
+	}
 	return errors.New("not implemented")
 }

@@ -152,7 +152,7 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName stri
 	if err != nil {
 		return err
 	}
-	err = this.groupService.CreateGroup(r, permgroups.Admin, "Full control over everything except mass database updates and exports.", true)
+	err = this.groupService.CreateGroup(r, permgroups.Admin, "Much control over most things.", true)
 	if err != nil {
 		return err
 	}

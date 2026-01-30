@@ -5,11 +5,14 @@
 package service
 
 import (
+	"errors"
 	"net/http"
 	"peanut/internal/data"
 	"peanut/internal/data/configkey"
 	"peanut/internal/logger"
 	"peanut/internal/security/perms/permgroups"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -28,12 +31,14 @@ func NewSetupService(
 	sessionStringDao data.SessionStringDao,
 	userDao data.UserDao,
 	configService ConfigService,
+	databaseService DatabaseService,
 	groupService GroupService,
 	scheduledJobService ScheduledJobService,
 	userService UserService,
 ) SetupService {
 	return &setupServiceImpl{
 		configDao:           configDao,
+		databaseService:     databaseService,
 		groupDao:            groupDao,
 		groupMembershipDao:  groupMembershipDao,
 		metaDao:             metaDao,
@@ -60,12 +65,34 @@ type setupServiceImpl struct {
 	sessionStringDao    data.SessionStringDao
 	userDao             data.UserDao
 	configService       ConfigService
+	databaseService     DatabaseService
 	groupService        GroupService
 	scheduledJobService ScheduledJobService
 	userService         UserService
 }
 
 func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName string, adminEmail string, adminPlainPassword string) error {
+	logger.Info(r, "Database initialization starting")
+
+	logger.Debug(r, "Checking postgres version...")
+	{
+		pgVersion, err := this.databaseService.GetPostgresVersion(r)
+		if err != nil {
+			return err
+		}
+		dotIndex := strings.IndexRune(pgVersion, '.')
+		if dotIndex == -1 {
+			return errors.New("failed to parse postgres version string")
+		}
+		versionInt, err := strconv.Atoi(pgVersion[:dotIndex])
+		if err != nil {
+			return errors.New("failed to parse postgres version number")
+		}
+		if versionInt < 18 {
+			return errors.New("only postgres version 18.0 and higher is supported")
+		}
+	}
+
 	logger.Debug(r, "Creating tables...")
 
 	err := this.metaDao.CreateDBObjects(r)
@@ -134,6 +161,8 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName stri
 		return err
 	}
 
+	logger.Debug(r, "Creating admin user...")
+
 	userId, err := this.userService.CreateUser(r, adminName, adminEmail, adminPlainPassword)
 	if err != nil {
 		return err
@@ -150,6 +179,8 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName stri
 	if err != nil {
 		return err
 	}
+
+	logger.Info(r, "Database initialization succeeded")
 
 	return nil
 }

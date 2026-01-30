@@ -21,13 +21,14 @@ type ScheduledJobService interface {
 	RunJob(req *http.Request, jobName string) error
 }
 
-func NewScheduledJobService(multiTableDao data.MultiTableDao, scheduledJobDao data.ScheduledJobDao) ScheduledJobService {
-	return &scheduledJobServiceImpl{multiTableDao: multiTableDao, scheduledJobDao: scheduledJobDao}
+func NewScheduledJobService(multiTableDao data.MultiTableDao, scheduledJobDao data.ScheduledJobDao, scheduledJobRunDao data.ScheduledJobRunDao) ScheduledJobService {
+	return &scheduledJobServiceImpl{multiTableDao: multiTableDao, scheduledJobDao: scheduledJobDao, scheduledJobRunDao: scheduledJobRunDao}
 }
 
 type scheduledJobServiceImpl struct {
-	multiTableDao   data.MultiTableDao
-	scheduledJobDao data.ScheduledJobDao
+	multiTableDao      data.MultiTableDao
+	scheduledJobDao    data.ScheduledJobDao
+	scheduledJobRunDao data.ScheduledJobRunDao
 }
 
 func (this *scheduledJobServiceImpl) AddJobDefinition(req *http.Request, jobName string, runInterval time.Duration) error {
@@ -50,9 +51,22 @@ func (this *scheduledJobServiceImpl) RunJob(req *http.Request, jobName string) e
 	if middleutil.RequestHasPermission(req, perms.Admin_ScheduledJob_Run) == false {
 		return errors.New("permission denied")
 	}
+
+	jobDetails, err := this.scheduledJobDao.SelectRowByName(req, jobName)
+	if err != nil {
+		return err
+	}
+
 	if jobName == "DeleteExpiredSessions" {
 		scheduled_job.RunExpiredSessionsJob()
-		return nil
+	} else {
+		return errors.New("not implemented")
 	}
-	return errors.New("not implemented")
+
+	err = this.scheduledJobRunDao.InsertRow(req, jobDetails.Id, true)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

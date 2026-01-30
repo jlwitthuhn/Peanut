@@ -49,6 +49,12 @@ func registerAdminScheduledJobHandlers(mux *http.ServeMux, scheduledJobService s
 			return
 		}
 
+		err = ep_util.CommitTransactionForRequest(r)
+		if err != nil {
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to commit transaction.", w, r)
+			return
+		}
+
 		RenderSimpleAdminMessage("Success", "Job has completed.", w, r)
 	})
 	mux.HandleFunc("POST /admin/scheduled_jobs/run", postScheduledJobRunHandler)

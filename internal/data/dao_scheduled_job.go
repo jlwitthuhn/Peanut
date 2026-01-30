@@ -22,6 +22,7 @@ type ScheduledJobRow struct {
 type ScheduledJobDao interface {
 	CreateDBObjects(req *http.Request) error
 	InsertRow(req *http.Request, name string, runInterval time.Duration) error
+	SelectRowByName(req *http.Request, name string) (*ScheduledJobRow, error)
 	SelectRowById(req *http.Request, id string) (*ScheduledJobRow, error)
 }
 
@@ -82,13 +83,32 @@ var sqlSelectScheduledJobsRowByName = `
 	SELECT
 		id, name, run_interval, _created, _updated
 	FROM scheduled_jobs
+		WHERE name = $1
+`
+
+func (this *scheduledJobDaoImpl) SelectRowByName(req *http.Request, name string) (*ScheduledJobRow, error) {
+	sqlh := getSqlExecutorFromRequest(req)
+	result := &ScheduledJobRow{}
+	row := sqlh.QueryRow(sqlSelectScheduledJobsRowByName, name)
+	err := row.Scan(&result.Id, &result.Name, &result.RunInterval, &result.Created, &result.Updated)
+	if err != nil {
+		logger.Error(req, "Got error on SelectRowByName query:", err)
+		return nil, err
+	}
+	return result, nil
+}
+
+var sqlSelectScheduledJobsRowById = `
+	SELECT
+		id, name, run_interval, _created, _updated
+	FROM scheduled_jobs
 		WHERE id = $1
 `
 
 func (this *scheduledJobDaoImpl) SelectRowById(req *http.Request, id string) (*ScheduledJobRow, error) {
 	sqlh := getSqlExecutorFromRequest(req)
 	result := &ScheduledJobRow{}
-	row := sqlh.QueryRow(sqlSelectScheduledJobsRowByName, id)
+	row := sqlh.QueryRow(sqlSelectScheduledJobsRowById, id)
 	err := row.Scan(&result.Id, &result.Name, &result.RunInterval, &result.Created, &result.Updated)
 	if err != nil {
 		logger.Error(req, "Got error on SelectRowById query:", err)

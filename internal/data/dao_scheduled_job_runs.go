@@ -11,6 +11,7 @@ import (
 
 type ScheduledJobRunDao interface {
 	CreateDBObjects(req *http.Request) error
+	InsertRow(req *http.Request, jobId string, success bool) error
 }
 
 func NewScheduledJobRunDao() ScheduledJobRunDao {
@@ -50,6 +51,18 @@ func (*scheduledJobRunDaoImpl) CreateDBObjects(req *http.Request) error {
 	_, err := sqlh.Exec(sqlCreateTableScheduledJobRuns)
 	if err != nil {
 		logger.Error(nil, "Got error on ScheduledJobRunDao/CreateDBObjects query: ", err)
+		return err
+	}
+	return nil
+}
+
+var sqlInsertScheduledJobRunRow = "INSERT INTO scheduled_job_runs(job_id, success) VALUES ($1, $2)"
+
+func (*scheduledJobRunDaoImpl) InsertRow(req *http.Request, jobId string, success bool) error {
+	sqlh := getSqlExecutorFromRequest(req)
+	_, err := sqlh.Exec(sqlInsertScheduledJobRunRow, jobId, success)
+	if err != nil {
+		logger.Error(nil, "Got error on InsertRow query:", err)
 		return err
 	}
 	return nil

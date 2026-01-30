@@ -33,7 +33,7 @@ type scheduledJobDaoImpl struct{}
 
 var sqlCreateTableScheduledJobs = `
 	CREATE TABLE scheduled_jobs (
-		id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+		id UUID PRIMARY KEY DEFAULT uuidv7(),
 	    name VARCHAR(100) NOT NULL UNIQUE,
 	    run_interval INTERVAL NOT NULL,
 		_created TIMESTAMP WITH TIME ZONE NOT NULL,

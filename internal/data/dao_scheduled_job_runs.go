@@ -21,7 +21,7 @@ type scheduledJobRunDaoImpl struct{}
 
 var sqlCreateTableScheduledJobRuns = `
 	CREATE TABLE scheduled_job_runs (
-		id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+		id UUID PRIMARY KEY DEFAULT uuidv7(),
 		job_id UUID NOT NULL REFERENCES scheduled_jobs(id) ON DELETE CASCADE,
 	    success BOOLEAN NOT NULL,
 		_created TIMESTAMP WITH TIME ZONE NOT NULL,

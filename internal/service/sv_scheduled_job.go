@@ -8,8 +8,8 @@ import (
 	"errors"
 	"net/http"
 	"peanut/internal/data"
+	"peanut/internal/logger"
 	"peanut/internal/middleutil"
-	"peanut/internal/sched_job"
 	"peanut/internal/security/perms"
 	"time"
 )
@@ -21,14 +21,15 @@ type ScheduledJobService interface {
 	RunJob(req *http.Request, jobName string) error
 }
 
-func NewScheduledJobService(multiTableDao data.MultiTableDao, scheduledJobDao data.ScheduledJobDao, scheduledJobRunDao data.ScheduledJobRunDao) ScheduledJobService {
-	return &scheduledJobServiceImpl{multiTableDao: multiTableDao, scheduledJobDao: scheduledJobDao, scheduledJobRunDao: scheduledJobRunDao}
+func NewScheduledJobService(multiTableDao data.MultiTableDao, scheduledJobDao data.ScheduledJobDao, scheduledJobRunDao data.ScheduledJobRunDao, sessionDao data.SessionDao) ScheduledJobService {
+	return &scheduledJobServiceImpl{multiTableDao: multiTableDao, scheduledJobDao: scheduledJobDao, scheduledJobRunDao: scheduledJobRunDao, sessionDao: sessionDao}
 }
 
 type scheduledJobServiceImpl struct {
 	multiTableDao      data.MultiTableDao
 	scheduledJobDao    data.ScheduledJobDao
 	scheduledJobRunDao data.ScheduledJobRunDao
+	sessionDao         data.SessionDao
 }
 
 func (this *scheduledJobServiceImpl) AddJobDefinition(req *http.Request, jobName string, runInterval time.Duration) error {
@@ -58,7 +59,7 @@ func (this *scheduledJobServiceImpl) RunJob(req *http.Request, jobName string) e
 	}
 
 	if jobName == "DeleteExpiredSessions" {
-		scheduled_job.RunExpiredSessionsJob()
+		this.runExpiredSessionsJob(req)
 	} else {
 		return errors.New("not implemented")
 	}
@@ -68,5 +69,15 @@ func (this *scheduledJobServiceImpl) RunJob(req *http.Request, jobName string) e
 		return err
 	}
 
+	return nil
+}
+
+func (this *scheduledJobServiceImpl) runExpiredSessionsJob(req *http.Request) error {
+	logger.Info(req, "Running expired sessions job")
+	err := this.sessionDao.DeleteRowsByExpired(req)
+	if err != nil {
+		logger.Error(req, "Failed to delete expired sessions")
+		return errors.New("failed to delete expired sessions")
+	}
 	return nil
 }

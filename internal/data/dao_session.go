@@ -19,6 +19,7 @@ type SessionDao interface {
 	CreateDBObjects(req *http.Request) error
 	CountValidDedupeByUser(req *http.Request) (int64, error)
 	DeleteRowById(req *http.Request, sessionId string) error
+	DeleteRowsByExpired(req *http.Request) error
 	InsertRow(req *http.Request, sessionId string, userId string) error
 	SelectValidRowBySessionId(req *http.Request, sessionId string) (*SessionRow, error)
 }
@@ -84,6 +85,18 @@ func (*sessionDaoImpl) DeleteRowById(req *http.Request, sessionId string) error 
 	_, err := sqlh.Exec(sqlDeleteSessionsRowById, sessionId)
 	if err != nil {
 		logger.Error(nil, "Got error on SessionDao/DeleteRowById query: ", err)
+		return err
+	}
+	return nil
+}
+
+var sqlDeleteSessionsRowsByExpired = "DELETE FROM sessions WHERE valid_until < NOW();"
+
+func (*sessionDaoImpl) DeleteRowsByExpired(req *http.Request) error {
+	sqlh := getSqlExecutorFromRequest(req)
+	_, err := sqlh.Exec(sqlDeleteSessionsRowsByExpired)
+	if err != nil {
+		logger.Error(nil, "Got error on SessionDao/DeleteRowByExpired query: ", err)
 		return err
 	}
 	return nil

@@ -5,9 +5,14 @@
 package service
 
 import (
+	"context"
+	"database/sql"
 	"errors"
 	"net/http"
+	"net/http/httptest"
 	"peanut/internal/data"
+	"peanut/internal/data/datasource"
+	"peanut/internal/keynames/contextkeys"
 	"peanut/internal/logger"
 	"peanut/internal/middleutil"
 	"peanut/internal/security/perms"
@@ -16,13 +21,14 @@ import (
 
 type ScheduledJobService interface {
 	AddJobDefinition(req *http.Request, jobName string, runInterval time.Duration) error
+	BackgroundThreadFunc()
 	GetAllJobSummaries(req *http.Request) ([]data.ScheduledJobSummary, error)
 	GetJobNameById(req *http.Request, id string) (string, error)
 	RunJob(req *http.Request, jobName string) error
 }
 
-func NewScheduledJobService(multiTableDao data.MultiTableDao, scheduledJobDao data.ScheduledJobDao, scheduledJobRunDao data.ScheduledJobRunDao, sessionDao data.SessionDao) ScheduledJobService {
-	return &scheduledJobServiceImpl{multiTableDao: multiTableDao, scheduledJobDao: scheduledJobDao, scheduledJobRunDao: scheduledJobRunDao, sessionDao: sessionDao}
+func NewScheduledJobService(multiTableDao data.MultiTableDao, scheduledJobDao data.ScheduledJobDao, scheduledJobRunDao data.ScheduledJobRunDao, sessionDao data.SessionDao, dbService DatabaseService) ScheduledJobService {
+	return &scheduledJobServiceImpl{multiTableDao: multiTableDao, scheduledJobDao: scheduledJobDao, scheduledJobRunDao: scheduledJobRunDao, sessionDao: sessionDao, dbService: dbService}
 }
 
 type scheduledJobServiceImpl struct {
@@ -30,10 +36,69 @@ type scheduledJobServiceImpl struct {
 	scheduledJobDao    data.ScheduledJobDao
 	scheduledJobRunDao data.ScheduledJobRunDao
 	sessionDao         data.SessionDao
+	dbService          DatabaseService
 }
 
 func (this *scheduledJobServiceImpl) AddJobDefinition(req *http.Request, jobName string, runInterval time.Duration) error {
 	return this.scheduledJobDao.InsertRow(req, jobName, runInterval)
+}
+
+// Application infrastructure expects each db access to be associated with a request
+// We make a fake request here for all background db operations that are not associated with a real request
+// The request here is never sent
+func createBackgroundHttpRequest() (*http.Request, error) {
+	result := httptest.NewRequest(http.MethodGet, "http://127.0.0.1", nil)
+
+	result = result.WithContext(context.WithValue(result.Context(), contextkeys.RequestId, "BGTHREAD"))
+
+	// Set up db transaction
+	tx, err := datasource.PostgresHandle().BeginTx(result.Context(), nil)
+	if err != nil {
+		logger.Error(result, "Failed to create db transaction for scheduled jobs")
+		return nil, err
+	}
+	ctx := context.WithValue(result.Context(), contextkeys.PostgresTx, tx)
+	result = result.WithContext(ctx)
+
+	return result, nil
+}
+
+func (this *scheduledJobServiceImpl) backgroundThreadIter() {
+	req, err := createBackgroundHttpRequest()
+	if err != nil {
+		return
+	}
+	tx, txOk := req.Context().Value(contextkeys.PostgresTx).(*sql.Tx)
+	if !txOk {
+		logger.Debug(req, "Database not yet initialized, waiting another cycle...")
+		return
+	}
+	defer tx.Rollback()
+
+	// Check if the database exists
+	exists, err := this.dbService.DoesTableExist(req, "config_int")
+	if err != nil {
+		logger.Error(req, "Failed to check if database exists")
+		return
+	}
+	if !exists {
+		logger.Debug(req, "Database not yet initialized, waiting another cycle...")
+		return
+	}
+
+	row, err := this.multiTableDao.SelectScheduledJobByNextPending(req)
+	if err != nil {
+		logger.Error(req, "Failed to find next pending scheduled job, aborting")
+		return
+	}
+	logger.Info(req, "Found job with name: ", row.Name)
+}
+
+func (this *scheduledJobServiceImpl) BackgroundThreadFunc() {
+	for {
+		this.backgroundThreadIter()
+		time.Sleep(1 * time.Minute)
+	}
 }
 
 func (this *scheduledJobServiceImpl) GetAllJobSummaries(req *http.Request) ([]data.ScheduledJobSummary, error) {

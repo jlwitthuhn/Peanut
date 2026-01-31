@@ -36,6 +36,7 @@ func (this *ScheduledJobSummary) populateStrings() {
 type MultiTableDao interface {
 	SelectAllScheduledJobSummaries(req *http.Request) ([]ScheduledJobSummary, error)
 	SelectGroupNamesByUserId(r *http.Request, userId string) ([]string, error)
+	SelectScheduledJobByNextPending(r *http.Request) (*ScheduledJobRow, error)
 	SelectUserRowsByGroupName(r *http.Request, groupName string) ([]UserRow, error)
 }
 
@@ -111,6 +112,60 @@ func (*multiTableDaoImpl) SelectGroupNamesByUserId(req *http.Request, userId str
 			return nil, scanErr
 		}
 		result = append(result, thisGroup)
+	}
+	return result, nil
+}
+
+var sqlSelectScheduledJobByNextPending = `
+	WITH
+	all_job_ids AS (
+		SELECT
+			id,
+			name,
+			run_interval,
+			_created,
+			_updated
+		FROM
+			scheduled_jobs
+	),
+
+	latest_success AS (
+		SELECT DISTINCT ON (job_id)
+			job_id,
+			_created as run_time
+		FROM
+			scheduled_job_runs
+		ORDER BY
+			job_id, _created DESC
+	),
+
+	full_successes_ordered AS (
+		SELECT
+			all_job_ids.id AS job_id,
+			all_job_ids.name AS job_name,
+			COALESCE(run_time, NOW() - INTERVAL '1 day') AS run_time,
+			all_job_ids._created AS created,
+			all_job_ids._updated AS updated
+		FROM
+			all_job_ids LEFT JOIN latest_success ON all_job_ids.id = latest_success.job_id
+	)
+
+	SELECT
+		job_id, job_name, run_time, created, updated
+	FROM
+		full_successes_ordered
+	ORDER BY run_time, job_name ASC
+	FETCH FIRST 1 ROWS ONLY
+`
+
+func (*multiTableDaoImpl) SelectScheduledJobByNextPending(req *http.Request) (*ScheduledJobRow, error) {
+	sqlh := getSqlExecutorFromRequest(req)
+	result := &ScheduledJobRow{}
+	row := sqlh.QueryRow(sqlSelectScheduledJobByNextPending)
+	err := row.Scan(&result.Id, &result.Name, &result.RunInterval, &result.Created, &result.Updated)
+	if err != nil {
+		logger.Error(nil, "Got error on MultiTableDao/SelectScheduledJobByNextPending query:", err)
+		return nil, err
 	}
 	return result, nil
 }

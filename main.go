@@ -61,7 +61,7 @@ func main() {
 	configService := service.NewConfigService(configDao)
 	dbService := service.NewDatabaseService(metaDao)
 	groupService := service.NewGroupService(groupDao, groupMembershipDao, multiTableDao)
-	scheduledJobService := service.NewScheduledJobService(multiTableDao, scheduledJobDao, scheduledJobRunDao, sessionDao)
+	scheduledJobService := service.NewScheduledJobService(multiTableDao, scheduledJobDao, scheduledJobRunDao, sessionDao, dbService)
 	sessionService := service.NewSessionService(sessionDao, sessionStringDao, userDao)
 	userService := service.NewUserService(sessionDao, userDao)
 
@@ -101,6 +101,8 @@ func main() {
 
 	logger.Info(nil, "Connecting to postgres...")
 	datasource.PostgresConnect()
+
+	go scheduledJobService.BackgroundThreadFunc()
 
 	logger.Info(nil, "Startup complete, listening on :8080")
 	logger.Fatal(nil, http.ListenAndServe(":8080", rootMux))

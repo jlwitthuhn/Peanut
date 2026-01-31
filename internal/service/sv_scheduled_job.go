@@ -60,6 +60,11 @@ func createBackgroundHttpRequest() (*http.Request, error) {
 	ctx := context.WithValue(result.Context(), contextkeys.PostgresTx, tx)
 	result = result.WithContext(ctx)
 
+	// Add permissions
+	permissions := []string{perms.Admin_ScheduledJob_Run}
+	ctx = context.WithValue(result.Context(), contextkeys.UserPerms, permissions)
+	result = result.WithContext(ctx)
+
 	return result, nil
 }
 
@@ -91,7 +96,18 @@ func (this *scheduledJobServiceImpl) backgroundThreadIter() {
 		logger.Error(req, "Failed to find next pending scheduled job, aborting")
 		return
 	}
-	logger.Info(req, "Found job with name: ", row.Name)
+
+	logger.Debug(req, "Running job: "+row.Name)
+	err = this.RunJob(req, row.Name)
+	if err != nil {
+		logger.Error(req, "Failed to run job, aborting")
+		return
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		logger.Error(req, "Failed to commit transaction")
+	}
 }
 
 func (this *scheduledJobServiceImpl) BackgroundThreadFunc() {
@@ -138,11 +154,12 @@ func (this *scheduledJobServiceImpl) RunJob(req *http.Request, jobName string) e
 }
 
 func (this *scheduledJobServiceImpl) runExpiredSessionsJob(req *http.Request) error {
-	logger.Info(req, "Running expired sessions job")
+	logger.Info(req, "Expired sessions job beginning")
 	err := this.sessionDao.DeleteRowsByExpired(req)
 	if err != nil {
 		logger.Error(req, "Failed to delete expired sessions")
 		return errors.New("failed to delete expired sessions")
 	}
+	logger.Debug(req, "Expired sessions job complete")
 	return nil
 }

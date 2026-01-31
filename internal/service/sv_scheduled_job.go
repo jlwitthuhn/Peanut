@@ -96,6 +96,10 @@ func (this *scheduledJobServiceImpl) backgroundThreadIter() {
 		logger.Error(req, "Failed to find next pending scheduled job, aborting")
 		return
 	}
+	if row == nil {
+		logger.Trace(req, "Nothing to do, waiting another cycle...")
+		return
+	}
 
 	logger.Debug(req, "Running job: "+row.Name)
 	err = this.RunJob(req, row.Name)

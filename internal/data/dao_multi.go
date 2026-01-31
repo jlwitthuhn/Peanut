@@ -6,6 +6,7 @@ package data
 
 import (
 	"database/sql"
+	"errors"
 	"net/http"
 	"peanut/internal/logger"
 )
@@ -156,6 +157,8 @@ var sqlSelectScheduledJobByNextPending = `
 			job_id, job_name, run_interval, created, updated
 		FROM
 			full_successes
+		WHERE
+			since_last_run >= run_interval
 		ORDER BY
 			since_last_run DESC
 	)
@@ -173,6 +176,9 @@ func (*multiTableDaoImpl) SelectScheduledJobByNextPending(req *http.Request) (*S
 	row := sqlh.QueryRow(sqlSelectScheduledJobByNextPending)
 	err := row.Scan(&result.Id, &result.Name, &result.RunInterval, &result.Created, &result.Updated)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
 		logger.Error(nil, "Got error on MultiTableDao/SelectScheduledJobByNextPending query:", err)
 		return nil, err
 	}

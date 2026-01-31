@@ -139,22 +139,31 @@ var sqlSelectScheduledJobByNextPending = `
 			job_id, _created DESC
 	),
 
-	full_successes_ordered AS (
+	full_successes AS (
 		SELECT
 			all_job_ids.id AS job_id,
 			all_job_ids.name AS job_name,
-			COALESCE(run_time, NOW() - INTERVAL '1 day') AS run_time,
+			all_job_ids.run_interval AS run_interval,
 			all_job_ids._created AS created,
-			all_job_ids._updated AS updated
+			all_job_ids._updated AS updated,
+			COALESCE(NOW() - latest_success.run_time, INTERVAL '1 day') AS since_last_run
 		FROM
 			all_job_ids LEFT JOIN latest_success ON all_job_ids.id = latest_success.job_id
+	),
+
+	full_successes_ordered AS (
+		SELECT
+			job_id, job_name, run_interval, created, updated
+		FROM
+			full_successes
+		ORDER BY
+			since_last_run DESC
 	)
 
 	SELECT
-		job_id, job_name, run_time, created, updated
+		job_id, job_name, run_interval, created, updated
 	FROM
 		full_successes_ordered
-	ORDER BY run_time, job_name ASC
 	FETCH FIRST 1 ROWS ONLY
 `
 

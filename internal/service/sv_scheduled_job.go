@@ -27,11 +27,26 @@ type ScheduledJobService interface {
 	RunJob(req *http.Request, jobName string) error
 }
 
-func NewScheduledJobService(multiTableDao data.MultiTableDao, scheduledJobDao data.ScheduledJobDao, scheduledJobRunDao data.ScheduledJobRunDao, sessionDao data.SessionDao, dbService DatabaseService) ScheduledJobService {
-	return &scheduledJobServiceImpl{multiTableDao: multiTableDao, scheduledJobDao: scheduledJobDao, scheduledJobRunDao: scheduledJobRunDao, sessionDao: sessionDao, dbService: dbService}
+func NewScheduledJobService(
+	metaDao data.MetaDao,
+	multiTableDao data.MultiTableDao,
+	scheduledJobDao data.ScheduledJobDao,
+	scheduledJobRunDao data.ScheduledJobRunDao,
+	sessionDao data.SessionDao,
+	dbService DatabaseService,
+) ScheduledJobService {
+	return &scheduledJobServiceImpl{
+		metaDao:            metaDao,
+		multiTableDao:      multiTableDao,
+		scheduledJobDao:    scheduledJobDao,
+		scheduledJobRunDao: scheduledJobRunDao,
+		sessionDao:         sessionDao,
+		dbService:          dbService,
+	}
 }
 
 type scheduledJobServiceImpl struct {
+	metaDao            data.MetaDao
 	multiTableDao      data.MultiTableDao
 	scheduledJobDao    data.ScheduledJobDao
 	scheduledJobRunDao data.ScheduledJobRunDao
@@ -144,7 +159,15 @@ func (this *scheduledJobServiceImpl) RunJob(req *http.Request, jobName string) e
 	}
 
 	if jobName == "DeleteExpiredSessions" {
-		this.runExpiredSessionsJob(req)
+		err = this.runExpiredSessionsJob(req)
+		if err != nil {
+			return err
+		}
+	} else if jobName == "VacuumDatabase" {
+		err = this.runVacuumDbJob(req)
+		if err != nil {
+			return err
+		}
 	} else {
 		return errors.New("not implemented")
 	}
@@ -165,5 +188,21 @@ func (this *scheduledJobServiceImpl) runExpiredSessionsJob(req *http.Request) er
 		return errors.New("failed to delete expired sessions")
 	}
 	logger.Debug(req, "Expired sessions job complete")
+	return nil
+}
+
+func (this *scheduledJobServiceImpl) runVacuumDbJob(req *http.Request) error {
+	logger.Info(req, "Vacuum database job beginning")
+	dbh := datasource.PostgresHandle()
+	if dbh == nil {
+		logger.Error(req, "No postgres handle, aborting")
+		return errors.New("no postgres handle")
+	}
+	err := this.metaDao.Vacuum(req, dbh)
+	if err != nil {
+		logger.Error(req, "Failed to vacuum:", err)
+		return errors.New("failed to vacuum")
+	}
+	logger.Debug(req, "Vacuum database job complete")
 	return nil
 }

@@ -14,6 +14,7 @@ type MetaDao interface {
 	CreateDBObjects(req *http.Request) error
 	DoesTableExist(req *http.Request, tableName string) (bool, error)
 	SelectVersion(req *http.Request) (string, error)
+	Vacuum(req *http.Request, dbh *sql.DB) error
 }
 
 type metaDaoImpl struct{}
@@ -79,6 +80,16 @@ func (*metaDaoImpl) SelectVersion(req *http.Request) (string, error) {
 		return "", err
 	}
 	return version, nil
+}
+
+var sqlVacuumDb = "VACUUM;"
+
+func (*metaDaoImpl) Vacuum(req *http.Request, dbh *sql.DB) error {
+	_, err := dbh.Exec(sqlVacuumDb)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 var sqlCreatedUpdatedBeforeInsert = `

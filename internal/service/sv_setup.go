@@ -138,6 +138,10 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName stri
 	if err != nil {
 		return err
 	}
+	err = this.scheduledJobService.AddJobDefinition(r, "VacuumDatabase", 6*time.Hour)
+	if err != nil {
+		return err
+	}
 
 	err = this.configService.SetInt(r, configkey.IntInitializedTime, time.Now().Unix())
 	if err != nil {

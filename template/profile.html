@@ -1,3 +1,13 @@
 {{ define "content" }}
-Id: {{ .ProfileId }}
+<div class="info-panel-container">
+	<div class="simple-panel">
+		<div class="simple-panel-header">
+			<h1>User Profile: {{ .ProfileName }}</h1>
+		</div>
+		<div class="simple-panel-content">
+			<p>Id: {{ .ProfileId }}</p>
+			<p>Created: {{ .ProfileCreated }}</p>
+		</div>
+	</div>
+</div>
 {{ end }}

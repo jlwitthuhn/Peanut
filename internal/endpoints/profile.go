@@ -27,6 +27,8 @@ func RegisterProfileHandlers(mux *http.ServeMux, userService service.UserService
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["ProfileId"] = user.Id
+		templateCtx["ProfileName"] = user.DisplayName
+		templateCtx["ProfileCreated"] = user.Created
 		ep_util.RenderTemplate("_profile", templateCtx, w, r)
 	})
 	mux.Handle("GET /profile/{id}", getProfileHandler)

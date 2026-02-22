@@ -5,9 +5,13 @@
 package data
 
 import (
+	"database/sql"
+	"errors"
 	"net/http"
 	"peanut/internal/logger"
 	"time"
+
+	"github.com/lib/pq"
 )
 
 type UserRow struct {
@@ -25,6 +29,7 @@ type UserDao interface {
 	CountRowsByEmail(req *http.Request, name string) (int64, error)
 	CountRowsByName(req *http.Request, name string) (int64, error)
 	InsertRow(req *http.Request, name string, email string, hashedPassword string) (string, error)
+	SelectRowById(req *http.Request, id string) (*UserRow, error)
 	SelectRowByName(req *http.Request, name string) (*UserRow, error)
 	SelectRowsAll(req *http.Request) ([]UserRow, error)
 	SelectRowsLikeName(req *http.Request, namePattern string) ([]UserRow, error)
@@ -65,7 +70,7 @@ func (*userDaoImpl) CreateDBObjects(req *http.Request) error {
 	sqlh := getSqlExecutorFromRequest(req)
 	_, err := sqlh.Exec(sqlCreateTableUsers)
 	if err != nil {
-		logger.Error(nil, "Got error on UserDao/CreateDBObjects query: ", err)
+		logger.Error(nil, "Got error on UserDao/CreateDBObjects query:", err)
 		return err
 	}
 	return nil
@@ -79,7 +84,7 @@ func (*userDaoImpl) CountRows(req *http.Request) (int64, error) {
 	row := sqlh.QueryRow(sqlCountUsers)
 	err := row.Scan(&count)
 	if err != nil {
-		logger.Error(nil, "Got error on UserDao/CountRows query: ", err)
+		logger.Error(nil, "Got error on UserDao/CountRows query:", err)
 		return 0, err
 	}
 	return count, nil
@@ -93,7 +98,7 @@ func (*userDaoImpl) CountRowsByEmail(req *http.Request, email string) (int64, er
 	row := sqlh.QueryRow(sqlCountUsersByEmail, email)
 	err := row.Scan(&count)
 	if err != nil {
-		logger.Error(nil, "Got error on UserDao/CountRowsByEmail query: ", err)
+		logger.Error(nil, "Got error on UserDao/CountRowsByEmail query:", err)
 		return 0, err
 	}
 	return count, nil
@@ -107,7 +112,7 @@ func (*userDaoImpl) CountRowsByName(req *http.Request, name string) (int64, erro
 	row := sqlh.QueryRow(sqlCountUsersByName, name)
 	err := row.Scan(&count)
 	if err != nil {
-		logger.Error(nil, "Got error on UserDao/CountRowsByName query: ", err)
+		logger.Error(nil, "Got error on UserDao/CountRowsByName query:", err)
 		return 0, err
 	}
 	return count, nil
@@ -121,10 +126,36 @@ func (*userDaoImpl) InsertRow(req *http.Request, name string, email string, hash
 	newId := ""
 	err := row.Scan(&newId)
 	if err != nil {
-		logger.Error(nil, "Got error on UserDao/InsertRow query: ", err)
+		logger.Error(nil, "Got error on UserDao/InsertRow query:", err)
 		return "", err
 	}
 	return newId, nil
+}
+
+var sqlSelectUsersRowById = "SELECT id, display_name, email, password, _created, _updated FROM users WHERE id = $1"
+
+func (*userDaoImpl) SelectRowById(req *http.Request, id string) (*UserRow, error) {
+	sqlh := getSqlExecutorFromRequest(req)
+	result := &UserRow{}
+	row := sqlh.QueryRow(sqlSelectUsersRowById, id)
+	err := row.Scan(&result.Id, &result.DisplayName, &result.Email, &result.Password, &result.Created, &result.Updated)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
+	if err != nil {
+		var pqErr *pq.Error
+		ok := errors.As(err, &pqErr)
+		if ok {
+			if pqErr.Code == "22P02" {
+				// INVALID_TEXT_REPRESENTATION
+				// This means the input string is not a UUID, so no match exists
+				return nil, nil
+			}
+		}
+		logger.Error(nil, "Got error on UserDao/SelectRowById query:", err)
+		return nil, err
+	}
+	return result, nil
 }
 
 var sqlSelectUsersRowByName = "SELECT id, display_name, email, password, _created, _updated FROM users WHERE display_name = $1"
@@ -135,7 +166,7 @@ func (*userDaoImpl) SelectRowByName(req *http.Request, name string) (*UserRow, e
 	row := sqlh.QueryRow(sqlSelectUsersRowByName, name)
 	err := row.Scan(&result.Id, &result.DisplayName, &result.Email, &result.Password, &result.Created, &result.Updated)
 	if err != nil {
-		logger.Error(nil, "Got error on UserDao/SelectRowByName query: ", err)
+		logger.Error(nil, "Got error on UserDao/SelectRowByName query:", err)
 		return nil, err
 	}
 	return result, nil
@@ -147,7 +178,7 @@ func (*userDaoImpl) SelectRowsAll(req *http.Request) ([]UserRow, error) {
 	sqlh := getSqlExecutorFromRequest(req)
 	rows, err := sqlh.Query(sqlSelectUsersRowsAll)
 	if err != nil {
-		logger.Error(nil, "Got error on UserDao/SelectRowAll query: ", err)
+		logger.Error(nil, "Got error on UserDao/SelectRowAll query:", err)
 		return nil, err
 	}
 	var result []UserRow
@@ -177,7 +208,7 @@ func (*userDaoImpl) SelectRowsLikeName(req *http.Request, namePattern string) ([
 	sqlh := getSqlExecutorFromRequest(req)
 	rows, err := sqlh.Query(sqlSelectUsersRowsLikeName, namePattern)
 	if err != nil {
-		logger.Error(nil, "Got error on UserDao/SelectRowsLikeName query: ", err)
+		logger.Error(nil, "Got error on UserDao/SelectRowsLikeName query:", err)
 		return nil, err
 	}
 	var result []UserRow

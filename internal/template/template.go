@@ -50,6 +50,9 @@ func LoadTemplates(fs fs.FS) {
 	loginFiles := []string{"base.html", "css/common.css", "login.html"}
 	loadTemplateOrDie(fs, "_login", loginFiles...)
 
+	profileFiles := []string{"base.html", "css/common.css", "profile.html"}
+	loadTemplateOrDie(fs, "_profile", profileFiles...)
+
 	registerFiles := []string{"base.html", "css/common.css", "register.html"}
 	loadTemplateOrDie(fs, "_register", registerFiles...)
 

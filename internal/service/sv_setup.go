@@ -22,6 +22,7 @@ type SetupService interface {
 
 func NewSetupService(
 	configDao data.ConfigDao,
+	forumSectionsDao data.ForumSectionsDao,
 	groupDao data.GroupDao,
 	groupMembershipDao data.GroupMembershipDao,
 	metaDao data.MetaDao,
@@ -38,6 +39,7 @@ func NewSetupService(
 ) SetupService {
 	return &setupServiceImpl{
 		configDao:           configDao,
+		forumSectionsDao:    forumSectionsDao,
 		databaseService:     databaseService,
 		groupDao:            groupDao,
 		groupMembershipDao:  groupMembershipDao,
@@ -56,6 +58,7 @@ func NewSetupService(
 
 type setupServiceImpl struct {
 	configDao           data.ConfigDao
+	forumSectionsDao    data.ForumSectionsDao
 	groupDao            data.GroupDao
 	groupMembershipDao  data.GroupMembershipDao
 	metaDao             data.MetaDao
@@ -95,6 +98,7 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName stri
 
 	logger.Debug(r, "Creating tables...")
 
+	// Core functionality
 	err := this.metaDao.CreateDBObjects(r)
 	if err != nil {
 		return err
@@ -128,6 +132,12 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName stri
 		return err
 	}
 	err = this.sessionStringDao.CreateDBObjects(r)
+	if err != nil {
+		return err
+	}
+
+	// Forums
+	err = this.forumSectionsDao.CreateDBObjects(r)
 	if err != nil {
 		return err
 	}

@@ -48,6 +48,7 @@ func main() {
 	logger.Info(nil, "Initializing services...")
 
 	configDao := data.NewConfigDao()
+	forumSectionsDao := data.NewForumSectionsDao()
 	groupDao := data.NewGroupDao()
 	groupMembershipDao := data.NewGroupMembershipDao()
 	metaDao := data.NewMetaDao()
@@ -66,8 +67,8 @@ func main() {
 	userService := service.NewUserService(sessionDao, userDao)
 
 	setupService := service.NewSetupService(
-		configDao, groupDao, groupMembershipDao, metaDao, scheduledJobDao, scheduledJobRunDao, sessionDao,
-		sessionStringDao, userDao, configService, dbService, groupService, scheduledJobService, userService,
+		configDao, forumSectionsDao, groupDao, groupMembershipDao, metaDao, scheduledJobDao, scheduledJobRunDao,
+		sessionDao, sessionStringDao, userDao, configService, dbService, groupService, scheduledJobService, userService,
 	)
 
 	// Setup mux is separate and is only used from within DatabaseInitCheck

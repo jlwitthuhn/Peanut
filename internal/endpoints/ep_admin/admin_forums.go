@@ -6,11 +6,19 @@ package ep_admin
 
 import (
 	"net/http"
+	"peanut/internal/endpoints/ep_util"
+	"peanut/internal/endpoints/templatecontext"
 )
 
 func registerAdminForumsHandlers(mux *http.ServeMux) {
 	getSectionsHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		templateCtx := templatecontext.GetStandardTemplateContext(r)
+		ep_util.RenderTemplate("_admin/forum/sections", templateCtx, w, r)
+	})
+	mux.Handle("GET /admin/forum/sections", getSectionsHandler)
+
+	getSectionsAddHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		RenderSimpleAdminMessage("Not Implemented", "This page has not been implemented yet.", w, r)
 	})
-	mux.Handle("GET /admin/forums/sections", getSectionsHandler)
+	mux.Handle("GET /admin/forum/sections/add", getSectionsAddHandler)
 }

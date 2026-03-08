@@ -23,6 +23,9 @@ func LoadTemplates(fs fs.FS) {
 	adminIndexFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/index.html"}
 	loadTemplateOrDie(fs, "_admin/index", adminIndexFiles...)
 
+	adminForumSectionsFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/forum/sections.html"}
+	loadTemplateOrDie(fs, "_admin/forum/sections", adminForumSectionsFiles...)
+
 	adminFrontPageFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/front_page.html"}
 	loadTemplateOrDie(fs, "_admin/front_page", adminFrontPageFiles...)
 

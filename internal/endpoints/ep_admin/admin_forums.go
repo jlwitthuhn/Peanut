@@ -18,7 +18,13 @@ func registerAdminForumsHandlers(mux *http.ServeMux) {
 	mux.Handle("GET /admin/forum/sections", getSectionsHandler)
 
 	getSectionsAddHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		RenderSimpleAdminMessage("Not Implemented", "This page has not been implemented yet.", w, r)
+		templateCtx := templatecontext.GetStandardTemplateContext(r)
+		ep_util.RenderTemplate("_admin/forum/sections/add", templateCtx, w, r)
 	})
 	mux.Handle("GET /admin/forum/sections/add", getSectionsAddHandler)
+
+	postSectionsAddHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ep_util.RenderSimpleMessage("Not Implemented", "This endpoint has not been implemented yet.", w, r)
+	})
+	mux.Handle("POST /admin/forum/sections/add", postSectionsAddHandler)
 }

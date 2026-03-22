@@ -10,8 +10,9 @@ import (
 	"sort"
 )
 
-const Admin_Gui_View = "Admin/Gui/View"
+const Admin_Forums_Structure_Edit = "Admin/Forums/Structure/Edit"
 const Admin_FrontPage_Edit = "Admin/FrontPage/Edit"
+const Admin_Gui_View = "Admin/Gui/View"
 const Admin_ScheduledJob_Run = "Admin/ScheduledJob/Run"
 
 func GetPermissionsForGroup(group string) map[string]struct{} {
@@ -20,8 +21,9 @@ func GetPermissionsForGroup(group string) map[string]struct{} {
 	case permgroups.TurboAdmin:
 		fallthrough
 	case permgroups.Admin:
-		result[Admin_Gui_View] = struct{}{}
+		result[Admin_Forums_Structure_Edit] = struct{}{}
 		result[Admin_FrontPage_Edit] = struct{}{}
+		result[Admin_Gui_View] = struct{}{}
 		result[Admin_ScheduledJob_Run] = struct{}{}
 		fallthrough
 	case permgroups.User:

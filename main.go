@@ -61,6 +61,7 @@ func main() {
 
 	configService := service.NewConfigService(configDao)
 	dbService := service.NewDatabaseService(metaDao)
+	forumsService := service.NewForumsService(forumSectionsDao)
 	groupService := service.NewGroupService(groupDao, groupMembershipDao, multiTableDao)
 	scheduledJobService := service.NewScheduledJobService(metaDao, multiTableDao, scheduledJobDao, scheduledJobRunDao, sessionDao, dbService)
 	sessionService := service.NewSessionService(sessionDao, sessionStringDao, userDao)
@@ -80,6 +81,7 @@ func main() {
 		middlewareMux,
 		configService,
 		dbService,
+		forumsService,
 		groupService,
 		scheduledJobService,
 		sessionService,

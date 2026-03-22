@@ -17,7 +17,7 @@ func CreateSessionCookie(sessionId string) http.Cookie {
 		Value:    sessionId,
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   true,
+		Secure:   false,
 		SameSite: http.SameSiteLaxMode,
 	}
 }
@@ -36,7 +36,7 @@ func CreateUnauthenticatedCsrfCookie(req *http.Request, newToken string) http.Co
 		Value:    content,
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   true,
+		Secure:   false,
 		SameSite: http.SameSiteLaxMode,
 	}
 }

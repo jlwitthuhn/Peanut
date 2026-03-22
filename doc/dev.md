@@ -1,5 +1,13 @@
 # Developer documentation
 
+This document is intended as a short introduction for anyone unfamiliar with the project, it covers the basic of how all of Peanut's core systems fit together.
+
+## Authentication
+
+Users authenticate with Peanut using a username and password. Once a user has successfully authenticated they are given a securely-generated session key which is a bearer token. The session key is attached to all requests sent to Peanut. Upon receiving a request with a session key, middleware looks up the appropriate user from the database and attaches their user ID and other user-specific information to the request.
+
+Session keys are stored in the database and expired server-side after a configurable amount of time so users cannot hold on to them forever.
+
 ## Data access
 
 The only data store for this application is a single Postgres database.

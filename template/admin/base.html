@@ -4,28 +4,28 @@
 {{ end }}
 
 {{ define "content" }}
-<div class="cp-container">
-	<div>
-		<nav>
-			<p>General</p>
-			<p><a href="/admin">Index</a></p>
-			<p><a href="/admin/front_page">Front Page</a></p>
-			<p><a href="/admin/users">Users</a></p>
-			<p><a href="/admin/groups">Groups</a></p>
+<div class="layout with-side">
+	<aside class="layout-side">
+		<nav class="side-nav">
+			<div class="side-nav-title">General</div>
+			<a href="/admin">Index</a>
+			<a href="/admin/front_page">Front Page</a>
+			<a href="/admin/users">Users</a>
+			<a href="/admin/groups">Groups</a>
 		</nav>
-		<br>
-		<nav>
-			<p>Forum</p>
-			<p><a href="/admin/forum/sections">Sections</a></p>
+		<nav class="side-nav">
+			<div class="side-nav-title">Forum</div>
+			<a href="/admin/forum/sections">Sections</a>
 		</nav>
-		<br>
-		<nav>
-			<p>Maintenance</p>
-			<p><a href="/admin/scheduled_jobs">Scheduled Jobs</a></p>
+		<nav class="side-nav">
+			<div class="side-nav-title">Maintenance</div>
+			<a href="/admin/scheduled_jobs">Scheduled Jobs</a>
 		</nav>
+	</aside>
+	<div class="layout-main">
+		{{ block "admin_content" . }}
+			<p>Error: Failed to load admin page content.</p>
+		{{ end }}
 	</div>
-	{{ block "admin_content" . }}
-		<p>Admin page. You should never see this text.</p>
-	{{ end }}
 </div>
 {{ end }}

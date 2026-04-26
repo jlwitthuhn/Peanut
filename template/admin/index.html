@@ -1,27 +1,27 @@
 {{ block "admin_content" . }}
-<div class="vertical-flex-container">
-	<div class="simple-panel">
-		<div class="simple-panel-header"><h1>Admin Index</h1></div>
-		<div class="simple-panel-content horizontal-space-evenly">
-			<table>
-				<tr><th colspan="2">Website Information</th></tr>
-				{{ range $index, $value := .WebsiteInfo }}
-				<tr>
-					<td>{{ $value.A }}</td>
-					<td>{{ $value.B }}</td>
-				</tr>
-				{{ end }}
-			</table>
-			<table>
-				<tr><th colspan="2">Environment Information</th></tr>
-				{{ range $index, $value := .EnvironmentInfo }}
-				<tr>
-					<td>{{ $value.A }}</td>
-					<td>{{ $value.B }}</td>
-				</tr>
-				{{ end }}
-			</table>
-		</div>
+<div class="panel">
+	<div class="panel-header">
+		<h1>Admin Index</h1>
+	</div>
+	<div class="panel-body row-evenly">
+		<table>
+			<tr><th colspan="2">Website Information</th></tr>
+			{{ range $index, $value := .WebsiteInfo }}
+			<tr>
+				<td>{{ $value.A }}</td>
+				<td>{{ $value.B }}</td>
+			</tr>
+			{{ end }}
+		</table>
+		<table>
+			<tr><th colspan="2">Environment Information</th></tr>
+			{{ range $index, $value := .EnvironmentInfo }}
+			<tr>
+				<td>{{ $value.A }}</td>
+				<td>{{ $value.B }}</td>
+			</tr>
+			{{ end }}
+		</table>
 	</div>
 </div>
 {{ end }}

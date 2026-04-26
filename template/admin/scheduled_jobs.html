@@ -1,33 +1,33 @@
 {{ define "admin_content" }}
-<div class="vertical-flex-container">
-	<div class="simple-panel">
-		<div class="simple-panel-header"><h1>Scheduled Jobs</h1></div>
-		<div class="simple-panel-content horizontal-space-evenly">
-			<table>
-				<tr>
-					<th>Name</th>
-					<th>Run Interval</th>
-					<th>Last Run</th>
-					<th>Success</th>
-					<th>Run Now</th>
-				</tr>
-				{{ range .Jobs }}
-				<tr>
-					<td>{{ .Name }}</td>
-					<td>{{ .RunInterval }}</td>
-					<td>{{ .LastRunTime }}</td>
-					<td>{{ .LastRunResult }}</td>
-					<td>
-						<form method="POST" action="/admin/scheduled_jobs/run">
-							<input type="hidden" name="id" value="{{ .JobId }}">
-							<input type="hidden" name="csrf" value="{{ $.CsrfToken }}">
-							<input type="submit" value="Run">
-						</form>
-					</td>
-				</tr>
-				{{ end }}
-			</table>
-		</div>
+<div class="panel">
+	<div class="panel-header">
+		<h1>Scheduled Jobs</h1>
+	</div>
+	<div class="panel-body">
+		<table>
+			<tr>
+				<th>Name</th>
+				<th>Run Interval</th>
+				<th>Last Run</th>
+				<th>Success</th>
+				<th>Run Now</th>
+			</tr>
+			{{ range .Jobs }}
+			<tr>
+				<td>{{ .Name }}</td>
+				<td>{{ .RunInterval }}</td>
+				<td>{{ .LastRunTime }}</td>
+				<td>{{ .LastRunResult }}</td>
+				<td>
+					<form method="POST" action="/admin/scheduled_jobs/run">
+						<input type="hidden" name="id" value="{{ .JobId }}">
+						<input type="hidden" name="csrf" value="{{ $.CsrfToken }}">
+						<input type="submit" value="Run">
+					</form>
+				</td>
+			</tr>
+			{{ end }}
+		</table>
 	</div>
 </div>
 {{ end }}

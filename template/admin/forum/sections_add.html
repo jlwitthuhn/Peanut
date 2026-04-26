@@ -1,19 +1,17 @@
 {{ define "admin_content" }}
-<div class="vertical-flex-container">
-	<div class="simple-panel">
-		<div class="simple-panel-header"><h1>Add Forum Section</h1></div>
-		<div class="simple-panel-content">
-			<form action="/admin/forum/sections/add" method="post">
-				<div class="simple-column simple-center-60">
-					<label for="section_title">Title:</label>
-					<input type="text" id="section_title" name="title">
-					<label for="section_order">Order:</label>
-					<input type="text" id="section_order" name="order">
-					<input type="hidden" name="csrf" value="{{ .CsrfToken }}">
-					<input id="submit_button" type="submit" value="Submit">
-				</div>
-			</form>
-		</div>
+<div class="panel">
+	<div class="panel-header">
+		<h1>Add Forum Section</h1>
+	</div>
+	<div class="panel-body">
+		<form class="standard-form" action="/admin/forum/sections/add" method="post">
+			<label for="section_title">Title:</label>
+			<input type="text" id="section_title" name="title">
+			<label for="section_order">Order:</label>
+			<input type="text" id="section_order" name="order">
+			<input type="hidden" name="csrf" value="{{ .CsrfToken }}">
+			<input id="submit_button" type="submit" value="Submit">
+		</form>
 	</div>
 </div>
 {{ end }}

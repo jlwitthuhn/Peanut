@@ -61,7 +61,7 @@ func registerAdminFrontPageHandlers(mux *http.ServeMux, configService service.Co
 			return
 		}
 
-		ep_util.RenderSimpleMessage("Success", "New welcome message has been set: "+newMessage, w, r)
+		RenderSimpleAdminMessage("Success", "New welcome message has been set: "+newMessage, w, r)
 	})
 	mux.Handle("POST /admin/front_page/welcome_message", postFrontPageWelcomeMessageHandler)
 }

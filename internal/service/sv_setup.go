@@ -157,6 +157,10 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName stri
 	if err != nil {
 		return err
 	}
+	err = this.configService.SetInt(r, configkey.IntSessionLengthMinutes, 120)
+	if err != nil {
+		return err
+	}
 	err = this.configService.SetString(r, configkey.StringWelcomeMessage, "Haldo.")
 	if err != nil {
 		return err

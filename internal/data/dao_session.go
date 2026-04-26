@@ -34,10 +34,29 @@ var sqlCreateTableSessions = `
 	CREATE TABLE sessions (
 		id VARCHAR(100) PRIMARY KEY,
 		user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-		valid_until TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (NOW() + INTERVAL '30 minutes'),
+		valid_until TIMESTAMP WITH TIME ZONE NOT NULL,
 		_created TIMESTAMP WITH TIME ZONE NOT NULL,
 		_updated TIMESTAMP WITH TIME ZONE NOT NULL
 	);
+
+	CREATE FUNCTION fn_session_set_valid_until()
+	RETURNS TRIGGER AS $$
+	BEGIN
+		NEW.valid_until := NOW() + (
+			SELECT value || ' minutes'
+			FROM config_int
+			WHERE name = 'sessionLengthMinutes'
+		)::interval;
+    RETURN NEW;
+	END;
+	$$ LANGUAGE plpgsql;
+
+	CREATE TRIGGER
+	    sessions_trigger_valid_until_before_insert
+	BEFORE INSERT ON
+	    sessions
+	FOR EACH ROW EXECUTE FUNCTION
+	    fn_session_set_valid_until();
 
 	CREATE TRIGGER
 		sessions_trigger_created_updated_before_insert

@@ -5,4 +5,5 @@
 package configkey
 
 var IntInitializedTime = "initializedTime"
+var IntSessionLengthMinutes = "sessionLengthMinutes"
 var StringWelcomeMessage = "welcomeMessage"

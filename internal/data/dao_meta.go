@@ -38,6 +38,10 @@ func (*metaDaoImpl) CreateDBObjects(req *http.Request) error {
 	if errUpdate != nil {
 		return errUpdate
 	}
+	_, errVis := sqlh.Exec(sqlVisibilityEnum)
+	if errVis != nil {
+		return errVis
+	}
 	return nil
 }
 
@@ -112,4 +116,9 @@ var sqlCreatedUpdatedBeforeUpdate = `
 		RETURN NEW;
 	END;
 	$$ LANGUAGE plpgsql;
+`
+
+var sqlVisibilityEnum = `
+	CREATE TYPE visibility_enum
+	AS ENUM('Public', 'Private', 'Deleted');
 `

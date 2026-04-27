@@ -25,6 +25,7 @@ var sqlCreateTableForumSections = `
 		id UUID PRIMARY KEY DEFAULT uuidv7(),
 		name VARCHAR(100) UNIQUE NOT NULL,
 		ordering INTEGER NOT NULL,
+		visibility visibility_enum NOT NULL DEFAULT 'Public',
 		_created TIMESTAMP WITH TIME ZONE NOT NULL,
 		_updated TIMESTAMP WITH TIME ZONE NOT NULL
 	);

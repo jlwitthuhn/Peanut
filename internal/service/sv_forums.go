@@ -5,8 +5,11 @@
 package service
 
 import (
+	"errors"
 	"net/http"
 	"peanut/internal/data"
+	"peanut/internal/middleutil"
+	"peanut/internal/security/perms"
 )
 
 type ForumsService interface {
@@ -23,6 +26,10 @@ type forumsServiceImpl struct {
 }
 
 func (this *forumsServiceImpl) CreateSection(req *http.Request, name string, ordering float32) error {
+	if middleutil.RequestHasPermission(req, perms.Admin_Forums_Structure_Edit) == false {
+		return errors.New("permission denied")
+	}
+
 	err := this.forumSectionsDao.InsertRow(req, name, ordering)
 	return err
 }

@@ -80,20 +80,20 @@
 
         input[type="submit"] {
             padding: var(--pad);
-            background-color: var(--accent);
-            color: var(--bg);
-            border: none;
+            background-color: var(--bg-alt-2);
+            color: var(--text);
+            border: 1px solid var(--border);
             border-radius: var(--radius-sm);
             font-weight: 600;
             font-family: inherit;
         }
 
         input[type="submit"]:hover {
-            background-color: var(--accent-bright);
+            background-color: var(--border);
+            border-color: var(--text-muted);
         }
 
         input[type="submit"]:not(:disabled):active {
-            background-color: var(--accent-bright);
             transform: translateY(1px);
             box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25);
             filter: brightness(0.9);
@@ -102,7 +102,23 @@
         input[type="submit"]:disabled {
             background-color: var(--button-color-disabled);
             color: var(--bg);
+            border-color: transparent;
             opacity: 0.5;
+        }
+
+        input[type="submit"].primary-button {
+            background-color: var(--accent);
+            color: var(--bg);
+            border: none;
+        }
+
+        input[type="submit"].primary-button:hover {
+            background-color: var(--accent-bright);
+            border: none;
+        }
+
+        input[type="submit"].primary-button:not(:disabled):active {
+            background-color: var(--accent-bright);
         }
 
         table {
@@ -741,8 +757,9 @@
             <div class="panel-body">
                 <div class="center-60">
                     <p>Lines in this one should be centered</p>
-                    <p>Ayyyyyyy lmao</p>
-                    <p><input type="submit" value="Button"><input type="submit" disabled value="Disabled"></p>
+                    <p><input class="primary-button" type="submit" value="Primary"></p>
+                    <p><input type="submit" value="Normal"></p>
+                    <p><input type="submit" disabled value="Disabled"></p>
                 </div>
             </div>
         </div>

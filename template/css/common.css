@@ -75,20 +75,20 @@ input[type="password"]:focus {
 
 input[type="submit"] {
 	padding: var(--pad);
-	background-color: var(--accent);
-	color: var(--bg);
-	border: none;
+	background-color: var(--bg-alt-2);
+	color: var(--text);
+	border: 1px solid var(--border);
 	border-radius: var(--radius-sm);
 	font-weight: 600;
 	font-family: inherit;
 }
 
 input[type="submit"]:hover {
-	background-color: var(--accent-bright);
+	background-color: var(--border);
+	border-color: var(--text-muted);
 }
 
 input[type="submit"]:not(:disabled):active {
-	background-color: var(--accent-bright);
 	transform: translateY(1px);
 	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25);
 	filter: brightness(0.9);
@@ -97,7 +97,23 @@ input[type="submit"]:not(:disabled):active {
 input[type="submit"]:disabled {
 	background-color: var(--button-color-disabled);
 	color: var(--bg);
+	border-color: transparent;
 	opacity: 0.5;
+}
+
+input[type="submit"].primary-button {
+	background-color: var(--accent);
+	color: var(--bg);
+	border: none;
+}
+
+input[type="submit"].primary-button:hover {
+	background-color: var(--accent-bright);
+	border: none;
+}
+
+input[type="submit"].primary-button:not(:disabled):active {
+	background-color: var(--accent-bright);
 }
 
 table {

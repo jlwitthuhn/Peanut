@@ -28,7 +28,7 @@ func registerAdminGroupsHandlers(mux *http.ServeMux, groupService service.GroupS
 		// Truncate IDs so they don't take up the whole width of the page
 		for i := range groupRows {
 			rawId := groupRows[i].Id
-			groupRows[i].Id = "..." + rawId[len(rawId)-12:]
+			groupRows[i].Id = "..." + rawId[len(rawId)-17:]
 		}
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)

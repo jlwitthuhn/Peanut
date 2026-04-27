@@ -14,7 +14,7 @@
 			<tr>
 				<td>{{ $user.Id }}</td>
 				<td>{{ $user.DisplayName }}</a></td>
-				<td>{{ $user.Created }}</td>
+				<td>{{ $user.Created.Format "2006-01-02 15:04:05.000 MST" }}</td>
 			</tr>
 			{{ end }}
 		</table>

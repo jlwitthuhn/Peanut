@@ -35,7 +35,7 @@ func registerAdminUsersHandlers(mux *http.ServeMux, groupService service.GroupSe
 		// Truncate IDs so they don't take up the whole width of the page
 		for i := range userRows {
 			rawId := userRows[i].Id
-			userRows[i].Id = "..." + rawId[len(rawId)-12:]
+			userRows[i].Id = "..." + rawId[len(rawId)-17:]
 		}
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)

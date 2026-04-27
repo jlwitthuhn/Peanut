@@ -19,7 +19,7 @@
 				<td>{{ .Name }}</td>
 				<td>{{ .Description }}</td>
 				<td>{{ .SystemOwned }}</td>
-				<td>{{ .Created }}</td>
+				<td>{{ .Created.Format "2006-01-02 15:04:05.000 MST" }}</td>
 				<td>
 					<form action="/admin/users/list/by_group" method="post">
 						<input type="hidden" name="group" value="{{ .Name }}">

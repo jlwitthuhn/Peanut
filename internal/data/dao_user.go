@@ -181,6 +181,8 @@ func (*userDaoImpl) SelectRowsAll(req *http.Request) ([]UserRow, error) {
 		logger.Error(nil, "Got error on UserDao/SelectRowAll query:", err)
 		return nil, err
 	}
+	defer rows.Close()
+
 	var result []UserRow
 	for rows.Next() {
 		thisRow := UserRow{}

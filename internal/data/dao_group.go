@@ -88,6 +88,8 @@ func (*groupDaoImpl) SelectRowAll(req *http.Request) ([]GroupRow, error) {
 		logger.Error(nil, "Got error on GroupDao/SelectRowAll query: ", err)
 		return nil, err
 	}
+	defer rows.Close()
+
 	var result []GroupRow
 	for rows.Next() {
 		thisRow := GroupRow{}

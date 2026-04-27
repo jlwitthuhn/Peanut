@@ -5,9 +5,8 @@
 	</div>
 	<div class="panel-body">
 		<p><a href="/admin/users/list/all">List all users</a></p>
-		<hr class="fullwidth">
+		<hr>
 		<div class="simple-form">
-			<br>
 			<form class="standard-form" action="/admin/users/list/by_name" method="post">
 				<label for="input_pattern">Display name (% for wildcard):</label>
 				<input type="text" id="input_pattern" name="pattern">
@@ -15,9 +14,8 @@
 				<input type="submit" value="Search by username">
 			</form>
 		</div>
-		<hr class="fullwidth">
+		<hr>
 		<div class="simple-form">
-			<br>
 			<form class="standard-form" action="/admin/users/list/by_group" method="post">
 				<label for="group_name">Group name:</label>
 				<select id="group_name" name="group">

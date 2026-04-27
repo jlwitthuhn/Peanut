@@ -38,7 +38,8 @@ var sqlCreateTableForumSections = `
 		ordering REAL NOT NULL,
 		visibility visibility_enum NOT NULL DEFAULT 'Public',
 		_created TIMESTAMP WITH TIME ZONE NOT NULL,
-		_updated TIMESTAMP WITH TIME ZONE NOT NULL
+		_updated TIMESTAMP WITH TIME ZONE NOT NULL,
+		CONSTRAINT _con_visibility_not_private CHECK (visibility <> 'Private')
 	);
 
 	CREATE TRIGGER

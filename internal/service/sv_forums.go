@@ -10,7 +10,7 @@ import (
 )
 
 type ForumsService interface {
-	CreateSection(req *http.Request, name string, ordering int) error
+	CreateSection(req *http.Request, name string, ordering float32) error
 	GetAllSectionRows(req *http.Request) ([]data.ForumSectionRow, error)
 }
 
@@ -22,7 +22,7 @@ type forumsServiceImpl struct {
 	forumSectionsDao data.ForumSectionsDao
 }
 
-func (this *forumsServiceImpl) CreateSection(req *http.Request, name string, ordering int) error {
+func (this *forumsServiceImpl) CreateSection(req *http.Request, name string, ordering float32) error {
 	err := this.forumSectionsDao.InsertRow(req, name, ordering)
 	return err
 }

@@ -44,13 +44,13 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 		title := r.PostFormValue("title")
 		orderStr := r.PostFormValue("order")
 
-		ordering, err := strconv.Atoi(orderStr)
+		ordering, err := strconv.ParseFloat(orderStr, 32)
 		if err != nil {
-			ep_util.RenderErrorHttp400BadRequestWithMessage("Order must be a valid integer.", w, r)
+			ep_util.RenderErrorHttp400BadRequestWithMessage("Order must be a valid number.", w, r)
 			return
 		}
 
-		err = forumsService.CreateSection(r, title, ordering)
+		err = forumsService.CreateSection(r, title, float32(ordering))
 		if err != nil {
 			logger.Error(r, "Failed to create forum section: ", err)
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to create forum section.", w, r)

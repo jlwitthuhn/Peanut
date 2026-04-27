@@ -13,7 +13,7 @@ import (
 type ForumSectionRow struct {
 	Id         string
 	Name       string
-	Ordering   int
+	Ordering   float32
 	Visibility string
 	Created    time.Time
 	Updated    time.Time
@@ -21,7 +21,7 @@ type ForumSectionRow struct {
 
 type ForumSectionsDao interface {
 	CreateDBObjects(req *http.Request) error
-	InsertRow(req *http.Request, name string, ordering int) error
+	InsertRow(req *http.Request, name string, ordering float32) error
 	SelectRowAll(req *http.Request) ([]ForumSectionRow, error)
 }
 
@@ -35,7 +35,7 @@ var sqlCreateTableForumSections = `
 	CREATE TABLE forum_sections (
 		id UUID PRIMARY KEY DEFAULT uuidv7(),
 		name VARCHAR(100) UNIQUE NOT NULL,
-		ordering INTEGER NOT NULL,
+		ordering REAL NOT NULL,
 		visibility visibility_enum NOT NULL DEFAULT 'Public',
 		_created TIMESTAMP WITH TIME ZONE NOT NULL,
 		_updated TIMESTAMP WITH TIME ZONE NOT NULL
@@ -68,7 +68,7 @@ func (*forumSectionsDaoImpl) CreateDBObjects(req *http.Request) error {
 
 var sqlInsertForumSectionsRow = "INSERT INTO forum_sections(name, ordering) VALUES ($1, $2)"
 
-func (*forumSectionsDaoImpl) InsertRow(req *http.Request, name string, ordering int) error {
+func (*forumSectionsDaoImpl) InsertRow(req *http.Request, name string, ordering float32) error {
 	sqlh := getSqlExecutorFromRequest(req)
 	_, err := sqlh.Exec(sqlInsertForumSectionsRow, name, ordering)
 	if err != nil {

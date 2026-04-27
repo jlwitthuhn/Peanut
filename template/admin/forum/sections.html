@@ -1,7 +1,7 @@
 {{ define "admin_content" }}
 <div class="panel">
 	<div class="panel-header">
-		<h1>List Forum Sections</h1>
+		<h1>Forum Sections</h1>
 	</div>
 	<div class="panel-body">
 		<table>
@@ -22,14 +22,25 @@
 			</tr>
 			{{ end }}
 		</table>
+		<hr>
+		<p><a href="/admin/forum/sections/add">Add new section</a></p>
 	</div>
 </div>
 <div class="panel">
 	<div class="panel-header">
-		<h1>Modify Forum Sections</h1>
+		<h1>Delete Section</h1>
 	</div>
 	<div class="panel-body">
-		<p><a href="/admin/forum/sections/add">Add new section</a></p>
+		<form class="standard-form" action="/admin/forum/sections/delete" method="post">
+			<label for="section_name">Section:</label>
+			<select id="section_name" name="section">
+				{{ range $section := .Sections }}
+					<option value="{{ $section.Id }}">{{ $section.Name }} [{{ $section.Id }}]</option>
+				{{ end }}
+			</select>
+			<input type="hidden" name="csrf" value="{{ .CsrfToken  }}">
+			<input type="submit" value="Delete">
+		</form>
 	</div>
 </div>
 {{ end }}

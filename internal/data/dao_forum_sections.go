@@ -7,11 +7,22 @@ package data
 import (
 	"net/http"
 	"peanut/internal/logger"
+	"time"
 )
+
+type ForumSectionRow struct {
+	Id         string
+	Name       string
+	Ordering   int
+	Visibility string
+	Created    time.Time
+	Updated    time.Time
+}
 
 type ForumSectionsDao interface {
 	CreateDBObjects(req *http.Request) error
 	InsertRow(req *http.Request, name string, ordering int) error
+	SelectRowAll(req *http.Request) ([]ForumSectionRow, error)
 }
 
 func NewForumSectionsDao() ForumSectionsDao {
@@ -65,4 +76,27 @@ func (*forumSectionsDaoImpl) InsertRow(req *http.Request, name string, ordering 
 		return err
 	}
 	return nil
+}
+
+var sqlSelectForumSectionsRowAll = "SELECT id, name, ordering, visibility, _created, _updated FROM forum_sections ORDER BY ordering"
+
+func (*forumSectionsDaoImpl) SelectRowAll(req *http.Request) ([]ForumSectionRow, error) {
+	sqlh := getSqlExecutorFromRequest(req)
+	rows, err := sqlh.Query(sqlSelectForumSectionsRowAll)
+	if err != nil {
+		logger.Error(nil, "Got error on ForumSectionsDao/SelectRowAll query: ", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var result []ForumSectionRow
+	for rows.Next() {
+		thisRow := ForumSectionRow{}
+		err = rows.Scan(&thisRow.Id, &thisRow.Name, &thisRow.Ordering, &thisRow.Visibility, &thisRow.Created, &thisRow.Updated)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, thisRow)
+	}
+	return result, nil
 }

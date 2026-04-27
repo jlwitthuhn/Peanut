@@ -1,6 +1,31 @@
 {{ define "admin_content" }}
 <div class="panel">
 	<div class="panel-header">
+		<h1>List Forum Sections</h1>
+	</div>
+	<div class="panel-body">
+		<table>
+			<tr>
+				<th>ID</th>
+				<th>Name</th>
+				<th>Ordering</th>
+				<th>Visibility</th>
+				<th>Created</th>
+			</tr>
+			{{ range $section := .Sections }}
+			<tr>
+				<td>{{ $section.Id }}</td>
+				<td>{{ $section.Name }}</a></td>
+				<td>{{ $section.Ordering }}</a></td>
+				<td>{{ $section.Visibility }}</a></td>
+				<td>{{ $section.Created.Format "2006-01-02 15:04:05.000 MST" }}</td>
+			</tr>
+			{{ end }}
+		</table>
+	</div>
+</div>
+<div class="panel">
+	<div class="panel-header">
 		<h1>Modify Forum Sections</h1>
 	</div>
 	<div class="panel-body">

@@ -11,6 +11,7 @@ import (
 
 type ForumsService interface {
 	CreateSection(req *http.Request, name string, ordering int) error
+	GetAllSectionRows(req *http.Request) ([]data.ForumSectionRow, error)
 }
 
 func NewForumsService(forumSectionsDao data.ForumSectionsDao) ForumsService {
@@ -24,4 +25,9 @@ type forumsServiceImpl struct {
 func (this *forumsServiceImpl) CreateSection(req *http.Request, name string, ordering int) error {
 	err := this.forumSectionsDao.InsertRow(req, name, ordering)
 	return err
+}
+
+func (this *forumsServiceImpl) GetAllSectionRows(req *http.Request) ([]data.ForumSectionRow, error) {
+	result, err := this.forumSectionsDao.SelectRowAll(req)
+	return result, err
 }

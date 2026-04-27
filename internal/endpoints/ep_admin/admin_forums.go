@@ -17,7 +17,14 @@ import (
 
 func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.ForumsService) {
 	getSectionsHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		sectionRows, err := forumsService.GetAllSectionRows(r)
+		if err != nil {
+			ep_util.RenderErrorHttp500InternalServerError(w, r)
+			return
+		}
+
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
+		templateCtx["Sections"] = sectionRows
 		ep_util.RenderTemplate("_admin/forum/sections", templateCtx, w, r)
 	})
 	mux.Handle("GET /admin/forum/sections", getSectionsHandler)

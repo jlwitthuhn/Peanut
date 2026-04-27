@@ -34,7 +34,8 @@ func registerAdminUsersHandlers(mux *http.ServeMux, groupService service.GroupSe
 
 		// Truncate IDs so they don't take up the whole width of the page
 		for i := range userRows {
-			userRows[i].Id = userRows[i].Id[:13] + "..."
+			rawId := userRows[i].Id
+			userRows[i].Id = "..." + rawId[len(rawId)-12:]
 		}
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
@@ -52,7 +53,8 @@ func registerAdminUsersHandlers(mux *http.ServeMux, groupService service.GroupSe
 
 		// Truncate IDs so they don't take up the whole width of the page
 		for i := range userRows {
-			userRows[i].Id = userRows[i].Id[:13] + "..."
+			rawId := userRows[i].Id
+			userRows[i].Id = "..." + rawId[len(rawId)-12:]
 		}
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
@@ -70,7 +72,8 @@ func registerAdminUsersHandlers(mux *http.ServeMux, groupService service.GroupSe
 
 		// Truncate IDs so they don't take up the whole width of the page
 		for i := range userRows {
-			userRows[i].Id = userRows[i].Id[:13] + "..."
+			rawId := userRows[i].Id
+			userRows[i].Id = "..." + rawId[len(rawId)-12:]
 		}
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)

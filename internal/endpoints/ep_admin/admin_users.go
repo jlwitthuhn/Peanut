@@ -32,12 +32,6 @@ func registerAdminUsersHandlers(mux *http.ServeMux, groupService service.GroupSe
 			return
 		}
 
-		// Truncate IDs so they don't take up the whole width of the page
-		for i := range userRows {
-			rawId := userRows[i].Id
-			userRows[i].Id = "..." + rawId[len(rawId)-17:]
-		}
-
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["Users"] = userRows
 		ep_util.RenderTemplate("_admin/users_list", templateCtx, w, r)
@@ -51,12 +45,6 @@ func registerAdminUsersHandlers(mux *http.ServeMux, groupService service.GroupSe
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query users in group.", w, r)
 		}
 
-		// Truncate IDs so they don't take up the whole width of the page
-		for i := range userRows {
-			rawId := userRows[i].Id
-			userRows[i].Id = "..." + rawId[len(rawId)-12:]
-		}
-
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["Users"] = userRows
 		ep_util.RenderTemplate("_admin/users_list", templateCtx, w, r)
@@ -68,12 +56,6 @@ func registerAdminUsersHandlers(mux *http.ServeMux, groupService service.GroupSe
 		userRows, err := userService.GetUserRowsLikeName(r, pattern)
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query users matching name.", w, r)
-		}
-
-		// Truncate IDs so they don't take up the whole width of the page
-		for i := range userRows {
-			rawId := userRows[i].Id
-			userRows[i].Id = "..." + rawId[len(rawId)-12:]
 		}
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)

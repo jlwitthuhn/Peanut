@@ -57,6 +57,7 @@ func main() {
 	scheduledJobRunDao := data.NewScheduledJobRunDao()
 	sessionDao := data.NewSessionDao()
 	sessionStringDao := data.NewSessionStringDao()
+	systemLogDao := data.NewSystemLogDao()
 	userDao := data.NewUserDao()
 
 	configService := service.NewConfigService(configDao)
@@ -69,7 +70,8 @@ func main() {
 
 	setupService := service.NewSetupService(
 		configDao, forumSectionsDao, groupDao, groupMembershipDao, metaDao, scheduledJobDao, scheduledJobRunDao,
-		sessionDao, sessionStringDao, userDao, configService, dbService, groupService, scheduledJobService, userService,
+		sessionDao, sessionStringDao, systemLogDao, userDao,
+		configService, dbService, groupService, scheduledJobService, userService,
 	)
 
 	// Setup mux is separate and is only used from within DatabaseInitCheck

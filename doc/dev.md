@@ -16,6 +16,10 @@ Data is accessed through DAO structs that are defined in the `internal/data` dir
 
 DAOs are created in `main.go` and are used to construct service instances.
 
+## Javascript
+
+Javascript is purely optional for clients, no page will require JS to work. Javascript may be used to build optional dynamic GUI elements.
+
 ## Services
 
 Most business logic is implemented in the service layer. Like DAOs these are also created in `main.go`.

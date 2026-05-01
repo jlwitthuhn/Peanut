@@ -62,7 +62,7 @@ func RegisterRegisterHandlers(mux *http.ServeMux, groupService service.GroupServ
 		}
 
 		ep_util.RenderSimpleMessage("Success", "New user has been successfully registered.", w, r)
-		logger.Info(r, "Registered user:", userId)
+		logger.Info(r.Context(), "Registered user:", userId)
 	})
 	mux.Handle("POST /register", postRegisterHandler)
 }

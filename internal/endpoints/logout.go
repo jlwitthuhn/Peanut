@@ -18,13 +18,13 @@ func RegisterLogoutHandlers(mux *http.ServeMux, sessionService service.SessionSe
 		sessionId := r.Context().Value(contextkeys.SessionId)
 		sessionIdString, ok := sessionId.(string)
 		if ok == false {
-			logger.Error(r, "'sessionId' is not a string while logging out.")
+			logger.Error(r.Context(), "'sessionId' is not a string while logging out.")
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Unable to log out: failed to read session id.", w, r)
 			return
 		}
 		err := sessionService.DestroySession(r, sessionIdString)
 		if err != nil {
-			logger.Warn(r, "Failed to delete session, proceeding anyways.")
+			logger.Warn(r.Context(), "Failed to delete session, proceeding anyways.")
 		}
 
 		err = ep_util.CommitTransactionForRequest(r)

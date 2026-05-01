@@ -92,7 +92,7 @@ func (this *scheduledJobDaoImpl) SelectRowByName(req *http.Request, name string)
 	row := sqlh.QueryRow(sqlSelectScheduledJobsRowByName, name)
 	err := row.Scan(&result.Id, &result.Name, &result.RunInterval, &result.Created, &result.Updated)
 	if err != nil {
-		logger.Error(req, "Got error on SelectRowByName query:", err)
+		logger.Error(req.Context(), "Got error on SelectRowByName query:", err)
 		return nil, err
 	}
 	return result, nil
@@ -111,7 +111,7 @@ func (this *scheduledJobDaoImpl) SelectRowById(req *http.Request, id string) (*S
 	row := sqlh.QueryRow(sqlSelectScheduledJobsRowById, id)
 	err := row.Scan(&result.Id, &result.Name, &result.RunInterval, &result.Created, &result.Updated)
 	if err != nil {
-		logger.Error(req, "Got error on SelectRowById query:", err)
+		logger.Error(req.Context(), "Got error on SelectRowById query:", err)
 		return nil, err
 	}
 	return result, nil

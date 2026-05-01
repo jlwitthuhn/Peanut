@@ -50,14 +50,14 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 
 		err = forumsService.CreateSection(r, title, float32(ordering))
 		if err != nil {
-			logger.Error(r, "Failed to create forum section: ", err)
+			logger.Error(r.Context(), "Failed to create forum section: ", err)
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to create forum section.", w, r)
 			return
 		}
 
 		err = ep_util.CommitTransactionForRequest(r)
 		if err != nil {
-			logger.Error(r, "Failed to commit transaction: ", err)
+			logger.Error(r.Context(), "Failed to commit transaction: ", err)
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to commit transaction.", w, r)
 			return
 		}

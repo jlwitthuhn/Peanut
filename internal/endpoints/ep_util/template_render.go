@@ -14,7 +14,7 @@ func RenderTemplate(templateName string, context map[string]any, w http.Response
 	theTemplate := template.GetTemplate(templateName)
 	err := theTemplate.Execute(w, context)
 	if err != nil {
-		logger.Error(r, "Error executing template:", err)
+		logger.Error(r.Context(), "Error executing template:", err)
 		RenderErrorHttp500InternalServerErrorWithMessage("Failed to execute template.", w, r)
 		return
 	}

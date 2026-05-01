@@ -22,7 +22,7 @@ func registerAdminFrontPageHandlers(mux *http.ServeMux, configService service.Co
 
 		welcomeMessage, err := configService.GetString(r, configkey.StringWelcomeMessage)
 		if err != nil {
-			logger.Error(r, "Error retrieving welcome message:", err)
+			logger.Error(r.Context(), "Error retrieving welcome message:", err)
 			ep_util.RenderErrorHttp500InternalServerError(w, r)
 			return
 		}

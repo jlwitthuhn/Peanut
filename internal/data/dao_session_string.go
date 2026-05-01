@@ -59,7 +59,7 @@ func (*sessionStringDaoImpl) CreateDBObjects(req *http.Request) error {
 	sqlh := getSqlExecutorFromRequest(req)
 	_, err := sqlh.Exec(sqlCreateTableSessionString)
 	if err != nil {
-		logger.Error(req, "Got error on SessionStringDao/CreateDBObjects query: ", err)
+		logger.Error(req.Context(), "Got error on SessionStringDao/CreateDBObjects query: ", err)
 		return err
 	}
 	return nil
@@ -80,7 +80,7 @@ func (*sessionStringDaoImpl) SelectRow(req *http.Request, sessionId string, name
 	row := sqlh.QueryRow(sqlSelectSessionString, sessionId, name)
 	err := row.Scan(&result.SessionId, &result.Name, &result.Value, &result.Created, &result.Updated)
 	if err != nil {
-		logger.Error(req, "Got error on SessionStringDao/SelectString query:", err)
+		logger.Error(req.Context(), "Got error on SessionStringDao/SelectString query:", err)
 		return nil, err
 	}
 	return result, nil
@@ -99,7 +99,7 @@ func (*sessionStringDaoImpl) UpsertString(req *http.Request, sessionId string, n
 	sqlh := getSqlExecutorFromRequest(req)
 	_, err := sqlh.Exec(sqlUpsertSessionStringByName, sessionId, name, value)
 	if err != nil {
-		logger.Error(req, "Got error on SessionStringDao/UpsertString query:", err)
+		logger.Error(req.Context(), "Got error on SessionStringDao/UpsertString query:", err)
 		return err
 	}
 	return nil

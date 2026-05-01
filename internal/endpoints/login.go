@@ -37,7 +37,7 @@ func RegisterLoginHandlers(mux *http.ServeMux, sessionService service.SessionSer
 		password := r.PostFormValue("password")
 		sessionId, err := sessionService.CreateSession(r, username, password)
 		if err != nil {
-			logger.Error(r, "Error creating session:", err)
+			logger.Error(r.Context(), "Error creating session:", err)
 			errMsg := fmt.Sprint("Error logging in: ", err)
 			ep_util.RenderErrorHttp400BadRequestWithMessage(errMsg, w, r)
 			return

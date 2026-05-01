@@ -78,9 +78,9 @@ type setupServiceImpl struct {
 }
 
 func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName string, adminEmail string, adminPlainPassword string) error {
-	logger.Info(r, "Database initialization starting")
+	logger.Info(r.Context(), "Database initialization starting")
 
-	logger.Debug(r, "Checking postgres version...")
+	logger.Debug(r.Context(), "Checking postgres version...")
 	{
 		pgVersion, err := this.databaseService.GetPostgresVersion(r)
 		if err != nil {
@@ -99,7 +99,7 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName stri
 		}
 	}
 
-	logger.Debug(r, "Creating tables...")
+	logger.Debug(r.Context(), "Creating tables...")
 
 	// Core functionality
 	err := this.metaDao.CreateDBObjects(r)
@@ -150,7 +150,7 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName stri
 		return err
 	}
 
-	logger.Debug(r, "Populating data...")
+	logger.Debug(r.Context(), "Populating data...")
 
 	err = this.scheduledJobService.AddJobDefinition(r, "DeleteExpiredSessions", time.Hour)
 	if err != nil {
@@ -187,7 +187,7 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName stri
 		return err
 	}
 
-	logger.Debug(r, "Creating admin user...")
+	logger.Debug(r.Context(), "Creating admin user...")
 
 	userId, err := this.userService.CreateUser(r, adminName, adminEmail, adminPlainPassword)
 	if err != nil {
@@ -206,7 +206,7 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName stri
 		return err
 	}
 
-	logger.Info(r, "Database initialization succeeded")
+	logger.Info(r.Context(), "Database initialization succeeded")
 
 	return nil
 }

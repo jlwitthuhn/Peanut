@@ -5,9 +5,9 @@
 package logger
 
 import (
+	"context"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"path/filepath"
 	"peanut/internal/middleutil"
@@ -37,44 +37,44 @@ func getLogLevel() int {
 var theLogger = log.New(os.Stdout, "", log.LstdFlags|log.Lmicroseconds|log.Lmsgprefix)
 var logLevel = getLogLevel()
 
-func Trace(r *http.Request, args ...any) {
+func Trace(ctx context.Context, args ...any) {
 	if logLevel >= 5 {
-		fullArgs := append([]any{formatRequestId(r), "[TRAC]", getCallerLocation()}, args...)
+		fullArgs := append([]any{formatRequestId(ctx), "[TRAC]", getCallerLocation()}, args...)
 		theLogger.Println(fullArgs...)
 	}
 }
 
-func Debug(r *http.Request, args ...any) {
+func Debug(ctx context.Context, args ...any) {
 	if logLevel >= 4 {
-		fullArgs := append([]any{formatRequestId(r), "[DBUG]", getCallerLocation()}, args...)
+		fullArgs := append([]any{formatRequestId(ctx), "[DBUG]", getCallerLocation()}, args...)
 		theLogger.Println(fullArgs...)
 	}
 }
 
-func Info(r *http.Request, args ...any) {
+func Info(ctx context.Context, args ...any) {
 	if logLevel >= 3 {
-		fullArgs := append([]any{formatRequestId(r), "[INFO]", getCallerLocation()}, args...)
+		fullArgs := append([]any{formatRequestId(ctx), "[INFO]", getCallerLocation()}, args...)
 		theLogger.Println(fullArgs...)
 	}
 }
 
-func Warn(r *http.Request, args ...any) {
+func Warn(ctx context.Context, args ...any) {
 	if logLevel >= 2 {
-		fullArgs := append([]any{formatRequestId(r), "[WARN]", getCallerLocation()}, args...)
+		fullArgs := append([]any{formatRequestId(ctx), "[WARN]", getCallerLocation()}, args...)
 		theLogger.Println(fullArgs...)
 	}
 }
 
-func Error(r *http.Request, args ...any) {
+func Error(ctx context.Context, args ...any) {
 	if logLevel >= 1 {
-		fullArgs := append([]any{formatRequestId(r), "[EROR]", getCallerLocation()}, args...)
+		fullArgs := append([]any{formatRequestId(ctx), "[EROR]", getCallerLocation()}, args...)
 		theLogger.Println(fullArgs...)
 	}
 }
 
-func Fatal(r *http.Request, args ...any) {
+func Fatal(ctx context.Context, args ...any) {
 	if logLevel >= 0 {
-		fullArgs := append([]any{formatRequestId(r), "[!!!!]", getCallerLocation()}, args...)
+		fullArgs := append([]any{formatRequestId(ctx), "[!!!!]", getCallerLocation()}, args...)
 		theLogger.Fatal(fullArgs...)
 	} else {
 		// End process if logging is disabled
@@ -82,8 +82,8 @@ func Fatal(r *http.Request, args ...any) {
 	}
 }
 
-func formatRequestId(r *http.Request) string {
-	return fmt.Sprintf("(%s)", middleutil.RetrieveRequestId(r))
+func formatRequestId(ctx context.Context) string {
+	return fmt.Sprintf("(%s)", middleutil.RetrieveRequestId(ctx))
 }
 
 func getCallerLocation() string {

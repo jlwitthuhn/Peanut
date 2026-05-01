@@ -17,7 +17,7 @@ func registerAdminScheduledJobHandlers(mux *http.ServeMux, scheduledJobService s
 	getScheduledJobHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		jobs, err := scheduledJobService.GetAllJobSummaries(r)
 		if err != nil {
-			logger.Error(r, "Failed to query scheduled job summaries:", err)
+			logger.Error(r.Context(), "Failed to query scheduled job summaries:", err)
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query scheduled job summaries.", w, r)
 			return
 		}
@@ -35,14 +35,14 @@ func registerAdminScheduledJobHandlers(mux *http.ServeMux, scheduledJobService s
 		id := r.PostFormValue("id")
 		jobName, err := scheduledJobService.GetJobNameById(r, id)
 		if err != nil {
-			logger.Error(r, "Failed to query scheduled job:", err)
+			logger.Error(r.Context(), "Failed to query scheduled job:", err)
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query scheduled job.", w, r)
 			return
 		}
 
 		err = scheduledJobService.RunJob(r, jobName)
 		if err != nil {
-			logger.Error(r, "Failed to run scheduled job:", err)
+			logger.Error(r.Context(), "Failed to run scheduled job:", err)
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to run scheduled job.", w, r)
 			return
 		}

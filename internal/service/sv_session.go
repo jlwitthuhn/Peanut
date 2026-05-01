@@ -57,7 +57,7 @@ func (this *sessionServiceImpl) CreateSession(req *http.Request, username string
 		return "", err
 	}
 
-	logger.Info(req, "User logger in:", userRow.Id)
+	logger.Info(req.Context(), "User logger in:", userRow.Id)
 
 	return newSessionId, nil
 }

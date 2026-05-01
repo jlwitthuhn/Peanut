@@ -69,7 +69,7 @@ func createBackgroundHttpRequest() (*http.Request, error) {
 	// Set up db transaction
 	tx, err := datasource.PostgresHandle().BeginTx(result.Context(), nil)
 	if err != nil {
-		logger.Error(result, "Failed to create db transaction for scheduled jobs")
+		logger.Error(result.Context(), "Failed to create db transaction for scheduled jobs")
 		return nil, err
 	}
 	ctx := context.WithValue(result.Context(), contextkeys.PostgresTx, tx)
@@ -90,7 +90,7 @@ func (this *scheduledJobServiceImpl) backgroundThreadIter() {
 	}
 	tx, txOk := req.Context().Value(contextkeys.PostgresTx).(*sql.Tx)
 	if !txOk {
-		logger.Debug(req, "Database not yet initialized, waiting another cycle...")
+		logger.Debug(req.Context(), "Database not yet initialized, waiting another cycle...")
 		return
 	}
 	defer tx.Rollback()
@@ -98,34 +98,34 @@ func (this *scheduledJobServiceImpl) backgroundThreadIter() {
 	// Check if the database exists
 	exists, err := this.dbService.DoesTableExist(req, "config_int")
 	if err != nil {
-		logger.Error(req, "Failed to check if database exists")
+		logger.Error(req.Context(), "Failed to check if database exists")
 		return
 	}
 	if !exists {
-		logger.Debug(req, "Database not yet initialized, waiting another cycle...")
+		logger.Debug(req.Context(), "Database not yet initialized, waiting another cycle...")
 		return
 	}
 
 	row, err := this.multiTableDao.SelectScheduledJobByNextPending(req)
 	if err != nil {
-		logger.Error(req, "Failed to find next pending scheduled job, aborting")
+		logger.Error(req.Context(), "Failed to find next pending scheduled job, aborting")
 		return
 	}
 	if row == nil {
-		logger.Trace(req, "Nothing to do, waiting another cycle...")
+		logger.Trace(req.Context(), "Nothing to do, waiting another cycle...")
 		return
 	}
 
-	logger.Debug(req, "Running job: "+row.Name)
+	logger.Debug(req.Context(), "Running job: "+row.Name)
 	err = this.RunJob(req, row.Name)
 	if err != nil {
-		logger.Error(req, "Failed to run job, aborting")
+		logger.Error(req.Context(), "Failed to run job, aborting")
 		return
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		logger.Error(req, "Failed to commit transaction")
+		logger.Error(req.Context(), "Failed to commit transaction")
 	}
 }
 
@@ -181,28 +181,28 @@ func (this *scheduledJobServiceImpl) RunJob(req *http.Request, jobName string) e
 }
 
 func (this *scheduledJobServiceImpl) runExpiredSessionsJob(req *http.Request) error {
-	logger.Info(req, "Expired sessions job beginning")
+	logger.Info(req.Context(), "Expired sessions job beginning")
 	err := this.sessionDao.DeleteRowsByExpired(req)
 	if err != nil {
-		logger.Error(req, "Failed to delete expired sessions")
+		logger.Error(req.Context(), "Failed to delete expired sessions")
 		return errors.New("failed to delete expired sessions")
 	}
-	logger.Debug(req, "Expired sessions job complete")
+	logger.Debug(req.Context(), "Expired sessions job complete")
 	return nil
 }
 
 func (this *scheduledJobServiceImpl) runVacuumDbJob(req *http.Request) error {
-	logger.Info(req, "Vacuum database job beginning")
+	logger.Info(req.Context(), "Vacuum database job beginning")
 	dbh := datasource.PostgresHandle()
 	if dbh == nil {
-		logger.Error(req, "No postgres handle, aborting")
+		logger.Error(req.Context(), "No postgres handle, aborting")
 		return errors.New("no postgres handle")
 	}
 	err := this.metaDao.Vacuum(req, dbh)
 	if err != nil {
-		logger.Error(req, "Failed to vacuum:", err)
+		logger.Error(req.Context(), "Failed to vacuum:", err)
 		return errors.New("failed to vacuum")
 	}
-	logger.Debug(req, "Vacuum database job complete")
+	logger.Debug(req.Context(), "Vacuum database job complete")
 	return nil
 }

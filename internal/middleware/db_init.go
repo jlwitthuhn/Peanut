@@ -16,7 +16,7 @@ func DatabaseInitCheck(dbService service.DatabaseService, setupHandler http.Hand
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			tableExists, err := dbService.DoesTableExist(r, "config_int")
 			if err != nil {
-				logger.Fatal(r, err)
+				logger.Fatal(r.Context(), err)
 			}
 			if !tableExists {
 				// Allow access to setup page only when DB is not initialized

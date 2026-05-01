@@ -5,14 +5,17 @@
 package middleutil
 
 import (
-	"net/http"
+	"context"
 	"peanut/internal/keynames/contextkeys"
 )
 
-func RetrieveRequestId(r *http.Request) string {
-	if r != nil {
-		return r.Context().Value(contextkeys.RequestId).(string)
-	} else {
+func RetrieveRequestId(ctx context.Context) string {
+	if ctx == nil {
 		return "--------"
 	}
+	id, ok := ctx.Value(contextkeys.RequestId).(string)
+	if !ok {
+		return "--------"
+	}
+	return id
 }

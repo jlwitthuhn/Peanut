@@ -15,13 +15,13 @@ import (
 func CommitTransactionForRequest(req *http.Request) error {
 	tx, ok := req.Context().Value(contextkeys.PostgresTx).(*sql.Tx)
 	if !ok || tx == nil {
-		logger.Error(req, "Attempted to commit transaction with no transaction.")
+		logger.Error(req.Context(), "Attempted to commit transaction with no transaction.")
 		return errors.New("No transaction to commit.")
 	}
 
 	err := tx.Commit()
 	if err != nil {
-		logger.Error(req, "Error committing transaction:", err.Error())
+		logger.Error(req.Context(), "Error committing transaction:", err.Error())
 		return err
 	}
 

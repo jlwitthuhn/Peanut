@@ -55,15 +55,15 @@ func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService
 			return
 		}
 
-		logger.Info(r, "Input valid, initializing...")
+		logger.Info(r.Context(), "Input valid, initializing...")
 		err := setupService.InitializeDatabase(r, adminName, email, adminPassword)
 		if err != nil {
-			logger.Error(r, "Error initializing database:", err)
+			logger.Error(r.Context(), "Error initializing database:", err)
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to initialize database.", w, r)
 			return
 		}
 
-		logger.Info(r, "Committing transaction...")
+		logger.Info(r.Context(), "Committing transaction...")
 
 		err = ep_util.CommitTransactionForRequest(r)
 		if err != nil {
@@ -71,7 +71,7 @@ func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService
 			return
 		}
 
-		logger.Info(r, "Peanut initialization complete.")
+		logger.Info(r.Context(), "Peanut initialization complete.")
 		ep_util.RenderSimpleMessage("Complete", "Peanut has been initialized.", w, r)
 	})
 	mux.Handle("POST /setup", postSetupHandler)

@@ -8,8 +8,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"net/http"
-	"net/http/httptest"
 	"peanut/internal/data"
 	"peanut/internal/data/datasource"
 	"peanut/internal/keynames/contextkeys"
@@ -58,37 +56,32 @@ func (this *scheduledJobServiceImpl) AddJobDefinition(ctx context.Context, jobNa
 	return this.scheduledJobDao.InsertRow(ctx, jobName, runInterval)
 }
 
-// Application infrastructure expects each db access to be associated with a request
-// We make a fake request here for all background db operations that are not associated with a real request
-// The request here is never sent
-func createBackgroundHttpRequest() (*http.Request, error) {
-	result := httptest.NewRequest(http.MethodGet, "http://127.0.0.1", nil)
-
-	result = result.WithContext(context.WithValue(result.Context(), contextkeys.RequestId, "BGTHREAD"))
+// Application infrastructure expects each db access to be associated with a request.
+// We create a synthetic context here for all background db operations that are not
+// associated with a real request.
+func createBackgroundContext() (context.Context, error) {
+	ctx := context.WithValue(context.Background(), contextkeys.RequestId, "BGTHREAD")
 
 	// Set up db transaction
-	tx, err := datasource.PostgresHandle().BeginTx(result.Context(), nil)
+	tx, err := datasource.PostgresHandle().BeginTx(ctx, nil)
 	if err != nil {
-		logger.Error(result.Context(), "Failed to create db transaction for scheduled jobs")
+		logger.Error(ctx, "Failed to create db transaction for scheduled jobs")
 		return nil, err
 	}
-	ctx := context.WithValue(result.Context(), contextkeys.PostgresTx, tx)
-	result = result.WithContext(ctx)
+	ctx = context.WithValue(ctx, contextkeys.PostgresTx, tx)
 
 	// Add permissions
 	permissions := map[string]struct{}{perms.Admin_ScheduledJob_Run: {}}
-	ctx = context.WithValue(result.Context(), contextkeys.UserPerms, permissions)
-	result = result.WithContext(ctx)
+	ctx = context.WithValue(ctx, contextkeys.UserPerms, permissions)
 
-	return result, nil
+	return ctx, nil
 }
 
 func (this *scheduledJobServiceImpl) backgroundThreadIter() {
-	req, err := createBackgroundHttpRequest()
+	ctx, err := createBackgroundContext()
 	if err != nil {
 		return
 	}
-	ctx := req.Context()
 
 	tx, txOk := ctx.Value(contextkeys.PostgresTx).(*sql.Tx)
 	if !txOk {

@@ -47,7 +47,7 @@ func (*systemLogDaoImpl) CreateDBObjects(ctx context.Context) error {
 	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlCreateTableSystemLog)
 	if err != nil {
-		logger.Error(nil, "Got error on SystemLogDao/CreateDBObjects query: ", err)
+		logger.Error(ctx, "Got error on SystemLogDao/CreateDBObjects query: ", err)
 		return err
 	}
 	return nil

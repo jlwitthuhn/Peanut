@@ -48,7 +48,7 @@ func (*groupMembershipDaoImpl) CreateDBObjects(ctx context.Context) error {
 	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlCreateTableGroupMembership)
 	if err != nil {
-		logger.Error(nil, "Got error on GroupMembershipDao/CreateDBObjects query: ", err)
+		logger.Error(ctx, "Got error on GroupMembershipDao/CreateDBObjects query: ", err)
 		return err
 	}
 	return nil
@@ -60,7 +60,7 @@ func (*groupMembershipDaoImpl) InsertRow(ctx context.Context, userId string, gro
 	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlInsertGroupMembershipRow, userId, groupId)
 	if err != nil {
-		logger.Error(nil, "Got error on GroupMembershipDao/InsertRow query: ", err)
+		logger.Error(ctx, "Got error on GroupMembershipDao/InsertRow query: ", err)
 		return err
 	}
 	return nil

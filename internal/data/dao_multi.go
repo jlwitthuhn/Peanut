@@ -70,7 +70,7 @@ func (*multiTableDaoImpl) SelectAllScheduledJobSummaries(ctx context.Context) ([
 	sqlh := getSqlExecutorFromContext(ctx)
 	rows, err := sqlh.Query(sqlSelectAllScheduledJobSummaries)
 	if err != nil {
-		logger.Error(nil, "Got error on SelectAllScheduledJobSummaries query:", err)
+		logger.Error(ctx, "Got error on SelectAllScheduledJobSummaries query:", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -179,7 +179,7 @@ func (*multiTableDaoImpl) SelectScheduledJobByNextPending(ctx context.Context) (
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
 		}
-		logger.Error(nil, "Got error on MultiTableDao/SelectScheduledJobByNextPending query:", err)
+		logger.Error(ctx, "Got error on MultiTableDao/SelectScheduledJobByNextPending query:", err)
 		return nil, err
 	}
 	return result, nil
@@ -219,7 +219,7 @@ func (*multiTableDaoImpl) SelectUserRowsByGroupName(ctx context.Context, groupNa
 	sqlh := getSqlExecutorFromContext(ctx)
 	rows, err := sqlh.Query(sqlSelectUsersByGroupName, groupName)
 	if err != nil {
-		logger.Error(nil, "Got error on MultiTableDao/SelectRowsLikeName query:", err)
+		logger.Error(ctx, "Got error on MultiTableDao/SelectRowsLikeName query:", err)
 		return nil, err
 	}
 	defer rows.Close()

@@ -60,7 +60,7 @@ func (this *scheduledJobDaoImpl) CreateDBObjects(ctx context.Context) error {
 	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlCreateTableScheduledJobs)
 	if err != nil {
-		logger.Error(nil, "Got error on CreateDBObjects query:", err)
+		logger.Error(ctx, "Got error on CreateDBObjects query:", err)
 		return err
 	}
 	return nil
@@ -73,7 +73,7 @@ func (this *scheduledJobDaoImpl) InsertRow(ctx context.Context, name string, run
 	formattedInterval := dataformat.FormatDurationAsPostgresInterval(runInterval)
 	_, err := sqlh.Exec(sqlInsertScheduledJobsRow, name, formattedInterval)
 	if err != nil {
-		logger.Error(nil, "Got error on InsertRow query:", err)
+		logger.Error(ctx, "Got error on InsertRow query:", err)
 		return err
 	}
 	return nil

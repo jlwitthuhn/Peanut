@@ -50,14 +50,14 @@ func (*metaDaoImpl) DoesTableExist(ctx context.Context, tableName string) (bool,
 
 	rows, err := sqlh.Query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = $1", tableName)
 	if err != nil {
-		logger.Warn(nil, "Error querying in data_meta.DoesTableExist:", tableName, err)
+		logger.Warn(ctx, "Error querying in data_meta.DoesTableExist:", tableName, err)
 		return false, err
 	}
 
 	defer func(rows *sql.Rows) {
 		err := rows.Close()
 		if err != nil {
-			logger.Warn(nil, "Error closing rows in data_meta.DoesTableExist:", err)
+			logger.Warn(ctx, "Error closing rows in data_meta.DoesTableExist:", err)
 		}
 	}(rows)
 
@@ -65,7 +65,7 @@ func (*metaDaoImpl) DoesTableExist(ctx context.Context, tableName string) (bool,
 	for rows.Next() {
 		rowErr := rows.Scan(&theCount)
 		if rowErr != nil {
-			logger.Warn(nil, "Error reading query result in data_meta.DoesTableExist:", tableName, err)
+			logger.Warn(ctx, "Error reading query result in data_meta.DoesTableExist:", tableName, err)
 			return false, rowErr
 		}
 		break

@@ -83,12 +83,12 @@ func (*configDaoImpl) CreateDBObjects(ctx context.Context) error {
 	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlCreateTableConfigInt)
 	if err != nil {
-		logger.Error(nil, "Got error on ConfigDao/CreateDBObjects query: ", err)
+		logger.Error(ctx, "Got error on ConfigDao/CreateDBObjects query: ", err)
 		return err
 	}
 	_, err = sqlh.Exec(sqlCreateTableConfigString)
 	if err != nil {
-		logger.Error(nil, "Got error on ConfigDao/CreateDBObjects query: ", err)
+		logger.Error(ctx, "Got error on ConfigDao/CreateDBObjects query: ", err)
 		return err
 	}
 	return nil
@@ -133,7 +133,7 @@ func (*configDaoImpl) UpsertIntByName(ctx context.Context, name string, value in
 	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlUpsertConfigIntByName, name, value)
 	if err != nil {
-		logger.Error(nil, "Got error on ConfigDao/UpsertIntByName query: ", err)
+		logger.Error(ctx, "Got error on ConfigDao/UpsertIntByName query: ", err)
 		return err
 	}
 	return nil
@@ -152,7 +152,7 @@ func (*configDaoImpl) UpsertStringByName(ctx context.Context, name string, value
 	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlUpsertConfigStringByName, name, value)
 	if err != nil {
-		logger.Error(nil, "Got error on ConfigDao/UpsertStringByName query: ", err)
+		logger.Error(ctx, "Got error on ConfigDao/UpsertStringByName query: ", err)
 		return err
 	}
 	return nil

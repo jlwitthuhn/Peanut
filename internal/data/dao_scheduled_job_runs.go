@@ -50,7 +50,7 @@ func (*scheduledJobRunDaoImpl) CreateDBObjects(ctx context.Context) error {
 	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlCreateTableScheduledJobRuns)
 	if err != nil {
-		logger.Error(nil, "Got error on ScheduledJobRunDao/CreateDBObjects query: ", err)
+		logger.Error(ctx, "Got error on ScheduledJobRunDao/CreateDBObjects query: ", err)
 		return err
 	}
 	return nil
@@ -62,7 +62,7 @@ func (*scheduledJobRunDaoImpl) InsertRow(ctx context.Context, jobId string, succ
 	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlInsertScheduledJobRunRow, jobId, success)
 	if err != nil {
-		logger.Error(nil, "Got error on InsertRow query:", err)
+		logger.Error(ctx, "Got error on InsertRow query:", err)
 		return err
 	}
 	return nil

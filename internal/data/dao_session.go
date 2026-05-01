@@ -77,7 +77,7 @@ func (*sessionDaoImpl) CreateDBObjects(ctx context.Context) error {
 	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlCreateTableSessions)
 	if err != nil {
-		logger.Error(nil, "Got error on SessionDao/CreateDBObjects query: ", err)
+		logger.Error(ctx, "Got error on SessionDao/CreateDBObjects query: ", err)
 		return err
 	}
 	return nil
@@ -91,7 +91,7 @@ func (*sessionDaoImpl) CountValidDedupeByUser(ctx context.Context) (int64, error
 	row := sqlh.QueryRow(sqlCountValidSessionsDedupeByUser)
 	err := row.Scan(&count)
 	if err != nil {
-		logger.Error(nil, "Got error on SessionDao/CountValidDedupeByUser query: ", err)
+		logger.Error(ctx, "Got error on SessionDao/CountValidDedupeByUser query: ", err)
 		return 0, err
 	}
 	return count, nil
@@ -103,7 +103,7 @@ func (*sessionDaoImpl) DeleteRowById(ctx context.Context, sessionId string) erro
 	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlDeleteSessionsRowById, sessionId)
 	if err != nil {
-		logger.Error(nil, "Got error on SessionDao/DeleteRowById query: ", err)
+		logger.Error(ctx, "Got error on SessionDao/DeleteRowById query: ", err)
 		return err
 	}
 	return nil
@@ -115,7 +115,7 @@ func (*sessionDaoImpl) DeleteRowsByExpired(ctx context.Context) error {
 	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlDeleteSessionsRowsByExpired)
 	if err != nil {
-		logger.Error(nil, "Got error on SessionDao/DeleteRowByExpired query: ", err)
+		logger.Error(ctx, "Got error on SessionDao/DeleteRowByExpired query: ", err)
 		return err
 	}
 	return nil
@@ -127,7 +127,7 @@ func (*sessionDaoImpl) InsertRow(ctx context.Context, sessionId string, userId s
 	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlInsertSessionsRow, sessionId, userId)
 	if err != nil {
-		logger.Error(nil, "Got error on SessionDao/InsertRow query: ", err)
+		logger.Error(ctx, "Got error on SessionDao/InsertRow query: ", err)
 		return err
 	}
 	return nil
@@ -144,7 +144,7 @@ func (*sessionDaoImpl) SelectValidRowBySessionId(ctx context.Context, sessionId 
 		if err == sql.ErrNoRows {
 			return nil, nil
 		} else {
-			logger.Error(nil, "Got error on SessionDao/SelectRowBySessionId query: ", err)
+			logger.Error(ctx, "Got error on SessionDao/SelectRowBySessionId query: ", err)
 			return nil, err
 		}
 	}

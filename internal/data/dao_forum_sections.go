@@ -61,7 +61,7 @@ func (*forumSectionsDaoImpl) CreateDBObjects(ctx context.Context) error {
 	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlCreateTableForumSections)
 	if err != nil {
-		logger.Error(nil, "Got error on ForumSectionsDao/CreateDBObjects query: ", err)
+		logger.Error(ctx, "Got error on ForumSectionsDao/CreateDBObjects query: ", err)
 		return err
 	}
 	return nil
@@ -73,7 +73,7 @@ func (*forumSectionsDaoImpl) InsertRow(ctx context.Context, name string, orderin
 	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlInsertForumSectionsRow, name, ordering)
 	if err != nil {
-		logger.Error(nil, "Got error on ForumSectionsDao/InsertRow query: ", err)
+		logger.Error(ctx, "Got error on ForumSectionsDao/InsertRow query: ", err)
 		return err
 	}
 	return nil
@@ -85,7 +85,7 @@ func (*forumSectionsDaoImpl) SelectRowAll(ctx context.Context) ([]ForumSectionRo
 	sqlh := getSqlExecutorFromContext(ctx)
 	rows, err := sqlh.Query(sqlSelectForumSectionsRowAll)
 	if err != nil {
-		logger.Error(nil, "Got error on ForumSectionsDao/SelectRowAll query: ", err)
+		logger.Error(ctx, "Got error on ForumSectionsDao/SelectRowAll query: ", err)
 		return nil, err
 	}
 	defer rows.Close()

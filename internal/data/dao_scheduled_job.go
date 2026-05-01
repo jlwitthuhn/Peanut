@@ -60,7 +60,7 @@ func (this *scheduledJobDaoImpl) CreateDBObjects(ctx context.Context) error {
 	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlCreateTableScheduledJobs)
 	if err != nil {
-		logger.Error(ctx, "Got error on CreateDBObjects query:", err)
+		logger.Error(ctx, "Got database error on ScheduledJobDao/CreateDBObjects query: ", err)
 		return err
 	}
 	return nil
@@ -73,7 +73,7 @@ func (this *scheduledJobDaoImpl) InsertRow(ctx context.Context, name string, run
 	formattedInterval := dataformat.FormatDurationAsPostgresInterval(runInterval)
 	_, err := sqlh.Exec(sqlInsertScheduledJobsRow, name, formattedInterval)
 	if err != nil {
-		logger.Error(ctx, "Got error on InsertRow query:", err)
+		logger.Error(ctx, "Got database error on ScheduledJobDao/InsertRow query: ", err)
 		return err
 	}
 	return nil
@@ -92,7 +92,7 @@ func (this *scheduledJobDaoImpl) SelectRowByName(ctx context.Context, name strin
 	row := sqlh.QueryRow(sqlSelectScheduledJobsRowByName, name)
 	err := row.Scan(&result.Id, &result.Name, &result.RunInterval, &result.Created, &result.Updated)
 	if err != nil {
-		logger.Error(ctx, "Got error on SelectRowByName query:", err)
+		logger.Error(ctx, "Got database error on ScheduledJobDao/SelectRowByName query: ", err)
 		return nil, err
 	}
 	return result, nil
@@ -111,7 +111,7 @@ func (this *scheduledJobDaoImpl) SelectRowById(ctx context.Context, id string) (
 	row := sqlh.QueryRow(sqlSelectScheduledJobsRowById, id)
 	err := row.Scan(&result.Id, &result.Name, &result.RunInterval, &result.Created, &result.Updated)
 	if err != nil {
-		logger.Error(ctx, "Got error on SelectRowById query:", err)
+		logger.Error(ctx, "Got database error on ScheduledJobDao/SelectRowById query: ", err)
 		return nil, err
 	}
 	return result, nil

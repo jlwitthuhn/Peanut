@@ -70,7 +70,7 @@ func (*multiTableDaoImpl) SelectAllScheduledJobSummaries(ctx context.Context) ([
 	sqlh := getSqlExecutorFromContext(ctx)
 	rows, err := sqlh.Query(sqlSelectAllScheduledJobSummaries)
 	if err != nil {
-		logger.Error(ctx, "Got error on SelectAllScheduledJobSummaries query:", err)
+		logger.Error(ctx, "Got database error on MultiTableDao/SelectAllScheduledJobSummaries query: ", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -80,6 +80,7 @@ func (*multiTableDaoImpl) SelectAllScheduledJobSummaries(ctx context.Context) ([
 		thisSummary := ScheduledJobSummary{}
 		scanErr := rows.Scan(&thisSummary.JobId, &thisSummary.Name, &thisSummary.RunInterval, &thisSummary.LastRunTimeRaw, &thisSummary.LastRunResultRaw)
 		if scanErr != nil {
+			logger.Error(ctx, "Got database error on MultiTableDao/SelectAllScheduledJobSummaries query: ", scanErr)
 			return nil, scanErr
 		}
 		thisSummary.populateStrings()
@@ -101,6 +102,7 @@ func (*multiTableDaoImpl) SelectGroupNamesByUserId(ctx context.Context, userId s
 	sqlh := getSqlExecutorFromContext(ctx)
 	rows, err := sqlh.Query(sqlSelectGroupNamesByUserId, userId)
 	if err != nil {
+		logger.Error(ctx, "Got database error on MultiTableDao/SelectGroupNamesByUserId query: ", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -110,6 +112,7 @@ func (*multiTableDaoImpl) SelectGroupNamesByUserId(ctx context.Context, userId s
 		var thisGroup string
 		scanErr := rows.Scan(&thisGroup)
 		if scanErr != nil {
+			logger.Error(ctx, "Got database error on MultiTableDao/SelectGroupNamesByUserId query: ", scanErr)
 			return nil, scanErr
 		}
 		result = append(result, thisGroup)
@@ -179,7 +182,7 @@ func (*multiTableDaoImpl) SelectScheduledJobByNextPending(ctx context.Context) (
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
 		}
-		logger.Error(ctx, "Got error on MultiTableDao/SelectScheduledJobByNextPending query:", err)
+		logger.Error(ctx, "Got database error on MultiTableDao/SelectScheduledJobByNextPending query: ", err)
 		return nil, err
 	}
 	return result, nil
@@ -219,7 +222,7 @@ func (*multiTableDaoImpl) SelectUserRowsByGroupName(ctx context.Context, groupNa
 	sqlh := getSqlExecutorFromContext(ctx)
 	rows, err := sqlh.Query(sqlSelectUsersByGroupName, groupName)
 	if err != nil {
-		logger.Error(ctx, "Got error on MultiTableDao/SelectRowsLikeName query:", err)
+		logger.Error(ctx, "Got database error on MultiTableDao/SelectUserRowsByGroupName query: ", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -229,6 +232,7 @@ func (*multiTableDaoImpl) SelectUserRowsByGroupName(ctx context.Context, groupNa
 		thisRow := UserRow{}
 		err = rows.Scan(&thisRow.Id, &thisRow.DisplayName, &thisRow.Email, &thisRow.Password, &thisRow.Created, &thisRow.Updated)
 		if err != nil {
+			logger.Error(ctx, "Got database error on MultiTableDao/SelectUserRowsByGroupName query: ", err)
 			return nil, err
 		}
 		result = append(result, thisRow)

@@ -32,14 +32,17 @@ func (*metaDaoImpl) CreateDBObjects(ctx context.Context) error {
 	sqlh := getSqlExecutorFromContext(ctx)
 	_, errInsert := sqlh.Exec(sqlCreatedUpdatedBeforeInsert)
 	if errInsert != nil {
+		logger.Error(ctx, "Got database error on MetaDao/CreateDBObjects query: ", errInsert)
 		return errInsert
 	}
 	_, errUpdate := sqlh.Exec(sqlCreatedUpdatedBeforeUpdate)
 	if errUpdate != nil {
+		logger.Error(ctx, "Got database error on MetaDao/CreateDBObjects query: ", errUpdate)
 		return errUpdate
 	}
 	_, errVis := sqlh.Exec(sqlVisibilityEnum)
 	if errVis != nil {
+		logger.Error(ctx, "Got database error on MetaDao/CreateDBObjects query: ", errVis)
 		return errVis
 	}
 	return nil
@@ -50,14 +53,14 @@ func (*metaDaoImpl) DoesTableExist(ctx context.Context, tableName string) (bool,
 
 	rows, err := sqlh.Query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = $1", tableName)
 	if err != nil {
-		logger.Warn(ctx, "Error querying in data_meta.DoesTableExist:", tableName, err)
+		logger.Error(ctx, "Got database error on MetaDao/DoesTableExist query: ", err)
 		return false, err
 	}
 
 	defer func(rows *sql.Rows) {
 		err := rows.Close()
 		if err != nil {
-			logger.Warn(ctx, "Error closing rows in data_meta.DoesTableExist:", err)
+			logger.Error(ctx, "Got database error on MetaDao/DoesTableExist query: ", err)
 		}
 	}(rows)
 
@@ -65,7 +68,7 @@ func (*metaDaoImpl) DoesTableExist(ctx context.Context, tableName string) (bool,
 	for rows.Next() {
 		rowErr := rows.Scan(&theCount)
 		if rowErr != nil {
-			logger.Warn(ctx, "Error reading query result in data_meta.DoesTableExist:", tableName, err)
+			logger.Error(ctx, "Got database error on MetaDao/DoesTableExist query: ", rowErr)
 			return false, rowErr
 		}
 		break
@@ -81,6 +84,7 @@ func (*metaDaoImpl) SelectVersion(ctx context.Context) (string, error) {
 	row := sqlh.QueryRow(sqlShowServerVersion)
 	err := row.Scan(&version)
 	if err != nil {
+		logger.Error(ctx, "Got database error on MetaDao/SelectVersion query: ", err)
 		return "", err
 	}
 	return version, nil
@@ -91,6 +95,7 @@ var sqlVacuumDb = "VACUUM;"
 func (*metaDaoImpl) Vacuum(ctx context.Context, dbh *sql.DB) error {
 	_, err := dbh.Exec(sqlVacuumDb)
 	if err != nil {
+		logger.Error(ctx, "Got database error on MetaDao/Vacuum query: ", err)
 		return err
 	}
 	return nil

@@ -61,7 +61,7 @@ func (*groupDaoImpl) CreateDBObjects(ctx context.Context) error {
 	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlCreateTableGroups)
 	if err != nil {
-		logger.Error(ctx, "Got error on GroupDao/CreateDBObjects query: ", err)
+		logger.Error(ctx, "Got database error on GroupDao/CreateDBObjects query: ", err)
 		return err
 	}
 	return nil
@@ -73,7 +73,7 @@ func (*groupDaoImpl) InsertRow(ctx context.Context, name string, desc string, sy
 	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlInsertGroupsRow, name, desc, systemOwned)
 	if err != nil {
-		logger.Error(ctx, "Got error on GroupDao/InsertRow query: ", err)
+		logger.Error(ctx, "Got database error on GroupDao/InsertRow query: ", err)
 		return err
 	}
 	return nil
@@ -85,7 +85,7 @@ func (*groupDaoImpl) SelectRowAll(ctx context.Context) ([]GroupRow, error) {
 	sqlh := getSqlExecutorFromContext(ctx)
 	rows, err := sqlh.Query(sqlSelectGroupsRowAll)
 	if err != nil {
-		logger.Error(ctx, "Got error on GroupDao/SelectRowAll query: ", err)
+		logger.Error(ctx, "Got database error on GroupDao/SelectRowAll query: ", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -95,6 +95,7 @@ func (*groupDaoImpl) SelectRowAll(ctx context.Context) ([]GroupRow, error) {
 		thisRow := GroupRow{}
 		err = rows.Scan(&thisRow.Id, &thisRow.Name, &thisRow.Description, &thisRow.SystemOwned, &thisRow.Created, &thisRow.Updated)
 		if err != nil {
+			logger.Error(ctx, "Got database error on GroupDao/SelectRowAll query: ", err)
 			return nil, err
 		}
 		result = append(result, thisRow)
@@ -110,7 +111,7 @@ func (*groupDaoImpl) SelectRowByName(ctx context.Context, name string) (*GroupRo
 	row := sqlh.QueryRow(sqlSelectGroupsRowByName, name)
 	err := row.Scan(&result.Id, &result.Name, &result.Description, &result.SystemOwned)
 	if err != nil {
-		logger.Error(ctx, "Got error on GroupDao/SelectRowByName query: ", err)
+		logger.Error(ctx, "Got database error on GroupDao/SelectRowByName query: ", err)
 		return nil, err
 	}
 	return result, nil

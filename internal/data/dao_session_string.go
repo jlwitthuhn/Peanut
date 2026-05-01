@@ -59,7 +59,7 @@ func (*sessionStringDaoImpl) CreateDBObjects(ctx context.Context) error {
 	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlCreateTableSessionString)
 	if err != nil {
-		logger.Error(ctx, "Got error on SessionStringDao/CreateDBObjects query: ", err)
+		logger.Error(ctx, "Got database error on SessionStringDao/CreateDBObjects query: ", err)
 		return err
 	}
 	return nil
@@ -80,7 +80,7 @@ func (*sessionStringDaoImpl) SelectRow(ctx context.Context, sessionId string, na
 	row := sqlh.QueryRow(sqlSelectSessionString, sessionId, name)
 	err := row.Scan(&result.SessionId, &result.Name, &result.Value, &result.Created, &result.Updated)
 	if err != nil {
-		logger.Error(ctx, "Got error on SessionStringDao/SelectString query:", err)
+		logger.Error(ctx, "Got database error on SessionStringDao/SelectRow query: ", err)
 		return nil, err
 	}
 	return result, nil
@@ -99,7 +99,7 @@ func (*sessionStringDaoImpl) UpsertString(ctx context.Context, sessionId string,
 	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlUpsertSessionStringByName, sessionId, name, value)
 	if err != nil {
-		logger.Error(ctx, "Got error on SessionStringDao/UpsertString query:", err)
+		logger.Error(ctx, "Got database error on SessionStringDao/UpsertString query: ", err)
 		return err
 	}
 	return nil

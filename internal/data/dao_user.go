@@ -70,7 +70,7 @@ func (*userDaoImpl) CreateDBObjects(ctx context.Context) error {
 	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlCreateTableUsers)
 	if err != nil {
-		logger.Error(ctx, "Got error on UserDao/CreateDBObjects query:", err)
+		logger.Error(ctx, "Got database error on UserDao/CreateDBObjects query: ", err)
 		return err
 	}
 	return nil
@@ -84,7 +84,7 @@ func (*userDaoImpl) CountRows(ctx context.Context) (int64, error) {
 	row := sqlh.QueryRow(sqlCountUsers)
 	err := row.Scan(&count)
 	if err != nil {
-		logger.Error(ctx, "Got error on UserDao/CountRows query:", err)
+		logger.Error(ctx, "Got database error on UserDao/CountRows query: ", err)
 		return 0, err
 	}
 	return count, nil
@@ -98,7 +98,7 @@ func (*userDaoImpl) CountRowsByEmail(ctx context.Context, email string) (int64, 
 	row := sqlh.QueryRow(sqlCountUsersByEmail, email)
 	err := row.Scan(&count)
 	if err != nil {
-		logger.Error(ctx, "Got error on UserDao/CountRowsByEmail query:", err)
+		logger.Error(ctx, "Got database error on UserDao/CountRowsByEmail query: ", err)
 		return 0, err
 	}
 	return count, nil
@@ -112,7 +112,7 @@ func (*userDaoImpl) CountRowsByName(ctx context.Context, name string) (int64, er
 	row := sqlh.QueryRow(sqlCountUsersByName, name)
 	err := row.Scan(&count)
 	if err != nil {
-		logger.Error(ctx, "Got error on UserDao/CountRowsByName query:", err)
+		logger.Error(ctx, "Got database error on UserDao/CountRowsByName query: ", err)
 		return 0, err
 	}
 	return count, nil
@@ -126,7 +126,7 @@ func (*userDaoImpl) InsertRow(ctx context.Context, name string, email string, ha
 	newId := ""
 	err := row.Scan(&newId)
 	if err != nil {
-		logger.Error(ctx, "Got error on UserDao/InsertRow query:", err)
+		logger.Error(ctx, "Got database error on UserDao/InsertRow query: ", err)
 		return "", err
 	}
 	return newId, nil
@@ -152,7 +152,7 @@ func (*userDaoImpl) SelectRowById(ctx context.Context, id string) (*UserRow, err
 				return nil, nil
 			}
 		}
-		logger.Error(ctx, "Got error on UserDao/SelectRowById query:", err)
+		logger.Error(ctx, "Got database error on UserDao/SelectRowById query: ", err)
 		return nil, err
 	}
 	return result, nil
@@ -166,7 +166,7 @@ func (*userDaoImpl) SelectRowByName(ctx context.Context, name string) (*UserRow,
 	row := sqlh.QueryRow(sqlSelectUsersRowByName, name)
 	err := row.Scan(&result.Id, &result.DisplayName, &result.Email, &result.Password, &result.Created, &result.Updated)
 	if err != nil {
-		logger.Error(ctx, "Got error on UserDao/SelectRowByName query:", err)
+		logger.Error(ctx, "Got database error on UserDao/SelectRowByName query: ", err)
 		return nil, err
 	}
 	return result, nil
@@ -178,7 +178,7 @@ func (*userDaoImpl) SelectRowsAll(ctx context.Context) ([]UserRow, error) {
 	sqlh := getSqlExecutorFromContext(ctx)
 	rows, err := sqlh.Query(sqlSelectUsersRowsAll)
 	if err != nil {
-		logger.Error(ctx, "Got error on UserDao/SelectRowAll query:", err)
+		logger.Error(ctx, "Got database error on UserDao/SelectRowsAll query: ", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -188,6 +188,7 @@ func (*userDaoImpl) SelectRowsAll(ctx context.Context) ([]UserRow, error) {
 		thisRow := UserRow{}
 		err = rows.Scan(&thisRow.Id, &thisRow.DisplayName, &thisRow.Email, &thisRow.Password, &thisRow.Created, &thisRow.Updated)
 		if err != nil {
+			logger.Error(ctx, "Got database error on UserDao/SelectRowsAll query: ", err)
 			return nil, err
 		}
 		result = append(result, thisRow)
@@ -210,7 +211,7 @@ func (*userDaoImpl) SelectRowsLikeName(ctx context.Context, namePattern string) 
 	sqlh := getSqlExecutorFromContext(ctx)
 	rows, err := sqlh.Query(sqlSelectUsersRowsLikeName, namePattern)
 	if err != nil {
-		logger.Error(ctx, "Got error on UserDao/SelectRowsLikeName query:", err)
+		logger.Error(ctx, "Got database error on UserDao/SelectRowsLikeName query: ", err)
 		return nil, err
 	}
 	var result []UserRow
@@ -218,6 +219,7 @@ func (*userDaoImpl) SelectRowsLikeName(ctx context.Context, namePattern string) 
 		thisRow := UserRow{}
 		err = rows.Scan(&thisRow.Id, &thisRow.DisplayName, &thisRow.Email, &thisRow.Password, &thisRow.Created, &thisRow.Updated)
 		if err != nil {
+			logger.Error(ctx, "Got database error on UserDao/SelectRowsLikeName query: ", err)
 			return nil, err
 		}
 		result = append(result, thisRow)

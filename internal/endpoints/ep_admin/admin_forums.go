@@ -9,7 +9,6 @@ import (
 	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/logger"
-	"peanut/internal/middleutil"
 	"peanut/internal/security/perms"
 	"peanut/internal/service"
 	"strconv"
@@ -36,8 +35,7 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 	mux.Handle("GET /admin/forum/sections/add", getSectionsAddHandler)
 
 	postSectionsAddHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if middleutil.RequestHasPermission(r, perms.Admin_Forums_Structure_Edit) == false {
-			ep_util.RenderErrorHttp403Forbidden(w, r)
+		if !ep_util.RequirePermissionOr403(w, r, perms.Admin_Forums_Structure_Edit) {
 			return
 		}
 

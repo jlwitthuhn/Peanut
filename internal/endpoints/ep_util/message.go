@@ -7,6 +7,7 @@ package ep_util
 import (
 	"net/http"
 	"peanut/internal/endpoints/templatecontext"
+	"peanut/internal/middleutil"
 )
 
 func RenderErrorHttp400BadRequestWithMessage(message string, w http.ResponseWriter, r *http.Request) {
@@ -38,4 +39,14 @@ func RenderSimpleMessage(title string, message string, w http.ResponseWriter, r 
 	templateCtx["MessageBody"] = message
 	templateCtx["MessageTitle"] = title
 	RenderTemplate("_simple_message", templateCtx, w, r)
+}
+
+// RequirePermissionOr403
+// When this returns false the caller must abort handling the request and write no further output
+func RequirePermissionOr403(w http.ResponseWriter, r *http.Request, permission string) bool {
+	if middleutil.RequestHasPermission(r, permission) {
+		return true
+	}
+	RenderErrorHttp403Forbidden(w, r)
+	return false
 }

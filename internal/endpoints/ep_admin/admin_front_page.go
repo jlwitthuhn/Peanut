@@ -10,15 +10,13 @@ import (
 	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/logger"
-	"peanut/internal/middleutil"
 	"peanut/internal/security/perms"
 	"peanut/internal/service"
 )
 
 func registerAdminFrontPageHandlers(mux *http.ServeMux, configService service.ConfigService) {
 	getFrontPageHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if middleutil.RequestHasPermission(r, perms.Admin_FrontPage_Edit) == false {
-			ep_util.RenderErrorHttp403Forbidden(w, r)
+		if !ep_util.RequirePermissionOr403(w, r, perms.Admin_FrontPage_Edit) {
 			return
 		}
 
@@ -36,8 +34,7 @@ func registerAdminFrontPageHandlers(mux *http.ServeMux, configService service.Co
 	mux.Handle("GET /admin/front_page", getFrontPageHandler)
 
 	postFrontPageWelcomeMessageHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if middleutil.RequestHasPermission(r, perms.Admin_FrontPage_Edit) == false {
-			ep_util.RenderErrorHttp403Forbidden(w, r)
+		if !ep_util.RequirePermissionOr403(w, r, perms.Admin_FrontPage_Edit) {
 			return
 		}
 

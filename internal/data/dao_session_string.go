@@ -5,7 +5,7 @@
 package data
 
 import (
-	"net/http"
+	"context"
 	"peanut/internal/logger"
 	"time"
 )
@@ -19,9 +19,9 @@ type SessionStringRow struct {
 }
 
 type SessionStringDao interface {
-	CreateDBObjects(req *http.Request) error
-	SelectRow(req *http.Request, sessionId string, name string) (*SessionStringRow, error)
-	UpsertString(req *http.Request, sessionId string, name string, value string) error
+	CreateDBObjects(ctx context.Context) error
+	SelectRow(ctx context.Context, sessionId string, name string) (*SessionStringRow, error)
+	UpsertString(ctx context.Context, sessionId string, name string, value string) error
 }
 
 func NewSessionStringDao() SessionStringDao {
@@ -55,11 +55,11 @@ var sqlCreateTableSessionString = `
 		fn_created_updated_before_update();
 `
 
-func (*sessionStringDaoImpl) CreateDBObjects(req *http.Request) error {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*sessionStringDaoImpl) CreateDBObjects(ctx context.Context) error {
+	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlCreateTableSessionString)
 	if err != nil {
-		logger.Error(req.Context(), "Got error on SessionStringDao/CreateDBObjects query: ", err)
+		logger.Error(ctx, "Got error on SessionStringDao/CreateDBObjects query: ", err)
 		return err
 	}
 	return nil
@@ -74,13 +74,13 @@ var sqlSelectSessionString = `
 	    session_id = $1 AND name = $2;
 `
 
-func (*sessionStringDaoImpl) SelectRow(req *http.Request, sessionId string, name string) (*SessionStringRow, error) {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*sessionStringDaoImpl) SelectRow(ctx context.Context, sessionId string, name string) (*SessionStringRow, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
 	result := &SessionStringRow{}
 	row := sqlh.QueryRow(sqlSelectSessionString, sessionId, name)
 	err := row.Scan(&result.SessionId, &result.Name, &result.Value, &result.Created, &result.Updated)
 	if err != nil {
-		logger.Error(req.Context(), "Got error on SessionStringDao/SelectString query:", err)
+		logger.Error(ctx, "Got error on SessionStringDao/SelectString query:", err)
 		return nil, err
 	}
 	return result, nil
@@ -95,11 +95,11 @@ var sqlUpsertSessionStringByName = `
 		DO UPDATE SET value = EXCLUDED.value;
 `
 
-func (*sessionStringDaoImpl) UpsertString(req *http.Request, sessionId string, name string, value string) error {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*sessionStringDaoImpl) UpsertString(ctx context.Context, sessionId string, name string, value string) error {
+	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlUpsertSessionStringByName, sessionId, name, value)
 	if err != nil {
-		logger.Error(req.Context(), "Got error on SessionStringDao/UpsertString query:", err)
+		logger.Error(ctx, "Got error on SessionStringDao/UpsertString query:", err)
 		return err
 	}
 	return nil

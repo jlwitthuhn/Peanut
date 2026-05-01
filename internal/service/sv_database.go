@@ -23,9 +23,9 @@ type databaseServiceImpl struct {
 }
 
 func (this *databaseServiceImpl) DoesTableExist(req *http.Request, tableName string) (bool, error) {
-	return this.metaDao.DoesTableExist(req, tableName)
+	return this.metaDao.DoesTableExist(req.Context(), tableName)
 }
 
 func (this *databaseServiceImpl) GetPostgresVersion(req *http.Request) (string, error) {
-	return this.metaDao.SelectVersion(req)
+	return this.metaDao.SelectVersion(req.Context())
 }

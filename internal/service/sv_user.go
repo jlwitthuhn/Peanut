@@ -31,7 +31,7 @@ type userServiceImpl struct {
 }
 
 func (this *userServiceImpl) CountUsers(req *http.Request) (int64, error) {
-	return this.userDao.CountRows(req)
+	return this.userDao.CountRows(req.Context())
 }
 
 func (this *userServiceImpl) CreateUser(req *http.Request, name string, email string, plainPassword string) (string, error) {
@@ -52,7 +52,7 @@ func (this *userServiceImpl) CreateUser(req *http.Request, name string, email st
 
 	hashedPassword := passhash.GenerateDefaultPhcString(plainPassword)
 
-	newId, insertErr := this.userDao.InsertRow(req, name, email, hashedPassword)
+	newId, insertErr := this.userDao.InsertRow(req.Context(), name, email, hashedPassword)
 	if insertErr != nil {
 		return "", insertErr
 	}
@@ -61,19 +61,19 @@ func (this *userServiceImpl) CreateUser(req *http.Request, name string, email st
 }
 
 func (this *userServiceImpl) GetUserRowById(req *http.Request, id string) (*data.UserRow, error) {
-	return this.userDao.SelectRowById(req, id)
+	return this.userDao.SelectRowById(req.Context(), id)
 }
 
 func (this *userServiceImpl) GetUserRowsAll(req *http.Request) ([]data.UserRow, error) {
-	return this.userDao.SelectRowsAll(req)
+	return this.userDao.SelectRowsAll(req.Context())
 }
 
 func (this *userServiceImpl) GetUserRowsLikeName(req *http.Request, namePattern string) ([]data.UserRow, error) {
-	return this.userDao.SelectRowsLikeName(req, namePattern)
+	return this.userDao.SelectRowsLikeName(req.Context(), namePattern)
 }
 
 func (this *userServiceImpl) IsEmailTaken(req *http.Request, email string) (bool, error) {
-	count, err := this.userDao.CountRowsByEmail(req, email)
+	count, err := this.userDao.CountRowsByEmail(req.Context(), email)
 	if err != nil {
 		return true, err
 	}
@@ -81,7 +81,7 @@ func (this *userServiceImpl) IsEmailTaken(req *http.Request, email string) (bool
 }
 
 func (this *userServiceImpl) IsNameTaken(req *http.Request, username string) (bool, error) {
-	count, err := this.userDao.CountRowsByName(req, username)
+	count, err := this.userDao.CountRowsByName(req.Context(), username)
 	if err != nil {
 		return true, err
 	}

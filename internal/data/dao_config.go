@@ -5,7 +5,7 @@
 package data
 
 import (
-	"net/http"
+	"context"
 	"peanut/internal/logger"
 )
 
@@ -20,11 +20,11 @@ type ConfigStringRow struct {
 }
 
 type ConfigDao interface {
-	CreateDBObjects(req *http.Request) error
-	SelectIntRowByName(req *http.Request, name string) (*ConfigIntRow, error)
-	SelectStringRowByName(req *http.Request, name string) (*ConfigStringRow, error)
-	UpsertIntByName(req *http.Request, name string, value int64) error
-	UpsertStringByName(req *http.Request, name string, value string) error
+	CreateDBObjects(ctx context.Context) error
+	SelectIntRowByName(ctx context.Context, name string) (*ConfigIntRow, error)
+	SelectStringRowByName(ctx context.Context, name string) (*ConfigStringRow, error)
+	UpsertIntByName(ctx context.Context, name string, value int64) error
+	UpsertStringByName(ctx context.Context, name string, value string) error
 }
 
 func NewConfigDao() ConfigDao {
@@ -79,8 +79,8 @@ var sqlCreateTableConfigString = `
 		fn_created_updated_before_update();
 `
 
-func (*configDaoImpl) CreateDBObjects(req *http.Request) error {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*configDaoImpl) CreateDBObjects(ctx context.Context) error {
+	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlCreateTableConfigInt)
 	if err != nil {
 		logger.Error(nil, "Got error on ConfigDao/CreateDBObjects query: ", err)
@@ -96,8 +96,8 @@ func (*configDaoImpl) CreateDBObjects(req *http.Request) error {
 
 var sqlSelectConfigIntRowByName = "SELECT name, value FROM config_int WHERE name = $1"
 
-func (*configDaoImpl) SelectIntRowByName(req *http.Request, name string) (*ConfigIntRow, error) {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*configDaoImpl) SelectIntRowByName(ctx context.Context, name string) (*ConfigIntRow, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
 	result := &ConfigIntRow{}
 	row := sqlh.QueryRow(sqlSelectConfigIntRowByName, name)
 	err := row.Scan(&result.Name, &result.Value)
@@ -109,8 +109,8 @@ func (*configDaoImpl) SelectIntRowByName(req *http.Request, name string) (*Confi
 
 var sqlSelectConfigStringRowByName = "SELECT name, value FROM config_string WHERE name = $1"
 
-func (*configDaoImpl) SelectStringRowByName(req *http.Request, name string) (*ConfigStringRow, error) {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*configDaoImpl) SelectStringRowByName(ctx context.Context, name string) (*ConfigStringRow, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
 	result := &ConfigStringRow{}
 	row := sqlh.QueryRow(sqlSelectConfigStringRowByName, name)
 	err := row.Scan(&result.Name, &result.Value)
@@ -129,8 +129,8 @@ var sqlUpsertConfigIntByName = `
 		DO UPDATE SET value = EXCLUDED.value;
 `
 
-func (*configDaoImpl) UpsertIntByName(req *http.Request, name string, value int64) error {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*configDaoImpl) UpsertIntByName(ctx context.Context, name string, value int64) error {
+	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlUpsertConfigIntByName, name, value)
 	if err != nil {
 		logger.Error(nil, "Got error on ConfigDao/UpsertIntByName query: ", err)
@@ -148,8 +148,8 @@ var sqlUpsertConfigStringByName = `
 		DO UPDATE SET value = EXCLUDED.value;
 `
 
-func (*configDaoImpl) UpsertStringByName(req *http.Request, name string, value string) error {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*configDaoImpl) UpsertStringByName(ctx context.Context, name string, value string) error {
+	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlUpsertConfigStringByName, name, value)
 	if err != nil {
 		logger.Error(nil, "Got error on ConfigDao/UpsertStringByName query: ", err)

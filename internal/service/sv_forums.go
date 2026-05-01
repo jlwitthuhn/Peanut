@@ -30,11 +30,11 @@ func (this *forumsServiceImpl) CreateSection(req *http.Request, name string, ord
 		return errors.New("permission denied")
 	}
 
-	err := this.forumSectionsDao.InsertRow(req, name, ordering)
+	err := this.forumSectionsDao.InsertRow(req.Context(), name, ordering)
 	return err
 }
 
 func (this *forumsServiceImpl) GetAllSectionRows(req *http.Request) ([]data.ForumSectionRow, error) {
-	result, err := this.forumSectionsDao.SelectRowAll(req)
+	result, err := this.forumSectionsDao.SelectRowAll(req.Context())
 	return result, err
 }

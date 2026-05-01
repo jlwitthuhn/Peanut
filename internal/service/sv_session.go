@@ -33,11 +33,11 @@ type sessionServiceImpl struct {
 }
 
 func (this *sessionServiceImpl) CountUsersWithValidSession(req *http.Request) (int64, error) {
-	return this.sessionDao.CountValidDedupeByUser(req)
+	return this.sessionDao.CountValidDedupeByUser(req.Context())
 }
 
 func (this *sessionServiceImpl) CreateSession(req *http.Request, username string, plainPassword string) (string, error) {
-	userRow, userErr := this.userDao.SelectRowByName(req, username)
+	userRow, userErr := this.userDao.SelectRowByName(req.Context(), username)
 	if userErr != nil {
 		return "", userErr
 	}
@@ -46,13 +46,13 @@ func (this *sessionServiceImpl) CreateSession(req *http.Request, username string
 	}
 
 	newSessionId := security.GenerateSessionId()
-	err := this.sessionDao.InsertRow(req, newSessionId, userRow.Id)
+	err := this.sessionDao.InsertRow(req.Context(), newSessionId, userRow.Id)
 	if err != nil {
 		return "", err
 	}
 
 	newCsrfToken := security.GenerateCsrfToken()
-	err = this.sessionStringDao.UpsertString(req, newSessionId, sessionkeys.CsrfToken, newCsrfToken)
+	err = this.sessionStringDao.UpsertString(req.Context(), newSessionId, sessionkeys.CsrfToken, newCsrfToken)
 	if err != nil {
 		return "", err
 	}
@@ -63,7 +63,7 @@ func (this *sessionServiceImpl) CreateSession(req *http.Request, username string
 }
 
 func (this *sessionServiceImpl) DestroySession(req *http.Request, sessionId string) error {
-	err := this.sessionDao.DeleteRowById(req, sessionId)
+	err := this.sessionDao.DeleteRowById(req.Context(), sessionId)
 	if err != nil {
 		return err
 	}
@@ -71,7 +71,7 @@ func (this *sessionServiceImpl) DestroySession(req *http.Request, sessionId stri
 }
 
 func (this *sessionServiceImpl) GetLoggedInUserIdBySessionId(req *http.Request, sessionId string) (string, error) {
-	sessionRow, sessionErr := this.sessionDao.SelectValidRowBySessionId(req, sessionId)
+	sessionRow, sessionErr := this.sessionDao.SelectValidRowBySessionId(req.Context(), sessionId)
 	if sessionErr != nil {
 		return "", sessionErr
 	}
@@ -82,7 +82,7 @@ func (this *sessionServiceImpl) GetLoggedInUserIdBySessionId(req *http.Request, 
 }
 
 func (this *sessionServiceImpl) GetString(req *http.Request, sessionId string, key string) (string, error) {
-	row, err := this.sessionStringDao.SelectRow(req, sessionId, key)
+	row, err := this.sessionStringDao.SelectRow(req.Context(), sessionId, key)
 	if err != nil {
 		return "", err
 	}

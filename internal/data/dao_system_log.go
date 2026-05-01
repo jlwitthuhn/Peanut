@@ -5,12 +5,12 @@
 package data
 
 import (
-	"net/http"
+	"context"
 	"peanut/internal/logger"
 )
 
 type SystemLogDao interface {
-	CreateDBObjects(req *http.Request) error
+	CreateDBObjects(ctx context.Context) error
 }
 
 func NewSystemLogDao() SystemLogDao {
@@ -43,8 +43,8 @@ var sqlCreateTableSystemLog = `
 		fn_created_updated_before_update();
 `
 
-func (*systemLogDaoImpl) CreateDBObjects(req *http.Request) error {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*systemLogDaoImpl) CreateDBObjects(ctx context.Context) error {
+	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlCreateTableSystemLog)
 	if err != nil {
 		logger.Error(nil, "Got error on SystemLogDao/CreateDBObjects query: ", err)

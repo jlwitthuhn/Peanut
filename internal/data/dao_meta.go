@@ -5,16 +5,16 @@
 package data
 
 import (
+	"context"
 	"database/sql"
-	"net/http"
 	"peanut/internal/logger"
 )
 
 type MetaDao interface {
-	CreateDBObjects(req *http.Request) error
-	DoesTableExist(req *http.Request, tableName string) (bool, error)
-	SelectVersion(req *http.Request) (string, error)
-	Vacuum(req *http.Request, dbh *sql.DB) error
+	CreateDBObjects(ctx context.Context) error
+	DoesTableExist(ctx context.Context, tableName string) (bool, error)
+	SelectVersion(ctx context.Context) (string, error)
+	Vacuum(ctx context.Context, dbh *sql.DB) error
 }
 
 type metaDaoImpl struct{}
@@ -28,8 +28,8 @@ func NewMetaDao() MetaDao {
 	return &metaDaoImpl{}
 }
 
-func (*metaDaoImpl) CreateDBObjects(req *http.Request) error {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*metaDaoImpl) CreateDBObjects(ctx context.Context) error {
+	sqlh := getSqlExecutorFromContext(ctx)
 	_, errInsert := sqlh.Exec(sqlCreatedUpdatedBeforeInsert)
 	if errInsert != nil {
 		return errInsert
@@ -45,8 +45,8 @@ func (*metaDaoImpl) CreateDBObjects(req *http.Request) error {
 	return nil
 }
 
-func (*metaDaoImpl) DoesTableExist(req *http.Request, tableName string) (bool, error) {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*metaDaoImpl) DoesTableExist(ctx context.Context, tableName string) (bool, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
 
 	rows, err := sqlh.Query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = $1", tableName)
 	if err != nil {
@@ -75,8 +75,8 @@ func (*metaDaoImpl) DoesTableExist(req *http.Request, tableName string) (bool, e
 
 var sqlShowServerVersion = "SHOW server_version;"
 
-func (*metaDaoImpl) SelectVersion(req *http.Request) (string, error) {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*metaDaoImpl) SelectVersion(ctx context.Context) (string, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
 	var version string
 	row := sqlh.QueryRow(sqlShowServerVersion)
 	err := row.Scan(&version)
@@ -88,7 +88,7 @@ func (*metaDaoImpl) SelectVersion(req *http.Request) (string, error) {
 
 var sqlVacuumDb = "VACUUM;"
 
-func (*metaDaoImpl) Vacuum(req *http.Request, dbh *sql.DB) error {
+func (*metaDaoImpl) Vacuum(ctx context.Context, dbh *sql.DB) error {
 	_, err := dbh.Exec(sqlVacuumDb)
 	if err != nil {
 		return err

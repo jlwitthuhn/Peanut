@@ -5,13 +5,13 @@
 package data
 
 import (
-	"net/http"
+	"context"
 	"peanut/internal/logger"
 )
 
 type GroupMembershipDao interface {
-	CreateDBObjects(req *http.Request) error
-	InsertRow(req *http.Request, userId string, groupId string) error
+	CreateDBObjects(ctx context.Context) error
+	InsertRow(ctx context.Context, userId string, groupId string) error
 }
 
 func NewGroupMembershipDao() GroupMembershipDao {
@@ -44,8 +44,8 @@ var sqlCreateTableGroupMembership = `
 		fn_created_updated_before_update();
 `
 
-func (*groupMembershipDaoImpl) CreateDBObjects(req *http.Request) error {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*groupMembershipDaoImpl) CreateDBObjects(ctx context.Context) error {
+	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlCreateTableGroupMembership)
 	if err != nil {
 		logger.Error(nil, "Got error on GroupMembershipDao/CreateDBObjects query: ", err)
@@ -56,8 +56,8 @@ func (*groupMembershipDaoImpl) CreateDBObjects(req *http.Request) error {
 
 var sqlInsertGroupMembershipRow = "INSERT INTO group_membership (user_id, group_id) VALUES ($1,$2)"
 
-func (*groupMembershipDaoImpl) InsertRow(req *http.Request, userId string, groupId string) error {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*groupMembershipDaoImpl) InsertRow(ctx context.Context, userId string, groupId string) error {
+	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlInsertGroupMembershipRow, userId, groupId)
 	if err != nil {
 		logger.Error(nil, "Got error on GroupMembershipDao/InsertRow query: ", err)

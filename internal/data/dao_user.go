@@ -5,9 +5,9 @@
 package data
 
 import (
+	"context"
 	"database/sql"
 	"errors"
-	"net/http"
 	"peanut/internal/logger"
 	"time"
 
@@ -24,15 +24,15 @@ type UserRow struct {
 }
 
 type UserDao interface {
-	CreateDBObjects(req *http.Request) error
-	CountRows(req *http.Request) (int64, error)
-	CountRowsByEmail(req *http.Request, name string) (int64, error)
-	CountRowsByName(req *http.Request, name string) (int64, error)
-	InsertRow(req *http.Request, name string, email string, hashedPassword string) (string, error)
-	SelectRowById(req *http.Request, id string) (*UserRow, error)
-	SelectRowByName(req *http.Request, name string) (*UserRow, error)
-	SelectRowsAll(req *http.Request) ([]UserRow, error)
-	SelectRowsLikeName(req *http.Request, namePattern string) ([]UserRow, error)
+	CreateDBObjects(ctx context.Context) error
+	CountRows(ctx context.Context) (int64, error)
+	CountRowsByEmail(ctx context.Context, name string) (int64, error)
+	CountRowsByName(ctx context.Context, name string) (int64, error)
+	InsertRow(ctx context.Context, name string, email string, hashedPassword string) (string, error)
+	SelectRowById(ctx context.Context, id string) (*UserRow, error)
+	SelectRowByName(ctx context.Context, name string) (*UserRow, error)
+	SelectRowsAll(ctx context.Context) ([]UserRow, error)
+	SelectRowsLikeName(ctx context.Context, namePattern string) ([]UserRow, error)
 }
 
 func NewUserDao() UserDao {
@@ -66,8 +66,8 @@ var sqlCreateTableUsers = `
 		fn_created_updated_before_update();
 `
 
-func (*userDaoImpl) CreateDBObjects(req *http.Request) error {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*userDaoImpl) CreateDBObjects(ctx context.Context) error {
+	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlCreateTableUsers)
 	if err != nil {
 		logger.Error(nil, "Got error on UserDao/CreateDBObjects query:", err)
@@ -78,8 +78,8 @@ func (*userDaoImpl) CreateDBObjects(req *http.Request) error {
 
 var sqlCountUsers = "SELECT COUNT(*) FROM users;"
 
-func (*userDaoImpl) CountRows(req *http.Request) (int64, error) {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*userDaoImpl) CountRows(ctx context.Context) (int64, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
 	var count int64
 	row := sqlh.QueryRow(sqlCountUsers)
 	err := row.Scan(&count)
@@ -92,8 +92,8 @@ func (*userDaoImpl) CountRows(req *http.Request) (int64, error) {
 
 var sqlCountUsersByEmail = "SELECT COUNT(*) FROM users WHERE email = $1;"
 
-func (*userDaoImpl) CountRowsByEmail(req *http.Request, email string) (int64, error) {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*userDaoImpl) CountRowsByEmail(ctx context.Context, email string) (int64, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
 	var count int64
 	row := sqlh.QueryRow(sqlCountUsersByEmail, email)
 	err := row.Scan(&count)
@@ -106,8 +106,8 @@ func (*userDaoImpl) CountRowsByEmail(req *http.Request, email string) (int64, er
 
 var sqlCountUsersByName = "SELECT COUNT(*) FROM users WHERE display_name = $1;"
 
-func (*userDaoImpl) CountRowsByName(req *http.Request, name string) (int64, error) {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*userDaoImpl) CountRowsByName(ctx context.Context, name string) (int64, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
 	var count int64
 	row := sqlh.QueryRow(sqlCountUsersByName, name)
 	err := row.Scan(&count)
@@ -120,8 +120,8 @@ func (*userDaoImpl) CountRowsByName(req *http.Request, name string) (int64, erro
 
 var sqlInsertUsersRow = "INSERT INTO users (display_name, email, password) VALUES ($1, $2, $3) RETURNING id"
 
-func (*userDaoImpl) InsertRow(req *http.Request, name string, email string, hashedPassword string) (string, error) {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*userDaoImpl) InsertRow(ctx context.Context, name string, email string, hashedPassword string) (string, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
 	row := sqlh.QueryRow(sqlInsertUsersRow, name, email, hashedPassword)
 	newId := ""
 	err := row.Scan(&newId)
@@ -134,8 +134,8 @@ func (*userDaoImpl) InsertRow(req *http.Request, name string, email string, hash
 
 var sqlSelectUsersRowById = "SELECT id, display_name, email, password, _created, _updated FROM users WHERE id = $1"
 
-func (*userDaoImpl) SelectRowById(req *http.Request, id string) (*UserRow, error) {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*userDaoImpl) SelectRowById(ctx context.Context, id string) (*UserRow, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
 	result := &UserRow{}
 	row := sqlh.QueryRow(sqlSelectUsersRowById, id)
 	err := row.Scan(&result.Id, &result.DisplayName, &result.Email, &result.Password, &result.Created, &result.Updated)
@@ -160,8 +160,8 @@ func (*userDaoImpl) SelectRowById(req *http.Request, id string) (*UserRow, error
 
 var sqlSelectUsersRowByName = "SELECT id, display_name, email, password, _created, _updated FROM users WHERE display_name = $1"
 
-func (*userDaoImpl) SelectRowByName(req *http.Request, name string) (*UserRow, error) {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*userDaoImpl) SelectRowByName(ctx context.Context, name string) (*UserRow, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
 	result := &UserRow{}
 	row := sqlh.QueryRow(sqlSelectUsersRowByName, name)
 	err := row.Scan(&result.Id, &result.DisplayName, &result.Email, &result.Password, &result.Created, &result.Updated)
@@ -174,8 +174,8 @@ func (*userDaoImpl) SelectRowByName(req *http.Request, name string) (*UserRow, e
 
 var sqlSelectUsersRowsAll = "SELECT id, display_name, email, password, _created, _updated FROM users ORDER BY _created"
 
-func (*userDaoImpl) SelectRowsAll(req *http.Request) ([]UserRow, error) {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*userDaoImpl) SelectRowsAll(ctx context.Context) ([]UserRow, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
 	rows, err := sqlh.Query(sqlSelectUsersRowsAll)
 	if err != nil {
 		logger.Error(nil, "Got error on UserDao/SelectRowAll query:", err)
@@ -206,8 +206,8 @@ var sqlSelectUsersRowsLikeName = `
 	    _created
 `
 
-func (*userDaoImpl) SelectRowsLikeName(req *http.Request, namePattern string) ([]UserRow, error) {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*userDaoImpl) SelectRowsLikeName(ctx context.Context, namePattern string) ([]UserRow, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
 	rows, err := sqlh.Query(sqlSelectUsersRowsLikeName, namePattern)
 	if err != nil {
 		logger.Error(nil, "Got error on UserDao/SelectRowsLikeName query:", err)

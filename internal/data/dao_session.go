@@ -5,8 +5,8 @@
 package data
 
 import (
+	"context"
 	"database/sql"
-	"net/http"
 	"peanut/internal/logger"
 )
 
@@ -16,12 +16,12 @@ type SessionRow struct {
 }
 
 type SessionDao interface {
-	CreateDBObjects(req *http.Request) error
-	CountValidDedupeByUser(req *http.Request) (int64, error)
-	DeleteRowById(req *http.Request, sessionId string) error
-	DeleteRowsByExpired(req *http.Request) error
-	InsertRow(req *http.Request, sessionId string, userId string) error
-	SelectValidRowBySessionId(req *http.Request, sessionId string) (*SessionRow, error)
+	CreateDBObjects(ctx context.Context) error
+	CountValidDedupeByUser(ctx context.Context) (int64, error)
+	DeleteRowById(ctx context.Context, sessionId string) error
+	DeleteRowsByExpired(ctx context.Context) error
+	InsertRow(ctx context.Context, sessionId string, userId string) error
+	SelectValidRowBySessionId(ctx context.Context, sessionId string) (*SessionRow, error)
 }
 
 func NewSessionDao() SessionDao {
@@ -73,8 +73,8 @@ var sqlCreateTableSessions = `
 		fn_created_updated_before_update();
 `
 
-func (*sessionDaoImpl) CreateDBObjects(req *http.Request) error {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*sessionDaoImpl) CreateDBObjects(ctx context.Context) error {
+	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlCreateTableSessions)
 	if err != nil {
 		logger.Error(nil, "Got error on SessionDao/CreateDBObjects query: ", err)
@@ -85,8 +85,8 @@ func (*sessionDaoImpl) CreateDBObjects(req *http.Request) error {
 
 var sqlCountValidSessionsDedupeByUser = "SELECT COUNT(DISTINCT user_id) FROM sessions WHERE valid_until >= NOW();"
 
-func (*sessionDaoImpl) CountValidDedupeByUser(req *http.Request) (int64, error) {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*sessionDaoImpl) CountValidDedupeByUser(ctx context.Context) (int64, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
 	var count int64
 	row := sqlh.QueryRow(sqlCountValidSessionsDedupeByUser)
 	err := row.Scan(&count)
@@ -99,8 +99,8 @@ func (*sessionDaoImpl) CountValidDedupeByUser(req *http.Request) (int64, error) 
 
 var sqlDeleteSessionsRowById = "DELETE FROM sessions WHERE id = $1"
 
-func (*sessionDaoImpl) DeleteRowById(req *http.Request, sessionId string) error {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*sessionDaoImpl) DeleteRowById(ctx context.Context, sessionId string) error {
+	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlDeleteSessionsRowById, sessionId)
 	if err != nil {
 		logger.Error(nil, "Got error on SessionDao/DeleteRowById query: ", err)
@@ -111,8 +111,8 @@ func (*sessionDaoImpl) DeleteRowById(req *http.Request, sessionId string) error 
 
 var sqlDeleteSessionsRowsByExpired = "DELETE FROM sessions WHERE valid_until < NOW();"
 
-func (*sessionDaoImpl) DeleteRowsByExpired(req *http.Request) error {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*sessionDaoImpl) DeleteRowsByExpired(ctx context.Context) error {
+	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlDeleteSessionsRowsByExpired)
 	if err != nil {
 		logger.Error(nil, "Got error on SessionDao/DeleteRowByExpired query: ", err)
@@ -123,8 +123,8 @@ func (*sessionDaoImpl) DeleteRowsByExpired(req *http.Request) error {
 
 var sqlInsertSessionsRow = "INSERT INTO sessions (id, user_id) VALUES ($1, $2::uuid)"
 
-func (*sessionDaoImpl) InsertRow(req *http.Request, sessionId string, userId string) error {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*sessionDaoImpl) InsertRow(ctx context.Context, sessionId string, userId string) error {
+	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlInsertSessionsRow, sessionId, userId)
 	if err != nil {
 		logger.Error(nil, "Got error on SessionDao/InsertRow query: ", err)
@@ -135,8 +135,8 @@ func (*sessionDaoImpl) InsertRow(req *http.Request, sessionId string, userId str
 
 var sqlSelectSessionsRowById = "SELECT id, user_id FROM sessions WHERE id = $1 AND valid_until >= NOW()"
 
-func (*sessionDaoImpl) SelectValidRowBySessionId(req *http.Request, sessionId string) (*SessionRow, error) {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*sessionDaoImpl) SelectValidRowBySessionId(ctx context.Context, sessionId string) (*SessionRow, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
 	result := &SessionRow{}
 	row := sqlh.QueryRow(sqlSelectSessionsRowById, sessionId)
 	err := row.Scan(&result.Id, &result.UserId)

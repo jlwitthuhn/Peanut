@@ -5,7 +5,7 @@
 package data
 
 import (
-	"net/http"
+	"context"
 	"peanut/internal/data/dataformat"
 	"peanut/internal/logger"
 	"time"
@@ -20,10 +20,10 @@ type ScheduledJobRow struct {
 }
 
 type ScheduledJobDao interface {
-	CreateDBObjects(req *http.Request) error
-	InsertRow(req *http.Request, name string, runInterval time.Duration) error
-	SelectRowByName(req *http.Request, name string) (*ScheduledJobRow, error)
-	SelectRowById(req *http.Request, id string) (*ScheduledJobRow, error)
+	CreateDBObjects(ctx context.Context) error
+	InsertRow(ctx context.Context, name string, runInterval time.Duration) error
+	SelectRowByName(ctx context.Context, name string) (*ScheduledJobRow, error)
+	SelectRowById(ctx context.Context, id string) (*ScheduledJobRow, error)
 }
 
 func NewScheduledJobDao() ScheduledJobDao {
@@ -56,8 +56,8 @@ var sqlCreateTableScheduledJobs = `
 		fn_created_updated_before_update();
 `
 
-func (this *scheduledJobDaoImpl) CreateDBObjects(req *http.Request) error {
-	sqlh := getSqlExecutorFromRequest(req)
+func (this *scheduledJobDaoImpl) CreateDBObjects(ctx context.Context) error {
+	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlCreateTableScheduledJobs)
 	if err != nil {
 		logger.Error(nil, "Got error on CreateDBObjects query:", err)
@@ -68,8 +68,8 @@ func (this *scheduledJobDaoImpl) CreateDBObjects(req *http.Request) error {
 
 var sqlInsertScheduledJobsRow = "INSERT INTO scheduled_jobs(name, run_interval) VALUES ($1, $2)"
 
-func (this *scheduledJobDaoImpl) InsertRow(req *http.Request, name string, runInterval time.Duration) error {
-	sqlh := getSqlExecutorFromRequest(req)
+func (this *scheduledJobDaoImpl) InsertRow(ctx context.Context, name string, runInterval time.Duration) error {
+	sqlh := getSqlExecutorFromContext(ctx)
 	formattedInterval := dataformat.FormatDurationAsPostgresInterval(runInterval)
 	_, err := sqlh.Exec(sqlInsertScheduledJobsRow, name, formattedInterval)
 	if err != nil {
@@ -86,13 +86,13 @@ var sqlSelectScheduledJobsRowByName = `
 		WHERE name = $1
 `
 
-func (this *scheduledJobDaoImpl) SelectRowByName(req *http.Request, name string) (*ScheduledJobRow, error) {
-	sqlh := getSqlExecutorFromRequest(req)
+func (this *scheduledJobDaoImpl) SelectRowByName(ctx context.Context, name string) (*ScheduledJobRow, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
 	result := &ScheduledJobRow{}
 	row := sqlh.QueryRow(sqlSelectScheduledJobsRowByName, name)
 	err := row.Scan(&result.Id, &result.Name, &result.RunInterval, &result.Created, &result.Updated)
 	if err != nil {
-		logger.Error(req.Context(), "Got error on SelectRowByName query:", err)
+		logger.Error(ctx, "Got error on SelectRowByName query:", err)
 		return nil, err
 	}
 	return result, nil
@@ -105,13 +105,13 @@ var sqlSelectScheduledJobsRowById = `
 		WHERE id = $1
 `
 
-func (this *scheduledJobDaoImpl) SelectRowById(req *http.Request, id string) (*ScheduledJobRow, error) {
-	sqlh := getSqlExecutorFromRequest(req)
+func (this *scheduledJobDaoImpl) SelectRowById(ctx context.Context, id string) (*ScheduledJobRow, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
 	result := &ScheduledJobRow{}
 	row := sqlh.QueryRow(sqlSelectScheduledJobsRowById, id)
 	err := row.Scan(&result.Id, &result.Name, &result.RunInterval, &result.Created, &result.Updated)
 	if err != nil {
-		logger.Error(req.Context(), "Got error on SelectRowById query:", err)
+		logger.Error(ctx, "Got error on SelectRowById query:", err)
 		return nil, err
 	}
 	return result, nil

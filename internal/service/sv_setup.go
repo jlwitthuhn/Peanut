@@ -102,50 +102,50 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName stri
 	logger.Debug(r.Context(), "Creating tables...")
 
 	// Core functionality
-	err := this.metaDao.CreateDBObjects(r)
+	err := this.metaDao.CreateDBObjects(r.Context())
 	if err != nil {
 		return err
 	}
-	err = this.configDao.CreateDBObjects(r)
+	err = this.configDao.CreateDBObjects(r.Context())
 	if err != nil {
 		return err
 	}
-	err = this.groupDao.CreateDBObjects(r)
+	err = this.groupDao.CreateDBObjects(r.Context())
 	if err != nil {
 		return err
 	}
-	err = this.scheduledJobDao.CreateDBObjects(r)
+	err = this.scheduledJobDao.CreateDBObjects(r.Context())
 	if err != nil {
 		return err
 	}
-	err = this.scheduledJobRunDao.CreateDBObjects(r)
+	err = this.scheduledJobRunDao.CreateDBObjects(r.Context())
 	if err != nil {
 		return err
 	}
-	err = this.userDao.CreateDBObjects(r)
+	err = this.userDao.CreateDBObjects(r.Context())
 	// Below depend on `users` existing
 	if err != nil {
 		return err
 	}
-	err = this.groupMembershipDao.CreateDBObjects(r)
+	err = this.groupMembershipDao.CreateDBObjects(r.Context())
 	if err != nil {
 		return err
 	}
-	err = this.sessionDao.CreateDBObjects(r)
+	err = this.sessionDao.CreateDBObjects(r.Context())
 	if err != nil {
 		return err
 	}
-	err = this.sessionStringDao.CreateDBObjects(r)
+	err = this.sessionStringDao.CreateDBObjects(r.Context())
 	if err != nil {
 		return err
 	}
-	err = this.systemLogDao.CreateDBObjects(r)
+	err = this.systemLogDao.CreateDBObjects(r.Context())
 	if err != nil {
 		return err
 	}
 
 	// Forums
-	err = this.forumSectionsDao.CreateDBObjects(r)
+	err = this.forumSectionsDao.CreateDBObjects(r.Context())
 	if err != nil {
 		return err
 	}

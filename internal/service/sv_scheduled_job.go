@@ -55,7 +55,7 @@ type scheduledJobServiceImpl struct {
 }
 
 func (this *scheduledJobServiceImpl) AddJobDefinition(req *http.Request, jobName string, runInterval time.Duration) error {
-	return this.scheduledJobDao.InsertRow(req, jobName, runInterval)
+	return this.scheduledJobDao.InsertRow(req.Context(), jobName, runInterval)
 }
 
 // Application infrastructure expects each db access to be associated with a request
@@ -106,7 +106,7 @@ func (this *scheduledJobServiceImpl) backgroundThreadIter() {
 		return
 	}
 
-	row, err := this.multiTableDao.SelectScheduledJobByNextPending(req)
+	row, err := this.multiTableDao.SelectScheduledJobByNextPending(req.Context())
 	if err != nil {
 		logger.Error(req.Context(), "Failed to find next pending scheduled job, aborting")
 		return
@@ -137,11 +137,11 @@ func (this *scheduledJobServiceImpl) BackgroundThreadFunc() {
 }
 
 func (this *scheduledJobServiceImpl) GetAllJobSummaries(req *http.Request) ([]data.ScheduledJobSummary, error) {
-	return this.multiTableDao.SelectAllScheduledJobSummaries(req)
+	return this.multiTableDao.SelectAllScheduledJobSummaries(req.Context())
 }
 
 func (this *scheduledJobServiceImpl) GetJobNameById(req *http.Request, id string) (string, error) {
-	row, err := this.scheduledJobDao.SelectRowById(req, id)
+	row, err := this.scheduledJobDao.SelectRowById(req.Context(), id)
 	if err != nil {
 		return "", err
 	}
@@ -153,7 +153,7 @@ func (this *scheduledJobServiceImpl) RunJob(req *http.Request, jobName string) e
 		return errors.New("permission denied")
 	}
 
-	jobDetails, err := this.scheduledJobDao.SelectRowByName(req, jobName)
+	jobDetails, err := this.scheduledJobDao.SelectRowByName(req.Context(), jobName)
 	if err != nil {
 		return err
 	}
@@ -172,7 +172,7 @@ func (this *scheduledJobServiceImpl) RunJob(req *http.Request, jobName string) e
 		return errors.New("not implemented")
 	}
 
-	err = this.scheduledJobRunDao.InsertRow(req, jobDetails.Id, true)
+	err = this.scheduledJobRunDao.InsertRow(req.Context(), jobDetails.Id, true)
 	if err != nil {
 		return err
 	}
@@ -182,7 +182,7 @@ func (this *scheduledJobServiceImpl) RunJob(req *http.Request, jobName string) e
 
 func (this *scheduledJobServiceImpl) runExpiredSessionsJob(req *http.Request) error {
 	logger.Info(req.Context(), "Expired sessions job beginning")
-	err := this.sessionDao.DeleteRowsByExpired(req)
+	err := this.sessionDao.DeleteRowsByExpired(req.Context())
 	if err != nil {
 		logger.Error(req.Context(), "Failed to delete expired sessions")
 		return errors.New("failed to delete expired sessions")
@@ -198,7 +198,7 @@ func (this *scheduledJobServiceImpl) runVacuumDbJob(req *http.Request) error {
 		logger.Error(req.Context(), "No postgres handle, aborting")
 		return errors.New("no postgres handle")
 	}
-	err := this.metaDao.Vacuum(req, dbh)
+	err := this.metaDao.Vacuum(req.Context(), dbh)
 	if err != nil {
 		logger.Error(req.Context(), "Failed to vacuum:", err)
 		return errors.New("failed to vacuum")

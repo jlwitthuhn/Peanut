@@ -5,7 +5,7 @@
 package data
 
 import (
-	"net/http"
+	"context"
 	"peanut/internal/logger"
 	"time"
 )
@@ -20,10 +20,10 @@ type GroupRow struct {
 }
 
 type GroupDao interface {
-	CreateDBObjects(req *http.Request) error
-	InsertRow(req *http.Request, name string, desc string, systemOwned bool) error
-	SelectRowAll(req *http.Request) ([]GroupRow, error)
-	SelectRowByName(req *http.Request, name string) (*GroupRow, error)
+	CreateDBObjects(ctx context.Context) error
+	InsertRow(ctx context.Context, name string, desc string, systemOwned bool) error
+	SelectRowAll(ctx context.Context) ([]GroupRow, error)
+	SelectRowByName(ctx context.Context, name string) (*GroupRow, error)
 }
 
 func NewGroupDao() GroupDao {
@@ -57,8 +57,8 @@ var sqlCreateTableGroups = `
 		fn_created_updated_before_update();
 `
 
-func (*groupDaoImpl) CreateDBObjects(req *http.Request) error {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*groupDaoImpl) CreateDBObjects(ctx context.Context) error {
+	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlCreateTableGroups)
 	if err != nil {
 		logger.Error(nil, "Got error on GroupDao/CreateDBObjects query: ", err)
@@ -69,8 +69,8 @@ func (*groupDaoImpl) CreateDBObjects(req *http.Request) error {
 
 var sqlInsertGroupsRow = "INSERT INTO groups(name, description, system_owned) VALUES ($1, $2, $3)"
 
-func (*groupDaoImpl) InsertRow(req *http.Request, name string, desc string, systemOwned bool) error {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*groupDaoImpl) InsertRow(ctx context.Context, name string, desc string, systemOwned bool) error {
+	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlInsertGroupsRow, name, desc, systemOwned)
 	if err != nil {
 		logger.Error(nil, "Got error on GroupDao/InsertRow query: ", err)
@@ -81,8 +81,8 @@ func (*groupDaoImpl) InsertRow(req *http.Request, name string, desc string, syst
 
 var sqlSelectGroupsRowAll = "SELECT id, name, description, system_owned, _created, _updated FROM groups ORDER BY name"
 
-func (*groupDaoImpl) SelectRowAll(req *http.Request) ([]GroupRow, error) {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*groupDaoImpl) SelectRowAll(ctx context.Context) ([]GroupRow, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
 	rows, err := sqlh.Query(sqlSelectGroupsRowAll)
 	if err != nil {
 		logger.Error(nil, "Got error on GroupDao/SelectRowAll query: ", err)
@@ -104,8 +104,8 @@ func (*groupDaoImpl) SelectRowAll(req *http.Request) ([]GroupRow, error) {
 
 var sqlSelectGroupsRowByName = "SELECT id, name, description, system_owned FROM groups WHERE name = $1"
 
-func (*groupDaoImpl) SelectRowByName(req *http.Request, name string) (*GroupRow, error) {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*groupDaoImpl) SelectRowByName(ctx context.Context, name string) (*GroupRow, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
 	result := &GroupRow{}
 	row := sqlh.QueryRow(sqlSelectGroupsRowByName, name)
 	err := row.Scan(&result.Id, &result.Name, &result.Description, &result.SystemOwned)

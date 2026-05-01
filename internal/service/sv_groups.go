@@ -29,12 +29,12 @@ type groupServiceImpl struct {
 }
 
 func (this *groupServiceImpl) CreateGroup(req *http.Request, name string, desc string, systemOwned bool) error {
-	err := this.groupDao.InsertRow(req, name, desc, systemOwned)
+	err := this.groupDao.InsertRow(req.Context(), name, desc, systemOwned)
 	return err
 }
 
 func (this *groupServiceImpl) GetAllGroupNames(req *http.Request) ([]string, error) {
-	groupRows, err := this.groupDao.SelectRowAll(req)
+	groupRows, err := this.groupDao.SelectRowAll(req.Context())
 	if err != nil {
 		return nil, err
 	}
@@ -46,11 +46,11 @@ func (this *groupServiceImpl) GetAllGroupNames(req *http.Request) ([]string, err
 }
 
 func (this *groupServiceImpl) GetAllGroupRows(req *http.Request) ([]data.GroupRow, error) {
-	return this.groupDao.SelectRowAll(req)
+	return this.groupDao.SelectRowAll(req.Context())
 }
 
 func (this *groupServiceImpl) GetGroupsByUserId(req *http.Request, userId string) ([]string, error) {
-	groupNames, err := this.multiTableDao.SelectGroupNamesByUserId(req, userId)
+	groupNames, err := this.multiTableDao.SelectGroupNamesByUserId(req.Context(), userId)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func (this *groupServiceImpl) GetGroupsByUserId(req *http.Request, userId string
 }
 
 func (this *groupServiceImpl) GetUserRowsByGroupName(req *http.Request, groupName string) ([]data.UserRow, error) {
-	userRows, err := this.multiTableDao.SelectUserRowsByGroupName(req, groupName)
+	userRows, err := this.multiTableDao.SelectUserRowsByGroupName(req.Context(), groupName)
 	if err != nil {
 		return nil, err
 	}
@@ -66,11 +66,11 @@ func (this *groupServiceImpl) GetUserRowsByGroupName(req *http.Request, groupNam
 }
 
 func (this *groupServiceImpl) EnrollUserInGroup(req *http.Request, userId string, groupName string) error {
-	groupRow, groupErr := this.groupDao.SelectRowByName(req, groupName)
+	groupRow, groupErr := this.groupDao.SelectRowByName(req.Context(), groupName)
 	if groupErr != nil {
 		return groupErr
 	}
-	err := this.groupMembershipDao.InsertRow(req, userId, groupRow.Id)
+	err := this.groupMembershipDao.InsertRow(req.Context(), userId, groupRow.Id)
 	if err != nil {
 		return err
 	}

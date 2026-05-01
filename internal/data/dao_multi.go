@@ -5,9 +5,9 @@
 package data
 
 import (
+	"context"
 	"database/sql"
 	"errors"
-	"net/http"
 	"peanut/internal/logger"
 )
 
@@ -35,10 +35,10 @@ func (this *ScheduledJobSummary) populateStrings() {
 }
 
 type MultiTableDao interface {
-	SelectAllScheduledJobSummaries(req *http.Request) ([]ScheduledJobSummary, error)
-	SelectGroupNamesByUserId(r *http.Request, userId string) ([]string, error)
-	SelectScheduledJobByNextPending(r *http.Request) (*ScheduledJobRow, error)
-	SelectUserRowsByGroupName(r *http.Request, groupName string) ([]UserRow, error)
+	SelectAllScheduledJobSummaries(ctx context.Context) ([]ScheduledJobSummary, error)
+	SelectGroupNamesByUserId(ctx context.Context, userId string) ([]string, error)
+	SelectScheduledJobByNextPending(ctx context.Context) (*ScheduledJobRow, error)
+	SelectUserRowsByGroupName(ctx context.Context, groupName string) ([]UserRow, error)
 }
 
 func NewMultiTableDao() MultiTableDao {
@@ -66,8 +66,8 @@ var sqlSelectAllScheduledJobSummaries = `
 	    name
 `
 
-func (*multiTableDaoImpl) SelectAllScheduledJobSummaries(req *http.Request) ([]ScheduledJobSummary, error) {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*multiTableDaoImpl) SelectAllScheduledJobSummaries(ctx context.Context) ([]ScheduledJobSummary, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
 	rows, err := sqlh.Query(sqlSelectAllScheduledJobSummaries)
 	if err != nil {
 		logger.Error(nil, "Got error on SelectAllScheduledJobSummaries query:", err)
@@ -97,8 +97,8 @@ var sqlSelectGroupNamesByUserId = `
 	    group_membership.user_id = $1
 `
 
-func (*multiTableDaoImpl) SelectGroupNamesByUserId(req *http.Request, userId string) ([]string, error) {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*multiTableDaoImpl) SelectGroupNamesByUserId(ctx context.Context, userId string) ([]string, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
 	rows, err := sqlh.Query(sqlSelectGroupNamesByUserId, userId)
 	if err != nil {
 		return nil, err
@@ -170,8 +170,8 @@ var sqlSelectScheduledJobByNextPending = `
 	FETCH FIRST 1 ROWS ONLY
 `
 
-func (*multiTableDaoImpl) SelectScheduledJobByNextPending(req *http.Request) (*ScheduledJobRow, error) {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*multiTableDaoImpl) SelectScheduledJobByNextPending(ctx context.Context) (*ScheduledJobRow, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
 	result := &ScheduledJobRow{}
 	row := sqlh.QueryRow(sqlSelectScheduledJobByNextPending)
 	err := row.Scan(&result.Id, &result.Name, &result.RunInterval, &result.Created, &result.Updated)
@@ -215,8 +215,8 @@ var sqlSelectUsersByGroupName = `
 		_created
 `
 
-func (*multiTableDaoImpl) SelectUserRowsByGroupName(req *http.Request, groupName string) ([]UserRow, error) {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*multiTableDaoImpl) SelectUserRowsByGroupName(ctx context.Context, groupName string) ([]UserRow, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
 	rows, err := sqlh.Query(sqlSelectUsersByGroupName, groupName)
 	if err != nil {
 		logger.Error(nil, "Got error on MultiTableDao/SelectRowsLikeName query:", err)

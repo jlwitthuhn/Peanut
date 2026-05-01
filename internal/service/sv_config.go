@@ -25,7 +25,7 @@ type configServiceImpl struct {
 }
 
 func (this *configServiceImpl) GetInt(req *http.Request, key string) (int64, error) {
-	row, err := this.configDao.SelectIntRowByName(req, key)
+	row, err := this.configDao.SelectIntRowByName(req.Context(), key)
 	if err != nil {
 		return 0, err
 	}
@@ -33,7 +33,7 @@ func (this *configServiceImpl) GetInt(req *http.Request, key string) (int64, err
 }
 
 func (this *configServiceImpl) GetString(req *http.Request, key string) (string, error) {
-	row, err := this.configDao.SelectStringRowByName(req, key)
+	row, err := this.configDao.SelectStringRowByName(req.Context(), key)
 	if err != nil {
 		return "", err
 	}
@@ -41,11 +41,11 @@ func (this *configServiceImpl) GetString(req *http.Request, key string) (string,
 }
 
 func (this *configServiceImpl) SetInt(req *http.Request, name string, value int64) error {
-	err := this.configDao.UpsertIntByName(req, name, value)
+	err := this.configDao.UpsertIntByName(req.Context(), name, value)
 	return err
 }
 
 func (this *configServiceImpl) SetString(req *http.Request, name string, value string) error {
-	err := this.configDao.UpsertStringByName(req, name, value)
+	err := this.configDao.UpsertStringByName(req.Context(), name, value)
 	return err
 }

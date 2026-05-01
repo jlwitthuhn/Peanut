@@ -5,7 +5,7 @@
 package data
 
 import (
-	"net/http"
+	"context"
 	"peanut/internal/logger"
 	"time"
 )
@@ -20,9 +20,9 @@ type ForumSectionRow struct {
 }
 
 type ForumSectionsDao interface {
-	CreateDBObjects(req *http.Request) error
-	InsertRow(req *http.Request, name string, ordering float32) error
-	SelectRowAll(req *http.Request) ([]ForumSectionRow, error)
+	CreateDBObjects(ctx context.Context) error
+	InsertRow(ctx context.Context, name string, ordering float32) error
+	SelectRowAll(ctx context.Context) ([]ForumSectionRow, error)
 }
 
 func NewForumSectionsDao() ForumSectionsDao {
@@ -57,8 +57,8 @@ var sqlCreateTableForumSections = `
 		fn_created_updated_before_update();
 `
 
-func (*forumSectionsDaoImpl) CreateDBObjects(req *http.Request) error {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*forumSectionsDaoImpl) CreateDBObjects(ctx context.Context) error {
+	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlCreateTableForumSections)
 	if err != nil {
 		logger.Error(nil, "Got error on ForumSectionsDao/CreateDBObjects query: ", err)
@@ -69,8 +69,8 @@ func (*forumSectionsDaoImpl) CreateDBObjects(req *http.Request) error {
 
 var sqlInsertForumSectionsRow = "INSERT INTO forum_sections(name, ordering) VALUES ($1, $2)"
 
-func (*forumSectionsDaoImpl) InsertRow(req *http.Request, name string, ordering float32) error {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*forumSectionsDaoImpl) InsertRow(ctx context.Context, name string, ordering float32) error {
+	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlInsertForumSectionsRow, name, ordering)
 	if err != nil {
 		logger.Error(nil, "Got error on ForumSectionsDao/InsertRow query: ", err)
@@ -81,8 +81,8 @@ func (*forumSectionsDaoImpl) InsertRow(req *http.Request, name string, ordering 
 
 var sqlSelectForumSectionsRowAll = "SELECT id, name, ordering, visibility, _created, _updated FROM forum_sections ORDER BY ordering"
 
-func (*forumSectionsDaoImpl) SelectRowAll(req *http.Request) ([]ForumSectionRow, error) {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*forumSectionsDaoImpl) SelectRowAll(ctx context.Context) ([]ForumSectionRow, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
 	rows, err := sqlh.Query(sqlSelectForumSectionsRowAll)
 	if err != nil {
 		logger.Error(nil, "Got error on ForumSectionsDao/SelectRowAll query: ", err)

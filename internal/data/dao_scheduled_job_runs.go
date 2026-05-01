@@ -5,13 +5,13 @@
 package data
 
 import (
-	"net/http"
+	"context"
 	"peanut/internal/logger"
 )
 
 type ScheduledJobRunDao interface {
-	CreateDBObjects(req *http.Request) error
-	InsertRow(req *http.Request, jobId string, success bool) error
+	CreateDBObjects(ctx context.Context) error
+	InsertRow(ctx context.Context, jobId string, success bool) error
 }
 
 func NewScheduledJobRunDao() ScheduledJobRunDao {
@@ -46,8 +46,8 @@ var sqlCreateTableScheduledJobRuns = `
 		fn_created_updated_before_update();
 `
 
-func (*scheduledJobRunDaoImpl) CreateDBObjects(req *http.Request) error {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*scheduledJobRunDaoImpl) CreateDBObjects(ctx context.Context) error {
+	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlCreateTableScheduledJobRuns)
 	if err != nil {
 		logger.Error(nil, "Got error on ScheduledJobRunDao/CreateDBObjects query: ", err)
@@ -58,8 +58,8 @@ func (*scheduledJobRunDaoImpl) CreateDBObjects(req *http.Request) error {
 
 var sqlInsertScheduledJobRunRow = "INSERT INTO scheduled_job_runs(job_id, success) VALUES ($1, $2)"
 
-func (*scheduledJobRunDaoImpl) InsertRow(req *http.Request, jobId string, success bool) error {
-	sqlh := getSqlExecutorFromRequest(req)
+func (*scheduledJobRunDaoImpl) InsertRow(ctx context.Context, jobId string, success bool) error {
+	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlInsertScheduledJobRunRow, jobId, success)
 	if err != nil {
 		logger.Error(nil, "Got error on InsertRow query:", err)

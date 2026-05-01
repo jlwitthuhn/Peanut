@@ -5,8 +5,8 @@
 package data
 
 import (
+	"context"
 	"database/sql"
-	"net/http"
 	"peanut/internal/data/datasource"
 	"peanut/internal/keynames/contextkeys"
 )
@@ -17,8 +17,8 @@ type sqlExecutor interface {
 	QueryRow(query string, args ...any) *sql.Row
 }
 
-func getSqlExecutorFromRequest(r *http.Request) sqlExecutor {
-	tx, ok := r.Context().Value(contextkeys.PostgresTx).(*sql.Tx)
+func getSqlExecutorFromContext(ctx context.Context) sqlExecutor {
+	tx, ok := ctx.Value(contextkeys.PostgresTx).(*sql.Tx)
 	if !ok || tx == nil {
 		return datasource.PostgresHandle()
 	}

@@ -19,7 +19,7 @@ func registerAdminGroupsHandlers(mux *http.ServeMux, groupService service.GroupS
 	mux.Handle("GET /admin/groups", getHandler)
 
 	getListAllHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		groupRows, err := groupService.GetAllGroupRows(r)
+		groupRows, err := groupService.GetAllGroupRows(r.Context())
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query group list.", w, r)
 			return

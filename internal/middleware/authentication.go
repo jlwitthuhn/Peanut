@@ -19,14 +19,14 @@ func Authentication(groupService service.GroupService, sessionService service.Se
 			ctx := r.Context()
 			cookies := r.CookiesNamed(cookie.SessionCookieName)
 			for _, thisCookie := range cookies {
-				userId, sessionErr := sessionService.GetLoggedInUserIdBySessionId(r, thisCookie.Value)
+				userId, sessionErr := sessionService.GetLoggedInUserIdBySessionId(r.Context(), thisCookie.Value)
 				if sessionErr != nil {
 					continue
 				}
 				if userId == "" {
 					continue
 				}
-				groups, groupsErr := groupService.GetGroupsByUserId(r, userId)
+				groups, groupsErr := groupService.GetGroupsByUserId(r.Context(), userId)
 				if groupsErr != nil {
 					continue
 				}

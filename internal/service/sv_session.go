@@ -5,8 +5,8 @@
 package service
 
 import (
+	"context"
 	"errors"
-	"net/http"
 	"peanut/internal/data"
 	"peanut/internal/keynames/sessionkeys"
 	"peanut/internal/logger"
@@ -15,11 +15,11 @@ import (
 )
 
 type SessionService interface {
-	CountUsersWithValidSession(req *http.Request) (int64, error)
-	CreateSession(req *http.Request, username string, plainPassword string) (string, error)
-	DestroySession(req *http.Request, sessionId string) error
-	GetLoggedInUserIdBySessionId(req *http.Request, sessionId string) (string, error)
-	GetString(req *http.Request, sessionId string, key string) (string, error)
+	CountUsersWithValidSession(ctx context.Context) (int64, error)
+	CreateSession(ctx context.Context, username string, plainPassword string) (string, error)
+	DestroySession(ctx context.Context, sessionId string) error
+	GetLoggedInUserIdBySessionId(ctx context.Context, sessionId string) (string, error)
+	GetString(ctx context.Context, sessionId string, key string) (string, error)
 }
 
 func NewSessionService(sessionDao data.SessionDao, sessionStringDao data.SessionStringDao, userDao data.UserDao) SessionService {
@@ -32,12 +32,12 @@ type sessionServiceImpl struct {
 	userDao          data.UserDao
 }
 
-func (this *sessionServiceImpl) CountUsersWithValidSession(req *http.Request) (int64, error) {
-	return this.sessionDao.CountValidDedupeByUser(req.Context())
+func (this *sessionServiceImpl) CountUsersWithValidSession(ctx context.Context) (int64, error) {
+	return this.sessionDao.CountValidDedupeByUser(ctx)
 }
 
-func (this *sessionServiceImpl) CreateSession(req *http.Request, username string, plainPassword string) (string, error) {
-	userRow, userErr := this.userDao.SelectRowByName(req.Context(), username)
+func (this *sessionServiceImpl) CreateSession(ctx context.Context, username string, plainPassword string) (string, error) {
+	userRow, userErr := this.userDao.SelectRowByName(ctx, username)
 	if userErr != nil {
 		return "", userErr
 	}
@@ -46,32 +46,32 @@ func (this *sessionServiceImpl) CreateSession(req *http.Request, username string
 	}
 
 	newSessionId := security.GenerateSessionId()
-	err := this.sessionDao.InsertRow(req.Context(), newSessionId, userRow.Id)
+	err := this.sessionDao.InsertRow(ctx, newSessionId, userRow.Id)
 	if err != nil {
 		return "", err
 	}
 
 	newCsrfToken := security.GenerateCsrfToken()
-	err = this.sessionStringDao.UpsertString(req.Context(), newSessionId, sessionkeys.CsrfToken, newCsrfToken)
+	err = this.sessionStringDao.UpsertString(ctx, newSessionId, sessionkeys.CsrfToken, newCsrfToken)
 	if err != nil {
 		return "", err
 	}
 
-	logger.Info(req.Context(), "User logger in:", userRow.Id)
+	logger.Info(ctx, "User logger in:", userRow.Id)
 
 	return newSessionId, nil
 }
 
-func (this *sessionServiceImpl) DestroySession(req *http.Request, sessionId string) error {
-	err := this.sessionDao.DeleteRowById(req.Context(), sessionId)
+func (this *sessionServiceImpl) DestroySession(ctx context.Context, sessionId string) error {
+	err := this.sessionDao.DeleteRowById(ctx, sessionId)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (this *sessionServiceImpl) GetLoggedInUserIdBySessionId(req *http.Request, sessionId string) (string, error) {
-	sessionRow, sessionErr := this.sessionDao.SelectValidRowBySessionId(req.Context(), sessionId)
+func (this *sessionServiceImpl) GetLoggedInUserIdBySessionId(ctx context.Context, sessionId string) (string, error) {
+	sessionRow, sessionErr := this.sessionDao.SelectValidRowBySessionId(ctx, sessionId)
 	if sessionErr != nil {
 		return "", sessionErr
 	}
@@ -81,8 +81,8 @@ func (this *sessionServiceImpl) GetLoggedInUserIdBySessionId(req *http.Request, 
 	return sessionRow.UserId, nil
 }
 
-func (this *sessionServiceImpl) GetString(req *http.Request, sessionId string, key string) (string, error) {
-	row, err := this.sessionStringDao.SelectRow(req.Context(), sessionId, key)
+func (this *sessionServiceImpl) GetString(ctx context.Context, sessionId string, key string) (string, error) {
+	row, err := this.sessionStringDao.SelectRow(ctx, sessionId, key)
 	if err != nil {
 		return "", err
 	}

@@ -32,7 +32,7 @@ func CsrfProtection(sessionService service.SessionService) MiddlewareFunc {
 					ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to read session id.", w, r)
 					return
 				}
-				token, err := sessionService.GetString(r, sessionId, sessionkeys.CsrfToken)
+				token, err := sessionService.GetString(r.Context(), sessionId, sessionkeys.CsrfToken)
 				if err != nil {
 					ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Database does not contain a valid CSRF token for this session.", w, r)
 					return

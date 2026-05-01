@@ -20,11 +20,11 @@ import (
 )
 
 type ScheduledJobService interface {
-	AddJobDefinition(req *http.Request, jobName string, runInterval time.Duration) error
+	AddJobDefinition(ctx context.Context, jobName string, runInterval time.Duration) error
 	BackgroundThreadFunc()
-	GetAllJobSummaries(req *http.Request) ([]data.ScheduledJobSummary, error)
-	GetJobNameById(req *http.Request, id string) (string, error)
-	RunJob(req *http.Request, jobName string) error
+	GetAllJobSummaries(ctx context.Context) ([]data.ScheduledJobSummary, error)
+	GetJobNameById(ctx context.Context, id string) (string, error)
+	RunJob(ctx context.Context, jobName string) error
 }
 
 func NewScheduledJobService(
@@ -54,8 +54,8 @@ type scheduledJobServiceImpl struct {
 	dbService          DatabaseService
 }
 
-func (this *scheduledJobServiceImpl) AddJobDefinition(req *http.Request, jobName string, runInterval time.Duration) error {
-	return this.scheduledJobDao.InsertRow(req.Context(), jobName, runInterval)
+func (this *scheduledJobServiceImpl) AddJobDefinition(ctx context.Context, jobName string, runInterval time.Duration) error {
+	return this.scheduledJobDao.InsertRow(ctx, jobName, runInterval)
 }
 
 // Application infrastructure expects each db access to be associated with a request
@@ -88,44 +88,46 @@ func (this *scheduledJobServiceImpl) backgroundThreadIter() {
 	if err != nil {
 		return
 	}
-	tx, txOk := req.Context().Value(contextkeys.PostgresTx).(*sql.Tx)
+	ctx := req.Context()
+
+	tx, txOk := ctx.Value(contextkeys.PostgresTx).(*sql.Tx)
 	if !txOk {
-		logger.Debug(req.Context(), "Database not yet initialized, waiting another cycle...")
+		logger.Debug(ctx, "Database not yet initialized, waiting another cycle...")
 		return
 	}
 	defer tx.Rollback()
 
 	// Check if the database exists
-	exists, err := this.dbService.DoesTableExist(req, "config_int")
+	exists, err := this.dbService.DoesTableExist(ctx, "config_int")
 	if err != nil {
-		logger.Error(req.Context(), "Failed to check if database exists")
+		logger.Error(ctx, "Failed to check if database exists")
 		return
 	}
 	if !exists {
-		logger.Debug(req.Context(), "Database not yet initialized, waiting another cycle...")
+		logger.Debug(ctx, "Database not yet initialized, waiting another cycle...")
 		return
 	}
 
-	row, err := this.multiTableDao.SelectScheduledJobByNextPending(req.Context())
+	row, err := this.multiTableDao.SelectScheduledJobByNextPending(ctx)
 	if err != nil {
-		logger.Error(req.Context(), "Failed to find next pending scheduled job, aborting")
+		logger.Error(ctx, "Failed to find next pending scheduled job, aborting")
 		return
 	}
 	if row == nil {
-		logger.Trace(req.Context(), "Nothing to do, waiting another cycle...")
+		logger.Trace(ctx, "Nothing to do, waiting another cycle...")
 		return
 	}
 
-	logger.Debug(req.Context(), "Running job: "+row.Name)
-	err = this.RunJob(req, row.Name)
+	logger.Debug(ctx, "Running job: "+row.Name)
+	err = this.RunJob(ctx, row.Name)
 	if err != nil {
-		logger.Error(req.Context(), "Failed to run job, aborting")
+		logger.Error(ctx, "Failed to run job, aborting")
 		return
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		logger.Error(req.Context(), "Failed to commit transaction")
+		logger.Error(ctx, "Failed to commit transaction")
 	}
 }
 
@@ -136,35 +138,35 @@ func (this *scheduledJobServiceImpl) BackgroundThreadFunc() {
 	}
 }
 
-func (this *scheduledJobServiceImpl) GetAllJobSummaries(req *http.Request) ([]data.ScheduledJobSummary, error) {
-	return this.multiTableDao.SelectAllScheduledJobSummaries(req.Context())
+func (this *scheduledJobServiceImpl) GetAllJobSummaries(ctx context.Context) ([]data.ScheduledJobSummary, error) {
+	return this.multiTableDao.SelectAllScheduledJobSummaries(ctx)
 }
 
-func (this *scheduledJobServiceImpl) GetJobNameById(req *http.Request, id string) (string, error) {
-	row, err := this.scheduledJobDao.SelectRowById(req.Context(), id)
+func (this *scheduledJobServiceImpl) GetJobNameById(ctx context.Context, id string) (string, error) {
+	row, err := this.scheduledJobDao.SelectRowById(ctx, id)
 	if err != nil {
 		return "", err
 	}
 	return row.Name, nil
 }
 
-func (this *scheduledJobServiceImpl) RunJob(req *http.Request, jobName string) error {
-	if middleutil.RequestHasPermission(req, perms.Admin_ScheduledJob_Run) == false {
+func (this *scheduledJobServiceImpl) RunJob(ctx context.Context, jobName string) error {
+	if middleutil.ContextHasPermission(ctx, perms.Admin_ScheduledJob_Run) == false {
 		return errors.New("permission denied")
 	}
 
-	jobDetails, err := this.scheduledJobDao.SelectRowByName(req.Context(), jobName)
+	jobDetails, err := this.scheduledJobDao.SelectRowByName(ctx, jobName)
 	if err != nil {
 		return err
 	}
 
 	if jobName == "DeleteExpiredSessions" {
-		err = this.runExpiredSessionsJob(req)
+		err = this.runExpiredSessionsJob(ctx)
 		if err != nil {
 			return err
 		}
 	} else if jobName == "VacuumDatabase" {
-		err = this.runVacuumDbJob(req)
+		err = this.runVacuumDbJob(ctx)
 		if err != nil {
 			return err
 		}
@@ -172,7 +174,7 @@ func (this *scheduledJobServiceImpl) RunJob(req *http.Request, jobName string) e
 		return errors.New("not implemented")
 	}
 
-	err = this.scheduledJobRunDao.InsertRow(req.Context(), jobDetails.Id, true)
+	err = this.scheduledJobRunDao.InsertRow(ctx, jobDetails.Id, true)
 	if err != nil {
 		return err
 	}
@@ -180,29 +182,29 @@ func (this *scheduledJobServiceImpl) RunJob(req *http.Request, jobName string) e
 	return nil
 }
 
-func (this *scheduledJobServiceImpl) runExpiredSessionsJob(req *http.Request) error {
-	logger.Info(req.Context(), "Expired sessions job beginning")
-	err := this.sessionDao.DeleteRowsByExpired(req.Context())
+func (this *scheduledJobServiceImpl) runExpiredSessionsJob(ctx context.Context) error {
+	logger.Info(ctx, "Expired sessions job beginning")
+	err := this.sessionDao.DeleteRowsByExpired(ctx)
 	if err != nil {
-		logger.Error(req.Context(), "Failed to delete expired sessions")
+		logger.Error(ctx, "Failed to delete expired sessions")
 		return errors.New("failed to delete expired sessions")
 	}
-	logger.Debug(req.Context(), "Expired sessions job complete")
+	logger.Debug(ctx, "Expired sessions job complete")
 	return nil
 }
 
-func (this *scheduledJobServiceImpl) runVacuumDbJob(req *http.Request) error {
-	logger.Info(req.Context(), "Vacuum database job beginning")
+func (this *scheduledJobServiceImpl) runVacuumDbJob(ctx context.Context) error {
+	logger.Info(ctx, "Vacuum database job beginning")
 	dbh := datasource.PostgresHandle()
 	if dbh == nil {
-		logger.Error(req.Context(), "No postgres handle, aborting")
+		logger.Error(ctx, "No postgres handle, aborting")
 		return errors.New("no postgres handle")
 	}
-	err := this.metaDao.Vacuum(req.Context(), dbh)
+	err := this.metaDao.Vacuum(ctx, dbh)
 	if err != nil {
-		logger.Error(req.Context(), "Failed to vacuum:", err)
+		logger.Error(ctx, "Failed to vacuum:", err)
 		return errors.New("failed to vacuum")
 	}
-	logger.Debug(req.Context(), "Vacuum database job complete")
+	logger.Debug(ctx, "Vacuum database job complete")
 	return nil
 }

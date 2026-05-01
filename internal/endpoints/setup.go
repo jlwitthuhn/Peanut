@@ -22,7 +22,7 @@ func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService
 	mux.Handle("GET /setup", getSetupHandler)
 
 	postSetupHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		configTableExists, configTableErr := dbService.DoesTableExist(r, "config_int")
+		configTableExists, configTableErr := dbService.DoesTableExist(r.Context(), "config_int")
 		if configTableErr != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query data.", w, r)
 			return
@@ -56,7 +56,7 @@ func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService
 		}
 
 		logger.Info(r.Context(), "Input valid, initializing...")
-		err := setupService.InitializeDatabase(r, adminName, email, adminPassword)
+		err := setupService.InitializeDatabase(r.Context(), adminName, email, adminPassword)
 		if err != nil {
 			logger.Error(r.Context(), "Error initializing database:", err)
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to initialize database.", w, r)

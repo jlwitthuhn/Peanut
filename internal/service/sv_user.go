@@ -5,20 +5,20 @@
 package service
 
 import (
+	"context"
 	"errors"
-	"net/http"
 	"peanut/internal/data"
 	"peanut/internal/security/passhash"
 )
 
 type UserService interface {
-	CountUsers(req *http.Request) (int64, error)
-	CreateUser(req *http.Request, name string, email string, plainPassword string) (string, error)
-	GetUserRowById(req *http.Request, id string) (*data.UserRow, error)
-	GetUserRowsAll(req *http.Request) ([]data.UserRow, error)
-	GetUserRowsLikeName(req *http.Request, namePattern string) ([]data.UserRow, error)
-	IsEmailTaken(req *http.Request, email string) (bool, error)
-	IsNameTaken(req *http.Request, username string) (bool, error)
+	CountUsers(ctx context.Context) (int64, error)
+	CreateUser(ctx context.Context, name string, email string, plainPassword string) (string, error)
+	GetUserRowById(ctx context.Context, id string) (*data.UserRow, error)
+	GetUserRowsAll(ctx context.Context) ([]data.UserRow, error)
+	GetUserRowsLikeName(ctx context.Context, namePattern string) ([]data.UserRow, error)
+	IsEmailTaken(ctx context.Context, email string) (bool, error)
+	IsNameTaken(ctx context.Context, username string) (bool, error)
 }
 
 func NewUserService(sessionDao data.SessionDao, userDao data.UserDao) UserService {
@@ -30,19 +30,19 @@ type userServiceImpl struct {
 	userDao    data.UserDao
 }
 
-func (this *userServiceImpl) CountUsers(req *http.Request) (int64, error) {
-	return this.userDao.CountRows(req.Context())
+func (this *userServiceImpl) CountUsers(ctx context.Context) (int64, error) {
+	return this.userDao.CountRows(ctx)
 }
 
-func (this *userServiceImpl) CreateUser(req *http.Request, name string, email string, plainPassword string) (string, error) {
-	nameTaken, nameErr := this.IsNameTaken(req, name)
+func (this *userServiceImpl) CreateUser(ctx context.Context, name string, email string, plainPassword string) (string, error) {
+	nameTaken, nameErr := this.IsNameTaken(ctx, name)
 	if nameErr != nil {
 		return "", nameErr
 	}
 	if nameTaken {
 		return "", errors.New("User name is already taken.")
 	}
-	emailTaken, emailErr := this.IsEmailTaken(req, email)
+	emailTaken, emailErr := this.IsEmailTaken(ctx, email)
 	if emailErr != nil {
 		return "", emailErr
 	}
@@ -52,7 +52,7 @@ func (this *userServiceImpl) CreateUser(req *http.Request, name string, email st
 
 	hashedPassword := passhash.GenerateDefaultPhcString(plainPassword)
 
-	newId, insertErr := this.userDao.InsertRow(req.Context(), name, email, hashedPassword)
+	newId, insertErr := this.userDao.InsertRow(ctx, name, email, hashedPassword)
 	if insertErr != nil {
 		return "", insertErr
 	}
@@ -60,28 +60,28 @@ func (this *userServiceImpl) CreateUser(req *http.Request, name string, email st
 	return newId, nil
 }
 
-func (this *userServiceImpl) GetUserRowById(req *http.Request, id string) (*data.UserRow, error) {
-	return this.userDao.SelectRowById(req.Context(), id)
+func (this *userServiceImpl) GetUserRowById(ctx context.Context, id string) (*data.UserRow, error) {
+	return this.userDao.SelectRowById(ctx, id)
 }
 
-func (this *userServiceImpl) GetUserRowsAll(req *http.Request) ([]data.UserRow, error) {
-	return this.userDao.SelectRowsAll(req.Context())
+func (this *userServiceImpl) GetUserRowsAll(ctx context.Context) ([]data.UserRow, error) {
+	return this.userDao.SelectRowsAll(ctx)
 }
 
-func (this *userServiceImpl) GetUserRowsLikeName(req *http.Request, namePattern string) ([]data.UserRow, error) {
-	return this.userDao.SelectRowsLikeName(req.Context(), namePattern)
+func (this *userServiceImpl) GetUserRowsLikeName(ctx context.Context, namePattern string) ([]data.UserRow, error) {
+	return this.userDao.SelectRowsLikeName(ctx, namePattern)
 }
 
-func (this *userServiceImpl) IsEmailTaken(req *http.Request, email string) (bool, error) {
-	count, err := this.userDao.CountRowsByEmail(req.Context(), email)
+func (this *userServiceImpl) IsEmailTaken(ctx context.Context, email string) (bool, error) {
+	count, err := this.userDao.CountRowsByEmail(ctx, email)
 	if err != nil {
 		return true, err
 	}
 	return count > 0, nil
 }
 
-func (this *userServiceImpl) IsNameTaken(req *http.Request, username string) (bool, error) {
-	count, err := this.userDao.CountRowsByName(req.Context(), username)
+func (this *userServiceImpl) IsNameTaken(ctx context.Context, username string) (bool, error) {
+	count, err := this.userDao.CountRowsByName(ctx, username)
 	if err != nil {
 		return true, err
 	}

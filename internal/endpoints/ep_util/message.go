@@ -44,7 +44,7 @@ func RenderSimpleMessage(title string, message string, w http.ResponseWriter, r 
 // RequirePermissionOr403
 // When this returns false the caller must abort handling the request and write no further output
 func RequirePermissionOr403(w http.ResponseWriter, r *http.Request, permission string) bool {
-	if middleutil.RequestHasPermission(r, permission) {
+	if middleutil.ContextHasPermission(r.Context(), permission) {
 		return true
 	}
 	RenderErrorHttp403Forbidden(w, r)

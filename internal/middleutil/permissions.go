@@ -5,12 +5,12 @@
 package middleutil
 
 import (
-	"net/http"
+	"context"
 	"peanut/internal/keynames/contextkeys"
 )
 
-func RequestHasPermission(r *http.Request, permission string) bool {
-	permissions := r.Context().Value(contextkeys.UserPerms).(map[string]struct{})
+func ContextHasPermission(ctx context.Context, permission string) bool {
+	permissions := ctx.Value(contextkeys.UserPerms).(map[string]struct{})
 	_, has := permissions[permission]
 	return has
 }

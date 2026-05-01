@@ -5,15 +5,15 @@
 package service
 
 import (
-	"net/http"
+	"context"
 	"peanut/internal/data"
 )
 
 type ConfigService interface {
-	GetInt(req *http.Request, key string) (int64, error)
-	GetString(req *http.Request, key string) (string, error)
-	SetInt(req *http.Request, key string, value int64) error
-	SetString(req *http.Request, key string, value string) error
+	GetInt(ctx context.Context, key string) (int64, error)
+	GetString(ctx context.Context, key string) (string, error)
+	SetInt(ctx context.Context, key string, value int64) error
+	SetString(ctx context.Context, key string, value string) error
 }
 
 func NewConfigService(configDao data.ConfigDao) ConfigService {
@@ -24,28 +24,28 @@ type configServiceImpl struct {
 	configDao data.ConfigDao
 }
 
-func (this *configServiceImpl) GetInt(req *http.Request, key string) (int64, error) {
-	row, err := this.configDao.SelectIntRowByName(req.Context(), key)
+func (this *configServiceImpl) GetInt(ctx context.Context, key string) (int64, error) {
+	row, err := this.configDao.SelectIntRowByName(ctx, key)
 	if err != nil {
 		return 0, err
 	}
 	return row.Value, nil
 }
 
-func (this *configServiceImpl) GetString(req *http.Request, key string) (string, error) {
-	row, err := this.configDao.SelectStringRowByName(req.Context(), key)
+func (this *configServiceImpl) GetString(ctx context.Context, key string) (string, error) {
+	row, err := this.configDao.SelectStringRowByName(ctx, key)
 	if err != nil {
 		return "", err
 	}
 	return row.Value, nil
 }
 
-func (this *configServiceImpl) SetInt(req *http.Request, name string, value int64) error {
-	err := this.configDao.UpsertIntByName(req.Context(), name, value)
+func (this *configServiceImpl) SetInt(ctx context.Context, name string, value int64) error {
+	err := this.configDao.UpsertIntByName(ctx, name, value)
 	return err
 }
 
-func (this *configServiceImpl) SetString(req *http.Request, name string, value string) error {
-	err := this.configDao.UpsertStringByName(req.Context(), name, value)
+func (this *configServiceImpl) SetString(ctx context.Context, name string, value string) error {
+	err := this.configDao.UpsertStringByName(ctx, name, value)
 	return err
 }

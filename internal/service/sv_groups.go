@@ -5,17 +5,17 @@
 package service
 
 import (
-	"net/http"
+	"context"
 	"peanut/internal/data"
 )
 
 type GroupService interface {
-	CreateGroup(req *http.Request, name string, desc string, systemOwned bool) error
-	GetAllGroupNames(req *http.Request) ([]string, error)
-	GetAllGroupRows(req *http.Request) ([]data.GroupRow, error)
-	GetGroupsByUserId(req *http.Request, userId string) ([]string, error)
-	GetUserRowsByGroupName(req *http.Request, groupName string) ([]data.UserRow, error)
-	EnrollUserInGroup(req *http.Request, userId string, groupName string) error
+	CreateGroup(ctx context.Context, name string, desc string, systemOwned bool) error
+	GetAllGroupNames(ctx context.Context) ([]string, error)
+	GetAllGroupRows(ctx context.Context) ([]data.GroupRow, error)
+	GetGroupsByUserId(ctx context.Context, userId string) ([]string, error)
+	GetUserRowsByGroupName(ctx context.Context, groupName string) ([]data.UserRow, error)
+	EnrollUserInGroup(ctx context.Context, userId string, groupName string) error
 }
 
 func NewGroupService(groupDao data.GroupDao, groupMembershipDao data.GroupMembershipDao, multiTableDao data.MultiTableDao) GroupService {
@@ -28,13 +28,13 @@ type groupServiceImpl struct {
 	multiTableDao      data.MultiTableDao
 }
 
-func (this *groupServiceImpl) CreateGroup(req *http.Request, name string, desc string, systemOwned bool) error {
-	err := this.groupDao.InsertRow(req.Context(), name, desc, systemOwned)
+func (this *groupServiceImpl) CreateGroup(ctx context.Context, name string, desc string, systemOwned bool) error {
+	err := this.groupDao.InsertRow(ctx, name, desc, systemOwned)
 	return err
 }
 
-func (this *groupServiceImpl) GetAllGroupNames(req *http.Request) ([]string, error) {
-	groupRows, err := this.groupDao.SelectRowAll(req.Context())
+func (this *groupServiceImpl) GetAllGroupNames(ctx context.Context) ([]string, error) {
+	groupRows, err := this.groupDao.SelectRowAll(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -45,32 +45,32 @@ func (this *groupServiceImpl) GetAllGroupNames(req *http.Request) ([]string, err
 	return result, nil
 }
 
-func (this *groupServiceImpl) GetAllGroupRows(req *http.Request) ([]data.GroupRow, error) {
-	return this.groupDao.SelectRowAll(req.Context())
+func (this *groupServiceImpl) GetAllGroupRows(ctx context.Context) ([]data.GroupRow, error) {
+	return this.groupDao.SelectRowAll(ctx)
 }
 
-func (this *groupServiceImpl) GetGroupsByUserId(req *http.Request, userId string) ([]string, error) {
-	groupNames, err := this.multiTableDao.SelectGroupNamesByUserId(req.Context(), userId)
+func (this *groupServiceImpl) GetGroupsByUserId(ctx context.Context, userId string) ([]string, error) {
+	groupNames, err := this.multiTableDao.SelectGroupNamesByUserId(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
 	return groupNames, nil
 }
 
-func (this *groupServiceImpl) GetUserRowsByGroupName(req *http.Request, groupName string) ([]data.UserRow, error) {
-	userRows, err := this.multiTableDao.SelectUserRowsByGroupName(req.Context(), groupName)
+func (this *groupServiceImpl) GetUserRowsByGroupName(ctx context.Context, groupName string) ([]data.UserRow, error) {
+	userRows, err := this.multiTableDao.SelectUserRowsByGroupName(ctx, groupName)
 	if err != nil {
 		return nil, err
 	}
 	return userRows, nil
 }
 
-func (this *groupServiceImpl) EnrollUserInGroup(req *http.Request, userId string, groupName string) error {
-	groupRow, groupErr := this.groupDao.SelectRowByName(req.Context(), groupName)
+func (this *groupServiceImpl) EnrollUserInGroup(ctx context.Context, userId string, groupName string) error {
+	groupRow, groupErr := this.groupDao.SelectRowByName(ctx, groupName)
 	if groupErr != nil {
 		return groupErr
 	}
-	err := this.groupMembershipDao.InsertRow(req.Context(), userId, groupRow.Id)
+	err := this.groupMembershipDao.InsertRow(ctx, userId, groupRow.Id)
 	if err != nil {
 		return err
 	}

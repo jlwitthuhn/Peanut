@@ -14,7 +14,7 @@ import (
 func RegisterProfileHandlers(mux *http.ServeMux, userService service.UserService) {
 	getProfileHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		id := r.PathValue("id")
-		user, err := userService.GetUserRowById(r, id)
+		user, err := userService.GetUserRowById(r.Context(), id)
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query user details from database", w, r)
 			return

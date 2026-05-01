@@ -44,12 +44,12 @@ func RegisterRegisterHandlers(mux *http.ServeMux, groupService service.GroupServ
 			return
 		}
 
-		userId, err := userService.CreateUser(r, username, email, password)
+		userId, err := userService.CreateUser(r.Context(), username, email, password)
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to create user.", w, r)
 			return
 		}
-		err = groupService.EnrollUserInGroup(r, userId, permgroups.User)
+		err = groupService.EnrollUserInGroup(r.Context(), userId, permgroups.User)
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to add new user to default group.", w, r)
 			return

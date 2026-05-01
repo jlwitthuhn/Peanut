@@ -16,7 +16,7 @@ import (
 
 func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.ForumsService) {
 	getSectionsHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		sectionRows, err := forumsService.GetAllSectionRows(r)
+		sectionRows, err := forumsService.GetAllSectionRows(r.Context())
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerError(w, r)
 			return
@@ -48,7 +48,7 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 			return
 		}
 
-		err = forumsService.CreateSection(r, title, float32(ordering))
+		err = forumsService.CreateSection(r.Context(), title, float32(ordering))
 		if err != nil {
 			logger.Error(r.Context(), "Failed to create forum section: ", err)
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to create forum section.", w, r)

@@ -5,8 +5,8 @@
 package service
 
 import (
+	"context"
 	"errors"
-	"net/http"
 	"peanut/internal/data"
 	"peanut/internal/data/configkey"
 	"peanut/internal/logger"
@@ -17,7 +17,7 @@ import (
 )
 
 type SetupService interface {
-	InitializeDatabase(r *http.Request, adminName string, adminEmail string, adminPlainPassword string) error
+	InitializeDatabase(ctx context.Context, adminName string, adminEmail string, adminPlainPassword string) error
 }
 
 func NewSetupService(
@@ -77,12 +77,12 @@ type setupServiceImpl struct {
 	userService         UserService
 }
 
-func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName string, adminEmail string, adminPlainPassword string) error {
-	logger.Info(r.Context(), "Database initialization starting")
+func (this *setupServiceImpl) InitializeDatabase(ctx context.Context, adminName string, adminEmail string, adminPlainPassword string) error {
+	logger.Info(ctx, "Database initialization starting")
 
-	logger.Debug(r.Context(), "Checking postgres version...")
+	logger.Debug(ctx, "Checking postgres version...")
 	{
-		pgVersion, err := this.databaseService.GetPostgresVersion(r)
+		pgVersion, err := this.databaseService.GetPostgresVersion(ctx)
 		if err != nil {
 			return err
 		}
@@ -99,114 +99,114 @@ func (this *setupServiceImpl) InitializeDatabase(r *http.Request, adminName stri
 		}
 	}
 
-	logger.Debug(r.Context(), "Creating tables...")
+	logger.Debug(ctx, "Creating tables...")
 
 	// Core functionality
-	err := this.metaDao.CreateDBObjects(r.Context())
+	err := this.metaDao.CreateDBObjects(ctx)
 	if err != nil {
 		return err
 	}
-	err = this.configDao.CreateDBObjects(r.Context())
+	err = this.configDao.CreateDBObjects(ctx)
 	if err != nil {
 		return err
 	}
-	err = this.groupDao.CreateDBObjects(r.Context())
+	err = this.groupDao.CreateDBObjects(ctx)
 	if err != nil {
 		return err
 	}
-	err = this.scheduledJobDao.CreateDBObjects(r.Context())
+	err = this.scheduledJobDao.CreateDBObjects(ctx)
 	if err != nil {
 		return err
 	}
-	err = this.scheduledJobRunDao.CreateDBObjects(r.Context())
+	err = this.scheduledJobRunDao.CreateDBObjects(ctx)
 	if err != nil {
 		return err
 	}
-	err = this.userDao.CreateDBObjects(r.Context())
+	err = this.userDao.CreateDBObjects(ctx)
 	// Below depend on `users` existing
 	if err != nil {
 		return err
 	}
-	err = this.groupMembershipDao.CreateDBObjects(r.Context())
+	err = this.groupMembershipDao.CreateDBObjects(ctx)
 	if err != nil {
 		return err
 	}
-	err = this.sessionDao.CreateDBObjects(r.Context())
+	err = this.sessionDao.CreateDBObjects(ctx)
 	if err != nil {
 		return err
 	}
-	err = this.sessionStringDao.CreateDBObjects(r.Context())
+	err = this.sessionStringDao.CreateDBObjects(ctx)
 	if err != nil {
 		return err
 	}
-	err = this.systemLogDao.CreateDBObjects(r.Context())
+	err = this.systemLogDao.CreateDBObjects(ctx)
 	if err != nil {
 		return err
 	}
 
 	// Forums
-	err = this.forumSectionsDao.CreateDBObjects(r.Context())
+	err = this.forumSectionsDao.CreateDBObjects(ctx)
 	if err != nil {
 		return err
 	}
 
-	logger.Debug(r.Context(), "Populating data...")
+	logger.Debug(ctx, "Populating data...")
 
-	err = this.scheduledJobService.AddJobDefinition(r, "DeleteExpiredSessions", time.Hour)
+	err = this.scheduledJobService.AddJobDefinition(ctx, "DeleteExpiredSessions", time.Hour)
 	if err != nil {
 		return err
 	}
-	err = this.scheduledJobService.AddJobDefinition(r, "VacuumDatabase", 6*time.Hour)
-	if err != nil {
-		return err
-	}
-
-	err = this.configService.SetInt(r, configkey.IntInitializedTime, time.Now().Unix())
-	if err != nil {
-		return err
-	}
-	err = this.configService.SetInt(r, configkey.IntSessionLengthMinutes, 120)
-	if err != nil {
-		return err
-	}
-	err = this.configService.SetString(r, configkey.StringWelcomeMessage, "Haldo.")
+	err = this.scheduledJobService.AddJobDefinition(ctx, "VacuumDatabase", 6*time.Hour)
 	if err != nil {
 		return err
 	}
 
-	err = this.groupService.CreateGroup(r, permgroups.TurboAdmin, "Full control over everything.", true)
+	err = this.configService.SetInt(ctx, configkey.IntInitializedTime, time.Now().Unix())
 	if err != nil {
 		return err
 	}
-	err = this.groupService.CreateGroup(r, permgroups.Admin, "Much control over most things.", true)
+	err = this.configService.SetInt(ctx, configkey.IntSessionLengthMinutes, 120)
 	if err != nil {
 		return err
 	}
-	err = this.groupService.CreateGroup(r, permgroups.User, "Ordinary registered user.", true)
-	if err != nil {
-		return err
-	}
-
-	logger.Debug(r.Context(), "Creating admin user...")
-
-	userId, err := this.userService.CreateUser(r, adminName, adminEmail, adminPlainPassword)
-	if err != nil {
-		return err
-	}
-	err = this.groupService.EnrollUserInGroup(r, userId, permgroups.TurboAdmin)
-	if err != nil {
-		return err
-	}
-	err = this.groupService.EnrollUserInGroup(r, userId, permgroups.Admin)
-	if err != nil {
-		return err
-	}
-	err = this.groupService.EnrollUserInGroup(r, userId, permgroups.User)
+	err = this.configService.SetString(ctx, configkey.StringWelcomeMessage, "Haldo.")
 	if err != nil {
 		return err
 	}
 
-	logger.Info(r.Context(), "Database initialization succeeded")
+	err = this.groupService.CreateGroup(ctx, permgroups.TurboAdmin, "Full control over everything.", true)
+	if err != nil {
+		return err
+	}
+	err = this.groupService.CreateGroup(ctx, permgroups.Admin, "Much control over most things.", true)
+	if err != nil {
+		return err
+	}
+	err = this.groupService.CreateGroup(ctx, permgroups.User, "Ordinary registered user.", true)
+	if err != nil {
+		return err
+	}
+
+	logger.Debug(ctx, "Creating admin user...")
+
+	userId, err := this.userService.CreateUser(ctx, adminName, adminEmail, adminPlainPassword)
+	if err != nil {
+		return err
+	}
+	err = this.groupService.EnrollUserInGroup(ctx, userId, permgroups.TurboAdmin)
+	if err != nil {
+		return err
+	}
+	err = this.groupService.EnrollUserInGroup(ctx, userId, permgroups.Admin)
+	if err != nil {
+		return err
+	}
+	err = this.groupService.EnrollUserInGroup(ctx, userId, permgroups.User)
+	if err != nil {
+		return err
+	}
+
+	logger.Info(ctx, "Database initialization succeeded")
 
 	return nil
 }

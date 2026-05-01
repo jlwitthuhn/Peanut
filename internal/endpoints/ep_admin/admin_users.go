@@ -13,7 +13,7 @@ import (
 
 func registerAdminUsersHandlers(mux *http.ServeMux, groupService service.GroupService, userService service.UserService) {
 	getHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		groupList, err := groupService.GetAllGroupNames(r)
+		groupList, err := groupService.GetAllGroupNames(r.Context())
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query group names.", w, r)
 			return
@@ -26,7 +26,7 @@ func registerAdminUsersHandlers(mux *http.ServeMux, groupService service.GroupSe
 	mux.Handle("GET /admin/users", getHandler)
 
 	getListAllHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		userRows, err := userService.GetUserRowsAll(r)
+		userRows, err := userService.GetUserRowsAll(r.Context())
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query user names.", w, r)
 			return
@@ -40,7 +40,7 @@ func registerAdminUsersHandlers(mux *http.ServeMux, groupService service.GroupSe
 
 	postListByGroupHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		groupName := r.PostFormValue("group")
-		userRows, err := groupService.GetUserRowsByGroupName(r, groupName)
+		userRows, err := groupService.GetUserRowsByGroupName(r.Context(), groupName)
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query users in group.", w, r)
 		}
@@ -53,7 +53,7 @@ func registerAdminUsersHandlers(mux *http.ServeMux, groupService service.GroupSe
 
 	postListByNamePatternHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		pattern := r.PostFormValue("pattern")
-		userRows, err := userService.GetUserRowsLikeName(r, pattern)
+		userRows, err := userService.GetUserRowsLikeName(r.Context(), pattern)
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query users matching name.", w, r)
 		}

@@ -28,25 +28,25 @@ func registerAdminIndexHandlers(
 	userService service.UserService,
 ) {
 	getIndexHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		initTime, err := configService.GetInt(r, configkey.IntInitializedTime)
+		initTime, err := configService.GetInt(r.Context(), configkey.IntInitializedTime)
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query init time.", w, r)
 			return
 		}
 
-		dbVersion, err := databaseService.GetPostgresVersion(r)
+		dbVersion, err := databaseService.GetPostgresVersion(r.Context())
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query postgres version.", w, r)
 			return
 		}
 
-		userCount, err := userService.CountUsers(r)
+		userCount, err := userService.CountUsers(r.Context())
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query user count.", w, r)
 			return
 		}
 
-		userSessionCount, err := sessionService.CountUsersWithValidSession(r)
+		userSessionCount, err := sessionService.CountUsersWithValidSession(r.Context())
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query user session count.", w, r)
 			return

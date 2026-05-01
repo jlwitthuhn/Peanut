@@ -5,16 +5,16 @@
 package service
 
 import (
+	"context"
 	"errors"
-	"net/http"
 	"peanut/internal/data"
 	"peanut/internal/middleutil"
 	"peanut/internal/security/perms"
 )
 
 type ForumsService interface {
-	CreateSection(req *http.Request, name string, ordering float32) error
-	GetAllSectionRows(req *http.Request) ([]data.ForumSectionRow, error)
+	CreateSection(ctx context.Context, name string, ordering float32) error
+	GetAllSectionRows(ctx context.Context) ([]data.ForumSectionRow, error)
 }
 
 func NewForumsService(forumSectionsDao data.ForumSectionsDao) ForumsService {
@@ -25,16 +25,16 @@ type forumsServiceImpl struct {
 	forumSectionsDao data.ForumSectionsDao
 }
 
-func (this *forumsServiceImpl) CreateSection(req *http.Request, name string, ordering float32) error {
-	if middleutil.RequestHasPermission(req, perms.Admin_Forums_Structure_Edit) == false {
+func (this *forumsServiceImpl) CreateSection(ctx context.Context, name string, ordering float32) error {
+	if middleutil.ContextHasPermission(ctx, perms.Admin_Forums_Structure_Edit) == false {
 		return errors.New("permission denied")
 	}
 
-	err := this.forumSectionsDao.InsertRow(req.Context(), name, ordering)
+	err := this.forumSectionsDao.InsertRow(ctx, name, ordering)
 	return err
 }
 
-func (this *forumsServiceImpl) GetAllSectionRows(req *http.Request) ([]data.ForumSectionRow, error) {
-	result, err := this.forumSectionsDao.SelectRowAll(req.Context())
+func (this *forumsServiceImpl) GetAllSectionRows(ctx context.Context) ([]data.ForumSectionRow, error) {
+	result, err := this.forumSectionsDao.SelectRowAll(ctx)
 	return result, err
 }

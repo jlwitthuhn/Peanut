@@ -20,7 +20,7 @@ func registerAdminFrontPageHandlers(mux *http.ServeMux, configService service.Co
 			return
 		}
 
-		welcomeMessage, err := configService.GetString(r, configkey.StringWelcomeMessage)
+		welcomeMessage, err := configService.GetString(r.Context(), configkey.StringWelcomeMessage)
 		if err != nil {
 			logger.Error(r.Context(), "Error retrieving welcome message:", err)
 			ep_util.RenderErrorHttp500InternalServerError(w, r)
@@ -46,7 +46,7 @@ func registerAdminFrontPageHandlers(mux *http.ServeMux, configService service.Co
 			return
 		}
 
-		err := configService.SetString(r, configkey.StringWelcomeMessage, newMessage)
+		err := configService.SetString(r.Context(), configkey.StringWelcomeMessage, newMessage)
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to set new welcome message.", w, r)
 			return

@@ -7,7 +7,6 @@ package perms
 import (
 	"peanut/internal/logger"
 	"peanut/internal/security/perms/permgroups"
-	"sort"
 )
 
 const Admin_Forums_Structure_Edit = "Admin/Forums/Structure/Edit"
@@ -34,18 +33,12 @@ func GetPermissionsForGroup(group string) map[string]struct{} {
 	return result
 }
 
-func GetGranularPermissionsForGroups(groups ...string) []string {
-	resultSet := make(map[string]struct{})
+func GetGranularPermissionsForGroups(groups ...string) map[string]struct{} {
+	result := make(map[string]struct{})
 	for _, group := range groups {
-		groupPerms := GetPermissionsForGroup(group)
-		for perm := range groupPerms {
-			resultSet[perm] = struct{}{}
+		for perm := range GetPermissionsForGroup(group) {
+			result[perm] = struct{}{}
 		}
 	}
-	var result []string
-	for perm := range resultSet {
-		result = append(result, perm)
-	}
-	sort.Strings(result)
 	return result
 }

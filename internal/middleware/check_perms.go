@@ -8,19 +8,18 @@ import (
 	"net/http"
 	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/keynames/contextkeys"
-	"slices"
 )
 
 func CheckPermissions(requiredPerms ...string) MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			userPerms, ok := r.Context().Value(contextkeys.UserPerms).([]string)
+			userPerms, ok := r.Context().Value(contextkeys.UserPerms).(map[string]struct{})
 			if !ok {
 				ep_util.RenderErrorHttp403Forbidden(w, r)
 				return
 			}
 			for _, requiredPerm := range requiredPerms {
-				if slices.Contains(userPerms, requiredPerm) == false {
+				if _, has := userPerms[requiredPerm]; !has {
 					ep_util.RenderErrorHttp403Forbidden(w, r)
 					return
 				}

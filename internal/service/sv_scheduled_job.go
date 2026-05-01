@@ -76,7 +76,7 @@ func createBackgroundHttpRequest() (*http.Request, error) {
 	result = result.WithContext(ctx)
 
 	// Add permissions
-	permissions := []string{perms.Admin_ScheduledJob_Run}
+	permissions := map[string]struct{}{perms.Admin_ScheduledJob_Run: {}}
 	ctx = context.WithValue(result.Context(), contextkeys.UserPerms, permissions)
 	result = result.WithContext(ctx)
 

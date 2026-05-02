@@ -5,16 +5,19 @@
 package ep_admin
 
 import (
+	"fmt"
 	"net/http"
+	"peanut/internal/data"
 	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
+	"peanut/internal/keynames/contextkeys"
 	"peanut/internal/logger"
 	"peanut/internal/security/perms"
 	"peanut/internal/service"
 	"strconv"
 )
 
-func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.ForumsService) {
+func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.ForumsService, systemLogDao data.SystemLogDao) {
 	getSectionsHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sectionRows, err := forumsService.GetAllSectionRows(r.Context())
 		if err != nil {
@@ -48,10 +51,18 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 			return
 		}
 
-		_, err = forumsService.CreateSection(r.Context(), title, float32(ordering))
+		newId, err := forumsService.CreateSection(r.Context(), title, float32(ordering))
 		if err != nil {
 			logger.Error(r.Context(), "Failed to create forum section: ", err)
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to create forum section.", w, r)
+			return
+		}
+
+		userId := r.Context().Value(contextkeys.UserId).(string)
+		err = systemLogDao.InsertRow(r.Context(), userId, fmt.Sprintf("Created forum section %s: %s", newId, title))
+		if err != nil {
+			logger.Error(r.Context(), "Failed to insert system log row: ", err)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to write system log.", w, r)
 			return
 		}
 

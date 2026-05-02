@@ -6,6 +6,7 @@ package ep_admin
 
 import (
 	"net/http"
+	"peanut/internal/data"
 	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/middleware"
@@ -21,11 +22,12 @@ func RegisterAdminHandlers(
 	groupService service.GroupService,
 	scheduledJobService service.ScheduledJobService,
 	sessionService service.SessionService,
+	systemLogDao data.SystemLogDao,
 	userService service.UserService,
 ) {
 	adminMux := http.NewServeMux()
 	registerAdminIndexHandlers(adminMux, configService, databaseService, sessionService, userService)
-	registerAdminForumsHandlers(adminMux, forumsService)
+	registerAdminForumsHandlers(adminMux, forumsService, systemLogDao)
 	registerAdminFrontPageHandlers(adminMux, configService)
 	registerAdminGroupsHandlers(adminMux, groupService)
 	registerAdminScheduledJobHandlers(adminMux, scheduledJobService)

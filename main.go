@@ -88,6 +88,7 @@ func main() {
 		groupService,
 		scheduledJobService,
 		sessionService,
+		systemLogDao,
 		userService)
 	endpoints.RegisterIndexHandlers(middlewareMux, configService)
 	endpoints.RegisterLoginHandlers(middlewareMux, sessionService)

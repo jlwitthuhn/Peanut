@@ -11,7 +11,7 @@ import (
 
 type SystemLogDao interface {
 	CreateDBObjects(ctx context.Context) error
-	InsertRow(ctx context.Context, userId string, message string) error
+	InsertRow(ctx context.Context, userId string, targetId string, message string) error
 }
 
 func NewSystemLogDao() SystemLogDao {
@@ -24,6 +24,7 @@ var sqlCreateTableSystemLog = `
 	CREATE TABLE system_log (
 		id UUID PRIMARY KEY DEFAULT uuidv7(),
 		user_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+		target_id UUID,
 		message TEXT NOT NULL,
 		_created TIMESTAMP WITH TIME ZONE NOT NULL,
 		_updated TIMESTAMP WITH TIME ZONE NOT NULL
@@ -44,11 +45,15 @@ var sqlCreateTableSystemLog = `
 		fn_created_updated_before_update();
 `
 
-var sqlInsertSystemLogRow = "INSERT INTO system_log(user_id, message) VALUES ($1, $2)"
+var sqlInsertSystemLogRow = "INSERT INTO system_log(user_id, target_id, message) VALUES ($1, $2, $3)"
 
-func (*systemLogDaoImpl) InsertRow(ctx context.Context, userId string, message string) error {
+func (*systemLogDaoImpl) InsertRow(ctx context.Context, userId string, targetId string, message string) error {
 	sqlh := getSqlExecutorFromContext(ctx)
-	_, err := sqlh.Exec(sqlInsertSystemLogRow, userId, message)
+	var targetIdParam any
+	if targetId != "" {
+		targetIdParam = targetId
+	}
+	_, err := sqlh.Exec(sqlInsertSystemLogRow, userId, targetIdParam, message)
 	if err != nil {
 		logger.Error(ctx, "Got database error on SystemLogDao/InsertRow query: ", err)
 		return err

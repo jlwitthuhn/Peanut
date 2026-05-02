@@ -43,7 +43,7 @@ func (this *forumsServiceImpl) CreateSection(ctx context.Context, name string, o
 		return "", err
 	}
 
-	err = this.systemLogDao.InsertRow(ctx, userId, fmt.Sprintf("Created forum section %s: %s", newId, name))
+	err = this.systemLogDao.InsertRow(ctx, userId, newId, fmt.Sprintf("Created forum section: %s", name))
 	if err != nil {
 		return "", err
 	}

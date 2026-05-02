@@ -62,7 +62,7 @@ func (this *configServiceImpl) SetInt(ctx context.Context, name string, value in
 		return err
 	}
 	message := fmt.Sprintf("Set config int '%s' to: %d", name, value)
-	return this.systemLogDao.InsertRow(ctx, userId, message)
+	return this.systemLogDao.InsertRow(ctx, userId, "", message)
 }
 
 func (this *configServiceImpl) SetString(ctx context.Context, name string, value string) error {
@@ -75,7 +75,7 @@ func (this *configServiceImpl) SetString(ctx context.Context, name string, value
 		return err
 	}
 	message := fmt.Sprintf("Set config string '%s' to: %s", name, value)
-	return this.systemLogDao.InsertRow(ctx, userId, message)
+	return this.systemLogDao.InsertRow(ctx, userId, "", message)
 }
 
 func (this *configServiceImpl) SetIntSetup(ctx context.Context, name string, value int64) error {

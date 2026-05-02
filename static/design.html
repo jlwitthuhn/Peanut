@@ -121,6 +121,22 @@
             background-color: var(--accent-bright);
         }
 
+        input[type="submit"].danger-button {
+            background-color: var(--danger-red);
+            color: var(--bg);
+            border: none;
+        }
+
+        input[type="submit"].danger-button:hover {
+            background-color: var(--danger-red);
+            filter: brightness(1.15);
+            border: none;
+        }
+
+        input[type="submit"].danger-button:not(:disabled):active {
+            background-color: var(--danger-red);
+        }
+
         table {
             border-collapse: collapse;
         }
@@ -758,6 +774,7 @@
                 <div class="center-60">
                     <p>Lines in this one should be centered</p>
                     <p><input class="primary-button" type="submit" value="Primary"></p>
+                    <p><input class="danger-button" type="submit" value="Danger"></p>
                     <p><input type="submit" value="Normal"></p>
                     <p><input type="submit" disabled value="Disabled"></p>
                 </div>

@@ -28,6 +28,7 @@ type ForumSectionsDao interface {
 	InsertRow(ctx context.Context, name string, ordering float32) (string, error)
 	SelectRowById(ctx context.Context, id string) (*ForumSectionRow, error)
 	SelectRowAll(ctx context.Context) ([]ForumSectionRow, error)
+	UpdateUserConfigById(ctx context.Context, id string, name string, ordering float32) error
 	UpdateVisibilityById(ctx context.Context, id string, visibility string) error
 }
 
@@ -85,6 +86,18 @@ func (*forumSectionsDaoImpl) InsertRow(ctx context.Context, name string, orderin
 		return "", err
 	}
 	return newId, nil
+}
+
+var sqlUpdateForumSectionsUserConfigById = "UPDATE forum_sections SET name = $1, ordering = $2 WHERE id = $3"
+
+func (*forumSectionsDaoImpl) UpdateUserConfigById(ctx context.Context, id string, name string, ordering float32) error {
+	sqlh := getSqlExecutorFromContext(ctx)
+	_, err := sqlh.Exec(sqlUpdateForumSectionsUserConfigById, name, ordering, id)
+	if err != nil {
+		logger.Error(ctx, "Got database error on ForumSectionsDao/UpdateUserConfigById query: ", err)
+		return err
+	}
+	return nil
 }
 
 var sqlUpdateForumSectionsVisibilityById = "UPDATE forum_sections SET visibility = $1 WHERE id = $2"

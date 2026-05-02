@@ -19,6 +19,7 @@ type ForumsService interface {
 	DeleteSection(ctx context.Context, id string) error
 	GetAllSectionRows(ctx context.Context) ([]data.ForumSectionRow, error)
 	GetSectionRowById(ctx context.Context, id string) (*data.ForumSectionRow, error)
+	UpdateSectionUserConfig(ctx context.Context, id string, name string, ordering float32) error
 }
 
 func NewForumsService(forumSectionsDao data.ForumSectionsDao, systemLogDao data.SystemLogDao) ForumsService {
@@ -84,4 +85,27 @@ func (this *forumsServiceImpl) GetAllSectionRows(ctx context.Context) ([]data.Fo
 func (this *forumsServiceImpl) GetSectionRowById(ctx context.Context, id string) (*data.ForumSectionRow, error) {
 	result, err := this.forumSectionsDao.SelectRowById(ctx, id)
 	return result, err
+}
+
+func (this *forumsServiceImpl) UpdateSectionUserConfig(ctx context.Context, id string, name string, ordering float32) error {
+	if middleutil.ContextHasPermission(ctx, perms.Admin_Forums_Structure_Edit) == false {
+		return errors.New("permission denied")
+	}
+
+	userId, ok := ctx.Value(contextkeys.UserId).(string)
+	if !ok {
+		return errors.New("cannot update forum section: no user id in context")
+	}
+
+	err := this.forumSectionsDao.UpdateUserConfigById(ctx, id, name, ordering)
+	if err != nil {
+		return err
+	}
+
+	err = this.systemLogDao.InsertRow(ctx, userId, id, fmt.Sprintf("Updated forum section: %s", name))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -140,4 +140,44 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 		http.Redirect(w, r, "/admin/forum/sections/edit/"+sectionId, http.StatusSeeOther)
 	})
 	mux.Handle("POST /admin/forum/sections/edit", postSectionsEditHandler)
+
+	postSectionsEditByIdHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !ep_util.RequirePermissionOr403(w, r, perms.Admin_Forums_Structure_Edit) {
+			return
+		}
+
+		urlSectionId := r.PathValue("sectionId")
+		formSectionId := r.PostFormValue("section")
+
+		if urlSectionId != formSectionId {
+			ep_util.RenderErrorHttp400BadRequestWithMessage("Section ID in URL does not match section ID in form.", w, r)
+			return
+		}
+
+		title := r.PostFormValue("title")
+		orderStr := r.PostFormValue("order")
+
+		ordering, err := strconv.ParseFloat(orderStr, 32)
+		if err != nil {
+			ep_util.RenderErrorHttp400BadRequestWithMessage("Order must be a valid number.", w, r)
+			return
+		}
+
+		err = forumsService.UpdateSectionUserConfig(r.Context(), urlSectionId, title, float32(ordering))
+		if err != nil {
+			logger.Error(r.Context(), "Failed to update forum section: ", err)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to update forum section.", w, r)
+			return
+		}
+
+		err = ep_util.CommitTransactionForRequest(r)
+		if err != nil {
+			logger.Error(r.Context(), "Failed to commit transaction: ", err)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to commit transaction.", w, r)
+			return
+		}
+
+		RenderSimpleAdminMessage("Success", "Forum section '"+title+"' has been updated.", w, r)
+	})
+	mux.Handle("POST /admin/forum/sections/edit/{sectionId}", postSectionsEditByIdHandler)
 }

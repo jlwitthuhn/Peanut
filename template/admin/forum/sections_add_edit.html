@@ -14,7 +14,7 @@
 			<form class="standard-form" method="post">
 				{{ if .EditMode }}
 					<label for="section_id">Section ID:</label>
-					<input type="text" id="section_id" value="{{ .Section.Id }}" readonly>
+					<input type="text" id="section_id" name="section" value="{{ .Section.Id }}" readonly>
 				{{ end }}
 				<label for="section_title">Title:</label>
 				<input type="text" id="section_title" name="title" value="{{ if .EditMode }}{{ .Section.Name }}{{ end }}">

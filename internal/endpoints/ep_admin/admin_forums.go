@@ -90,4 +90,14 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 		RenderSimpleAdminMessage("Success", "Forum section has been deleted.", w, r)
 	})
 	mux.Handle("POST /admin/forum/sections/delete", postSectionsDeleteHandler)
+
+	postSectionsEditHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !ep_util.RequirePermissionOr403(w, r, perms.Admin_Forums_Structure_Edit) {
+			return
+		}
+
+		sectionId := r.PostFormValue("section")
+		http.Redirect(w, r, "/admin/forum/sections/edit/"+sectionId, http.StatusSeeOther)
+	})
+	mux.Handle("POST /admin/forum/sections/edit", postSectionsEditHandler)
 }

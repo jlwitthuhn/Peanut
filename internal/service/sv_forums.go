@@ -7,7 +7,9 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"peanut/internal/data"
+	"peanut/internal/keynames/contextkeys"
 	"peanut/internal/middleutil"
 	"peanut/internal/security/perms"
 )
@@ -17,12 +19,13 @@ type ForumsService interface {
 	GetAllSectionRows(ctx context.Context) ([]data.ForumSectionRow, error)
 }
 
-func NewForumsService(forumSectionsDao data.ForumSectionsDao) ForumsService {
-	return &forumsServiceImpl{forumSectionsDao: forumSectionsDao}
+func NewForumsService(forumSectionsDao data.ForumSectionsDao, systemLogDao data.SystemLogDao) ForumsService {
+	return &forumsServiceImpl{forumSectionsDao: forumSectionsDao, systemLogDao: systemLogDao}
 }
 
 type forumsServiceImpl struct {
 	forumSectionsDao data.ForumSectionsDao
+	systemLogDao     data.SystemLogDao
 }
 
 func (this *forumsServiceImpl) CreateSection(ctx context.Context, name string, ordering float32) (string, error) {
@@ -30,8 +33,22 @@ func (this *forumsServiceImpl) CreateSection(ctx context.Context, name string, o
 		return "", errors.New("permission denied")
 	}
 
+	userId, ok := ctx.Value(contextkeys.UserId).(string)
+	if !ok {
+		return "", errors.New("cannot create forum section: no user id in context")
+	}
+
 	newId, err := this.forumSectionsDao.InsertRow(ctx, name, ordering)
-	return newId, err
+	if err != nil {
+		return "", err
+	}
+
+	err = this.systemLogDao.InsertRow(ctx, userId, fmt.Sprintf("Created forum section %s: %s", newId, name))
+	if err != nil {
+		return "", err
+	}
+
+	return newId, nil
 }
 
 func (this *forumsServiceImpl) GetAllSectionRows(ctx context.Context) ([]data.ForumSectionRow, error) {

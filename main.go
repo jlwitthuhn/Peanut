@@ -48,6 +48,7 @@ func main() {
 	logger.Info(nil, "Initializing services...")
 
 	configDao := data.NewConfigDao()
+	forumsDao := data.NewForumsDao()
 	forumSectionsDao := data.NewForumSectionsDao()
 	groupDao := data.NewGroupDao()
 	groupMembershipDao := data.NewGroupMembershipDao()
@@ -70,8 +71,8 @@ func main() {
 	userService := service.NewUserService(sessionDao, userDao)
 
 	setupService := service.NewSetupService(
-		configDao, forumSectionsDao, groupDao, groupMembershipDao, metaDao, scheduledJobDao, scheduledJobRunDao,
-		sessionDao, sessionStringDao, systemLogDao, userDao,
+		configDao, forumsDao, forumSectionsDao, groupDao, groupMembershipDao, metaDao, scheduledJobDao,
+		scheduledJobRunDao, sessionDao, sessionStringDao, systemLogDao, userDao,
 		setupConfigService, dbService, groupService, scheduledJobService, userService,
 	)
 

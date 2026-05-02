@@ -11,7 +11,7 @@
 	</div>
 	<div class="panel-body">
 		{{ if or .EditMode .AddMode }}
-			<form class="standard-form" action="." method="post">
+			<form class="standard-form" method="post">
 				{{ if .EditMode }}
 					<label for="section_id">Section ID:</label>
 					<input type="text" id="section_id" value="{{ .Section.Id }}" readonly>

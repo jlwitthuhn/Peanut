@@ -6,7 +6,9 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"peanut/internal/data"
+	"peanut/internal/keynames/contextkeys"
 )
 
 type ConfigService interface {
@@ -16,12 +18,13 @@ type ConfigService interface {
 	SetString(ctx context.Context, key string, value string) error
 }
 
-func NewConfigService(configDao data.ConfigDao) ConfigService {
-	return &configServiceImpl{configDao: configDao}
+func NewConfigService(configDao data.ConfigDao, systemLogDao data.SystemLogDao) ConfigService {
+	return &configServiceImpl{configDao: configDao, systemLogDao: systemLogDao}
 }
 
 type configServiceImpl struct {
-	configDao data.ConfigDao
+	configDao    data.ConfigDao
+	systemLogDao data.SystemLogDao
 }
 
 func (this *configServiceImpl) GetInt(ctx context.Context, key string) (int64, error) {
@@ -47,5 +50,14 @@ func (this *configServiceImpl) SetInt(ctx context.Context, name string, value in
 
 func (this *configServiceImpl) SetString(ctx context.Context, name string, value string) error {
 	err := this.configDao.UpsertStringByName(ctx, name, value)
+	if err != nil {
+		return err
+	}
+	// This key won't exist during initial setup because no user exists yet, that's ok
+	userId, ok := ctx.Value(contextkeys.UserId).(string)
+	if ok {
+		message := fmt.Sprintf("Set config string '%s' to: %s", name, value)
+		err = this.systemLogDao.InsertRow(ctx, userId, message)
+	}
 	return err
 }

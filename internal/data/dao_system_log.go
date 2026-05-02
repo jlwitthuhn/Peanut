@@ -11,6 +11,7 @@ import (
 
 type SystemLogDao interface {
 	CreateDBObjects(ctx context.Context) error
+	InsertRow(ctx context.Context, userId string, message string) error
 }
 
 func NewSystemLogDao() SystemLogDao {
@@ -42,6 +43,18 @@ var sqlCreateTableSystemLog = `
 	FOR EACH ROW EXECUTE FUNCTION
 		fn_created_updated_before_update();
 `
+
+var sqlInsertSystemLogRow = "INSERT INTO system_log(user_id, message) VALUES ($1, $2)"
+
+func (*systemLogDaoImpl) InsertRow(ctx context.Context, userId string, message string) error {
+	sqlh := getSqlExecutorFromContext(ctx)
+	_, err := sqlh.Exec(sqlInsertSystemLogRow, userId, message)
+	if err != nil {
+		logger.Error(ctx, "Got database error on SystemLogDao/InsertRow query: ", err)
+		return err
+	}
+	return nil
+}
 
 func (*systemLogDaoImpl) CreateDBObjects(ctx context.Context) error {
 	sqlh := getSqlExecutorFromContext(ctx)

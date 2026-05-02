@@ -60,7 +60,7 @@ func main() {
 	systemLogDao := data.NewSystemLogDao()
 	userDao := data.NewUserDao()
 
-	configService := service.NewConfigService(configDao)
+	configService := service.NewConfigService(configDao, systemLogDao)
 	dbService := service.NewDatabaseService(metaDao)
 	forumsService := service.NewForumsService(forumSectionsDao)
 	groupService := service.NewGroupService(groupDao, groupMembershipDao, multiTableDao)

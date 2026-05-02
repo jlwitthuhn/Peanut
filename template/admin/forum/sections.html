@@ -1,3 +1,15 @@
+{{ define "admin_head_script"}}
+	document.addEventListener('DOMContentLoaded', function() {
+		let confirm_check = document.getElementById("confirm_check")
+		let submit_button = document.getElementById("submit_button")
+		confirm_check.addEventListener("click", function() {
+			submit_button.disabled = !(confirm_check.checked)
+		});
+		confirm_check.checked = false;
+		submit_button.disabled = true;
+	});
+{{ end }}
+
 {{ define "admin_content" }}
 <div class="panel">
 	<div class="panel-header">
@@ -55,8 +67,9 @@
 					<option value="{{ $section.Id }}">{{ $section.Name }} [{{ $section.Id }}]</option>
 				{{ end }}
 			</select>
+			<div><input id="confirm_check" type="checkbox" name="confirm"><label for="confirm_check">Confirm</label></div>
 			<input type="hidden" name="csrf" value="{{ .CsrfToken  }}">
-			<input class="danger-button" type="submit" value="Delete">
+			<input class="danger-button" id="submit_button" type="submit" value="Delete">
 		</form>
 	</div>
 </div>

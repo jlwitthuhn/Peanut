@@ -94,6 +94,12 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 		}
 
 		sectionId := r.PostFormValue("section")
+		confirm := r.PostFormValue("confirm")
+
+		if confirm != "on" {
+			ep_util.RenderErrorHttp400BadRequestWithMessage("You must check the 'Confirm' box to delete a forum section.", w, r)
+			return
+		}
 
 		err := forumsService.DeleteSection(r.Context(), sectionId)
 		if err != nil {

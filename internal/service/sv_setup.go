@@ -33,6 +33,7 @@ func NewSetupService(
 	systemLogDao data.SystemLogDao,
 	userDao data.UserDao,
 	configService ConfigService,
+	setupConfigService SetupConfigService,
 	databaseService DatabaseService,
 	groupService GroupService,
 	scheduledJobService ScheduledJobService,
@@ -52,6 +53,7 @@ func NewSetupService(
 		systemLogDao:        systemLogDao,
 		userDao:             userDao,
 		configService:       configService,
+		setupConfigService:  setupConfigService,
 		groupService:        groupService,
 		scheduledJobService: scheduledJobService,
 		userService:         userService,
@@ -71,6 +73,7 @@ type setupServiceImpl struct {
 	systemLogDao        data.SystemLogDao
 	userDao             data.UserDao
 	configService       ConfigService
+	setupConfigService  SetupConfigService
 	databaseService     DatabaseService
 	groupService        GroupService
 	scheduledJobService ScheduledJobService
@@ -169,7 +172,7 @@ func (this *setupServiceImpl) InitializeDatabase(ctx context.Context, adminName 
 	if err != nil {
 		return err
 	}
-	err = this.configService.SetString(ctx, configkey.StringWelcomeMessage, "Haldo.")
+	err = this.setupConfigService.SetStringSetup(ctx, configkey.StringWelcomeMessage, "Haldo.")
 	if err != nil {
 		return err
 	}

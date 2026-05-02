@@ -18,7 +18,15 @@ type ConfigService interface {
 	SetString(ctx context.Context, key string, value string) error
 }
 
+type SetupConfigService interface {
+	SetStringSetup(ctx context.Context, key string, value string) error
+}
+
 func NewConfigService(configDao data.ConfigDao, systemLogDao data.SystemLogDao) ConfigService {
+	return &configServiceImpl{configDao: configDao, systemLogDao: systemLogDao}
+}
+
+func NewSetupConfigService(configDao data.ConfigDao, systemLogDao data.SystemLogDao) SetupConfigService {
 	return &configServiceImpl{configDao: configDao, systemLogDao: systemLogDao}
 }
 
@@ -49,15 +57,18 @@ func (this *configServiceImpl) SetInt(ctx context.Context, name string, value in
 }
 
 func (this *configServiceImpl) SetString(ctx context.Context, name string, value string) error {
+	userId, ok := ctx.Value(contextkeys.UserId).(string)
+	if !ok {
+		return fmt.Errorf("cannot set config string '%s': no user id in context", name)
+	}
 	err := this.configDao.UpsertStringByName(ctx, name, value)
 	if err != nil {
 		return err
 	}
-	// This key won't exist during initial setup because no user exists yet, that's ok
-	userId, ok := ctx.Value(contextkeys.UserId).(string)
-	if ok {
-		message := fmt.Sprintf("Set config string '%s' to: %s", name, value)
-		err = this.systemLogDao.InsertRow(ctx, userId, message)
-	}
-	return err
+	message := fmt.Sprintf("Set config string '%s' to: %s", name, value)
+	return this.systemLogDao.InsertRow(ctx, userId, message)
+}
+
+func (this *configServiceImpl) SetStringSetup(ctx context.Context, name string, value string) error {
+	return this.configDao.UpsertStringByName(ctx, name, value)
 }

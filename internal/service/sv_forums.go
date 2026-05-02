@@ -18,6 +18,7 @@ type ForumsService interface {
 	CreateSection(ctx context.Context, name string, ordering float32) (string, error)
 	DeleteSection(ctx context.Context, id string) error
 	GetAllSectionRows(ctx context.Context) ([]data.ForumSectionRow, error)
+	GetSectionRowById(ctx context.Context, id string) (*data.ForumSectionRow, error)
 }
 
 func NewForumsService(forumSectionsDao data.ForumSectionsDao, systemLogDao data.SystemLogDao) ForumsService {
@@ -77,5 +78,10 @@ func (this *forumsServiceImpl) DeleteSection(ctx context.Context, id string) err
 
 func (this *forumsServiceImpl) GetAllSectionRows(ctx context.Context) ([]data.ForumSectionRow, error) {
 	result, err := this.forumSectionsDao.SelectRowAll(ctx)
+	return result, err
+}
+
+func (this *forumsServiceImpl) GetSectionRowById(ctx context.Context, id string) (*data.ForumSectionRow, error) {
+	result, err := this.forumSectionsDao.SelectRowById(ctx, id)
 	return result, err
 }

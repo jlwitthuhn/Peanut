@@ -6,8 +6,12 @@ package data
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"peanut/internal/logger"
 	"time"
+
+	"github.com/lib/pq"
 )
 
 type ForumSectionRow struct {
@@ -22,6 +26,7 @@ type ForumSectionRow struct {
 type ForumSectionsDao interface {
 	CreateDBObjects(ctx context.Context) error
 	InsertRow(ctx context.Context, name string, ordering float32) (string, error)
+	SelectRowById(ctx context.Context, id string) (*ForumSectionRow, error)
 	SelectRowAll(ctx context.Context) ([]ForumSectionRow, error)
 	UpdateVisibilityById(ctx context.Context, id string, visibility string) error
 }
@@ -92,6 +97,32 @@ func (*forumSectionsDaoImpl) UpdateVisibilityById(ctx context.Context, id string
 		return err
 	}
 	return nil
+}
+
+var sqlSelectForumSectionsRowById = "SELECT id, name, ordering, visibility, _created, _updated FROM forum_sections WHERE id = $1"
+
+func (*forumSectionsDaoImpl) SelectRowById(ctx context.Context, id string) (*ForumSectionRow, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
+	result := &ForumSectionRow{}
+	row := sqlh.QueryRow(sqlSelectForumSectionsRowById, id)
+	err := row.Scan(&result.Id, &result.Name, &result.Ordering, &result.Visibility, &result.Created, &result.Updated)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
+	if err != nil {
+		var pqErr *pq.Error
+		ok := errors.As(err, &pqErr)
+		if ok {
+			if pqErr.Code == "22P02" {
+				// INVALID_TEXT_REPRESENTATION
+				// This means the input string is not a UUID, so no match exists
+				return nil, nil
+			}
+		}
+		logger.Error(ctx, "Got database error on ForumSectionsDao/SelectRowById query: ", err)
+		return nil, err
+	}
+	return result, nil
 }
 
 var sqlSelectForumSectionsRowAll = "SELECT id, name, ordering, visibility, _created, _updated FROM forum_sections ORDER BY ordering"

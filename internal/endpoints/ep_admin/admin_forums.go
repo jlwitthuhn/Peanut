@@ -97,6 +97,18 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 		}
 
 		sectionId := r.PostFormValue("section")
+
+		sectionRow, err := forumsService.GetSectionRowById(r.Context(), sectionId)
+		if err != nil {
+			logger.Error(r.Context(), "Failed to get forum section: ", err)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to get forum section.", w, r)
+			return
+		}
+		if sectionRow == nil {
+			ep_util.RenderErrorHttp400BadRequestWithMessage("The specified forum section does not exist.", w, r)
+			return
+		}
+
 		http.Redirect(w, r, "/admin/forum/sections/edit/"+sectionId, http.StatusSeeOther)
 	})
 	mux.Handle("POST /admin/forum/sections/edit", postSectionsEditHandler)

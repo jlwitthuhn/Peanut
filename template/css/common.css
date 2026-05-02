@@ -116,6 +116,22 @@ input[type="submit"].primary-button:not(:disabled):active {
 	background-color: var(--accent-bright);
 }
 
+input[type="submit"].danger-button {
+	background-color: var(--danger-red);
+	color: var(--bg);
+	border: none;
+}
+
+input[type="submit"].danger-button:hover {
+	background-color: var(--danger-red);
+	filter: brightness(1.15);
+	border: none;
+}
+
+input[type="submit"].danger-button:not(:disabled):active {
+	background-color: var(--danger-red);
+}
+
 table {
 	border-collapse: collapse;
 }

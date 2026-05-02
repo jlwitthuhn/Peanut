@@ -1,0 +1,31 @@
+{{ define "admin_content" }}
+<div class="panel">
+	<div class="panel-header">
+		{{ if .EditMode }}
+			<h1>Edit Forum Section</h1>
+		{{ else if .AddMode }}
+			<h1>Add Forum Section</h1>
+		{{ else }}
+			<h1>Error</h1>
+		{{ end }}
+	</div>
+	<div class="panel-body">
+		{{ if or .EditMode .AddMode }}
+			<form class="standard-form" action="." method="post">
+				{{ if .EditMode }}
+					<label for="section_id">Section ID:</label>
+					<input type="text" id="section_id" value="{{ .Section.Id }}" readonly>
+				{{ end }}
+				<label for="section_title">Title:</label>
+				<input type="text" id="section_title" name="title" value="{{ if .EditMode }}{{ .Section.Name }}{{ end }}">
+				<label for="section_order">Order:</label>
+				<input type="text" id="section_order" name="order" value="{{ if .EditMode }}{{ .Section.Ordering }}{{ end }}">
+				<input type="hidden" name="csrf" value="{{ .CsrfToken }}">
+				<input id="submit_button" type="submit" value="Submit">
+			</form>
+		{{ else }}
+			<p>Error: Invalid page mode.</p>
+		{{ end }}
+	</div>
+</div>
+{{ end }}

@@ -30,9 +30,31 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 
 	getSectionsAddHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
-		ep_util.RenderTemplate("_admin/forum/sections/add", templateCtx, w, r)
+		templateCtx["AddMode"] = true
+		ep_util.RenderTemplate("_admin/forum/sections/add_edit", templateCtx, w, r)
 	})
 	mux.Handle("GET /admin/forum/sections/add", getSectionsAddHandler)
+
+	getSectionsEditHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		sectionId := r.PathValue("sectionId")
+
+		sectionRow, err := forumsService.GetSectionRowById(r.Context(), sectionId)
+		if err != nil {
+			logger.Error(r.Context(), "Failed to get forum section: ", err)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to get forum section.", w, r)
+			return
+		}
+		if sectionRow == nil {
+			ep_util.RenderErrorHttp400BadRequestWithMessage("The specified forum section does not exist.", w, r)
+			return
+		}
+
+		templateCtx := templatecontext.GetStandardTemplateContext(r)
+		templateCtx["EditMode"] = true
+		templateCtx["Section"] = sectionRow
+		ep_util.RenderTemplate("_admin/forum/sections/add_edit", templateCtx, w, r)
+	})
+	mux.Handle("GET /admin/forum/sections/edit/{sectionId}", getSectionsEditHandler)
 
 	postSectionsAddHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !ep_util.RequirePermissionOr403(w, r, perms.Admin_Forums_Structure_Edit) {

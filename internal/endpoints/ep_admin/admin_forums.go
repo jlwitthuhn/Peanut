@@ -65,4 +65,29 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 		RenderSimpleAdminMessage("Success", "Forum section '"+title+"' has been created.", w, r)
 	})
 	mux.Handle("POST /admin/forum/sections/add", postSectionsAddHandler)
+
+	postSectionsDeleteHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !ep_util.RequirePermissionOr403(w, r, perms.Admin_Forums_Structure_Edit) {
+			return
+		}
+
+		sectionId := r.PostFormValue("section")
+
+		err := forumsService.DeleteSection(r.Context(), sectionId)
+		if err != nil {
+			logger.Error(r.Context(), "Failed to delete forum section: ", err)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to delete forum section.", w, r)
+			return
+		}
+
+		err = ep_util.CommitTransactionForRequest(r)
+		if err != nil {
+			logger.Error(r.Context(), "Failed to commit transaction: ", err)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to commit transaction.", w, r)
+			return
+		}
+
+		RenderSimpleAdminMessage("Success", "Forum section has been deleted.", w, r)
+	})
+	mux.Handle("POST /admin/forum/sections/delete", postSectionsDeleteHandler)
 }

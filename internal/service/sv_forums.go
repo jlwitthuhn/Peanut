@@ -16,6 +16,7 @@ import (
 
 type ForumsService interface {
 	CreateSection(ctx context.Context, name string, ordering float32) (string, error)
+	DeleteSection(ctx context.Context, id string) error
 	GetAllSectionRows(ctx context.Context) ([]data.ForumSectionRow, error)
 }
 
@@ -49,6 +50,29 @@ func (this *forumsServiceImpl) CreateSection(ctx context.Context, name string, o
 	}
 
 	return newId, nil
+}
+
+func (this *forumsServiceImpl) DeleteSection(ctx context.Context, id string) error {
+	if middleutil.ContextHasPermission(ctx, perms.Admin_Forums_Structure_Edit) == false {
+		return errors.New("permission denied")
+	}
+
+	userId, ok := ctx.Value(contextkeys.UserId).(string)
+	if !ok {
+		return errors.New("cannot delete forum section: no user id in context")
+	}
+
+	err := this.forumSectionsDao.UpdateVisibilityById(ctx, id, "Deleted")
+	if err != nil {
+		return err
+	}
+
+	err = this.systemLogDao.InsertRow(ctx, userId, id, fmt.Sprintf("Deleted forum section: %s", id))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (this *forumsServiceImpl) GetAllSectionRows(ctx context.Context) ([]data.ForumSectionRow, error) {

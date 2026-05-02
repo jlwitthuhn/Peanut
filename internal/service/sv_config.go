@@ -19,6 +19,7 @@ type ConfigService interface {
 }
 
 type SetupConfigService interface {
+	SetIntSetup(ctx context.Context, key string, value int64) error
 	SetStringSetup(ctx context.Context, key string, value string) error
 }
 
@@ -52,8 +53,16 @@ func (this *configServiceImpl) GetString(ctx context.Context, key string) (strin
 }
 
 func (this *configServiceImpl) SetInt(ctx context.Context, name string, value int64) error {
+	userId, ok := ctx.Value(contextkeys.UserId).(string)
+	if !ok {
+		return fmt.Errorf("cannot set config int '%s': no user id in context", name)
+	}
 	err := this.configDao.UpsertIntByName(ctx, name, value)
-	return err
+	if err != nil {
+		return err
+	}
+	message := fmt.Sprintf("Set config int '%s' to: %d", name, value)
+	return this.systemLogDao.InsertRow(ctx, userId, message)
 }
 
 func (this *configServiceImpl) SetString(ctx context.Context, name string, value string) error {
@@ -67,6 +76,10 @@ func (this *configServiceImpl) SetString(ctx context.Context, name string, value
 	}
 	message := fmt.Sprintf("Set config string '%s' to: %s", name, value)
 	return this.systemLogDao.InsertRow(ctx, userId, message)
+}
+
+func (this *configServiceImpl) SetIntSetup(ctx context.Context, name string, value int64) error {
+	return this.configDao.UpsertIntByName(ctx, name, value)
 }
 
 func (this *configServiceImpl) SetStringSetup(ctx context.Context, name string, value string) error {

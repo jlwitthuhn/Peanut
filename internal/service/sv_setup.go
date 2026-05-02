@@ -32,7 +32,6 @@ func NewSetupService(
 	sessionStringDao data.SessionStringDao,
 	systemLogDao data.SystemLogDao,
 	userDao data.UserDao,
-	configService ConfigService,
 	setupConfigService SetupConfigService,
 	databaseService DatabaseService,
 	groupService GroupService,
@@ -52,7 +51,6 @@ func NewSetupService(
 		sessionStringDao:    sessionStringDao,
 		systemLogDao:        systemLogDao,
 		userDao:             userDao,
-		configService:       configService,
 		setupConfigService:  setupConfigService,
 		groupService:        groupService,
 		scheduledJobService: scheduledJobService,
@@ -72,7 +70,6 @@ type setupServiceImpl struct {
 	sessionStringDao    data.SessionStringDao
 	systemLogDao        data.SystemLogDao
 	userDao             data.UserDao
-	configService       ConfigService
 	setupConfigService  SetupConfigService
 	databaseService     DatabaseService
 	groupService        GroupService
@@ -164,11 +161,11 @@ func (this *setupServiceImpl) InitializeDatabase(ctx context.Context, adminName 
 		return err
 	}
 
-	err = this.configService.SetInt(ctx, configkey.IntInitializedTime, time.Now().Unix())
+	err = this.setupConfigService.SetIntSetup(ctx,configkey.IntInitializedTime, time.Now().Unix())
 	if err != nil {
 		return err
 	}
-	err = this.configService.SetInt(ctx, configkey.IntSessionLengthMinutes, 120)
+	err = this.setupConfigService.SetIntSetup(ctx,configkey.IntSessionLengthMinutes, 120)
 	if err != nil {
 		return err
 	}

@@ -48,7 +48,7 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 			return
 		}
 
-		err = forumsService.CreateSection(r.Context(), title, float32(ordering))
+		_, err = forumsService.CreateSection(r.Context(), title, float32(ordering))
 		if err != nil {
 			logger.Error(r.Context(), "Failed to create forum section: ", err)
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to create forum section.", w, r)

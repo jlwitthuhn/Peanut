@@ -13,7 +13,7 @@ import (
 )
 
 type ForumsService interface {
-	CreateSection(ctx context.Context, name string, ordering float32) error
+	CreateSection(ctx context.Context, name string, ordering float32) (string, error)
 	GetAllSectionRows(ctx context.Context) ([]data.ForumSectionRow, error)
 }
 
@@ -25,13 +25,13 @@ type forumsServiceImpl struct {
 	forumSectionsDao data.ForumSectionsDao
 }
 
-func (this *forumsServiceImpl) CreateSection(ctx context.Context, name string, ordering float32) error {
+func (this *forumsServiceImpl) CreateSection(ctx context.Context, name string, ordering float32) (string, error) {
 	if middleutil.ContextHasPermission(ctx, perms.Admin_Forums_Structure_Edit) == false {
-		return errors.New("permission denied")
+		return "", errors.New("permission denied")
 	}
 
-	err := this.forumSectionsDao.InsertRow(ctx, name, ordering)
-	return err
+	newId, err := this.forumSectionsDao.InsertRow(ctx, name, ordering)
+	return newId, err
 }
 
 func (this *forumsServiceImpl) GetAllSectionRows(ctx context.Context) ([]data.ForumSectionRow, error) {

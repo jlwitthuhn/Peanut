@@ -21,7 +21,7 @@ type ForumSectionRow struct {
 
 type ForumSectionsDao interface {
 	CreateDBObjects(ctx context.Context) error
-	InsertRow(ctx context.Context, name string, ordering float32) error
+	InsertRow(ctx context.Context, name string, ordering float32) (string, error)
 	SelectRowAll(ctx context.Context) ([]ForumSectionRow, error)
 }
 
@@ -67,16 +67,18 @@ func (*forumSectionsDaoImpl) CreateDBObjects(ctx context.Context) error {
 	return nil
 }
 
-var sqlInsertForumSectionsRow = "INSERT INTO forum_sections(name, ordering) VALUES ($1, $2)"
+var sqlInsertForumSectionsRow = "INSERT INTO forum_sections(name, ordering) VALUES ($1, $2) RETURNING id"
 
-func (*forumSectionsDaoImpl) InsertRow(ctx context.Context, name string, ordering float32) error {
+func (*forumSectionsDaoImpl) InsertRow(ctx context.Context, name string, ordering float32) (string, error) {
 	sqlh := getSqlExecutorFromContext(ctx)
-	_, err := sqlh.Exec(sqlInsertForumSectionsRow, name, ordering)
+	row := sqlh.QueryRow(sqlInsertForumSectionsRow, name, ordering)
+	newId := ""
+	err := row.Scan(&newId)
 	if err != nil {
 		logger.Error(ctx, "Got database error on ForumSectionsDao/InsertRow query: ", err)
-		return err
+		return "", err
 	}
-	return nil
+	return newId, nil
 }
 
 var sqlSelectForumSectionsRowAll = "SELECT id, name, ordering, visibility, _created, _updated FROM forum_sections ORDER BY ordering"

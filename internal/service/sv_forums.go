@@ -15,6 +15,7 @@ import (
 )
 
 type ForumsService interface {
+	CreateForum(ctx context.Context, sectionId string, name string, ordering float32, visibility string) (string, error)
 	CreateSection(ctx context.Context, name string, ordering float32) (string, error)
 	DeleteSection(ctx context.Context, id string) error
 	GetAllSectionRows(ctx context.Context) ([]data.ForumSectionRow, error)
@@ -22,13 +23,37 @@ type ForumsService interface {
 	UpdateSectionUserConfig(ctx context.Context, id string, name string, ordering float32) error
 }
 
-func NewForumsService(forumSectionsDao data.ForumSectionsDao, systemLogDao data.SystemLogDao) ForumsService {
-	return &forumsServiceImpl{forumSectionsDao: forumSectionsDao, systemLogDao: systemLogDao}
+func NewForumsService(forumsDao data.ForumsDao, forumSectionsDao data.ForumSectionsDao, systemLogDao data.SystemLogDao) ForumsService {
+	return &forumsServiceImpl{forumsDao: forumsDao, forumSectionsDao: forumSectionsDao, systemLogDao: systemLogDao}
 }
 
 type forumsServiceImpl struct {
+	forumsDao        data.ForumsDao
 	forumSectionsDao data.ForumSectionsDao
 	systemLogDao     data.SystemLogDao
+}
+
+func (this *forumsServiceImpl) CreateForum(ctx context.Context, sectionId string, name string, ordering float32, visibility string) (string, error) {
+	if middleutil.ContextHasPermission(ctx, perms.Admin_Forums_Structure_Edit) == false {
+		return "", errors.New("permission denied")
+	}
+
+	userId, ok := ctx.Value(contextkeys.UserId).(string)
+	if !ok {
+		return "", errors.New("cannot create forum: no user id in context")
+	}
+
+	newId, err := this.forumsDao.InsertRow(ctx, sectionId, name, ordering, visibility)
+	if err != nil {
+		return "", err
+	}
+
+	err = this.systemLogDao.InsertRow(ctx, userId, newId, fmt.Sprintf("Created forum: %s", name))
+	if err != nil {
+		return "", err
+	}
+
+	return newId, nil
 }
 
 func (this *forumsServiceImpl) CreateSection(ctx context.Context, name string, ordering float32) (string, error) {

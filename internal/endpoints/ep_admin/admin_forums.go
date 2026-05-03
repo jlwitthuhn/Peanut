@@ -35,6 +35,40 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 	})
 	mux.Handle("GET /admin/forum/forums/add", getForumsAddHandler)
 
+	postForumsAddHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !ep_util.RequirePermissionOr403(w, r, perms.Admin_Forums_Structure_Edit) {
+			return
+		}
+
+		sectionId := r.PostFormValue("section_id")
+		name := r.PostFormValue("name")
+		orderStr := r.PostFormValue("order")
+		visibility := r.PostFormValue("visibility")
+
+		ordering, err := strconv.ParseFloat(orderStr, 32)
+		if err != nil {
+			ep_util.RenderErrorHttp400BadRequestWithMessage("Order must be a valid number.", w, r)
+			return
+		}
+
+		_, err = forumsService.CreateForum(r.Context(), sectionId, name, float32(ordering), visibility)
+		if err != nil {
+			logger.Error(r.Context(), "Failed to create forum: ", err)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to create forum.", w, r)
+			return
+		}
+
+		err = ep_util.CommitTransactionForRequest(r)
+		if err != nil {
+			logger.Error(r.Context(), "Failed to commit transaction: ", err)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to commit transaction.", w, r)
+			return
+		}
+
+		RenderSimpleAdminMessage("Success", "Forum '"+name+"' has been created.", w, r)
+	})
+	mux.Handle("POST /admin/forum/forums/add", postForumsAddHandler)
+
 	getSectionsHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sectionRows, err := forumsService.GetAllSectionRows(r.Context())
 		if err != nil {

@@ -22,6 +22,7 @@ type ForumRow struct {
 
 type ForumsDao interface {
 	CreateDBObjects(ctx context.Context) error
+	InsertRow(ctx context.Context, sectionId string, name string, ordering float32, visibility string) (string, error)
 }
 
 func NewForumsDao() ForumsDao {
@@ -64,4 +65,18 @@ func (*forumsDaoImpl) CreateDBObjects(ctx context.Context) error {
 		return err
 	}
 	return nil
+}
+
+var sqlInsertForumsRow = "INSERT INTO forums(section_id, name, ordering, visibility) VALUES ($1, $2, $3, $4) RETURNING id"
+
+func (*forumsDaoImpl) InsertRow(ctx context.Context, sectionId string, name string, ordering float32, visibility string) (string, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
+	row := sqlh.QueryRow(sqlInsertForumsRow, sectionId, name, ordering, visibility)
+	newId := ""
+	err := row.Scan(&newId)
+	if err != nil {
+		logger.Error(ctx, "Got database error on ForumsDao/InsertRow query: ", err)
+		return "", err
+	}
+	return newId, nil
 }

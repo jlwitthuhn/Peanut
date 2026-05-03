@@ -18,6 +18,7 @@ type forumHomeSection struct {
 
 type forumHomeForum struct {
 	Name string
+	Id   string
 }
 
 func groupForumsBySection(rows []data.ForumHomeViewRow) []forumHomeSection {
@@ -29,7 +30,7 @@ func groupForumsBySection(rows []data.ForumHomeViewRow) []forumHomeSection {
 			sections = append(sections, forumHomeSection{Name: row.SectionName})
 			currentSection = &sections[len(sections)-1]
 		}
-		currentSection.Forums = append(currentSection.Forums, forumHomeForum{Name: row.ForumName})
+		currentSection.Forums = append(currentSection.Forums, forumHomeForum{Name: row.ForumName, Id: row.ForumId})
 	}
 
 	return sections

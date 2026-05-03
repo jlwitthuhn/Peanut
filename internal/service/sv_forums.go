@@ -23,6 +23,7 @@ type ForumsService interface {
 	GetAllSectionRows(ctx context.Context) ([]data.ForumSectionRow, error)
 	GetForumRowById(ctx context.Context, id string) (*data.ForumRow, error)
 	GetSectionRowById(ctx context.Context, id string) (*data.ForumSectionRow, error)
+	IsForumReadable(ctx context.Context, id string) (bool, error)
 	UpdateForumUserConfig(ctx context.Context, id string, sectionId string, name string, ordering float32, visibility string) error
 	UpdateSectionUserConfig(ctx context.Context, id string, name string, ordering float32) error
 }
@@ -147,6 +148,17 @@ func (this *forumsServiceImpl) GetAllSectionRows(ctx context.Context) ([]data.Fo
 func (this *forumsServiceImpl) GetSectionRowById(ctx context.Context, id string) (*data.ForumSectionRow, error) {
 	result, err := this.forumSectionsDao.SelectRowById(ctx, id)
 	return result, err
+}
+
+func (this *forumsServiceImpl) IsForumReadable(ctx context.Context, id string) (bool, error) {
+	forum, err := this.forumsDao.SelectRowById(ctx, id)
+	if err != nil {
+		return false, err
+	}
+	if forum == nil {
+		return false, nil
+	}
+	return forum.Visibility == "Public", nil
 }
 
 func (this *forumsServiceImpl) UpdateSectionUserConfig(ctx context.Context, id string, name string, ordering float32) error {

@@ -21,7 +21,7 @@
 			{{ range $forum := $section.Forums }}
 			<div class="data-row">
 				<div class="data-cell">
-					<h1><a href="#">{{ $forum.Name }}</a></h1>
+					<h1><a href="/forum/index/{{ $forum.Id }}">{{ $forum.Name }}</a></h1>
 					<p class="description">No description available</p>
 				</div>
 				<div class="data-cell">

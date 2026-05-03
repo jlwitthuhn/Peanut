@@ -4,6 +4,27 @@
 		<h1>Forums</h1>
 	</div>
 	<div class="panel-body">
+		<table>
+			<tr>
+				<th>ID</th>
+				<th>Section ID</th>
+				<th>Name</th>
+				<th>Ordering</th>
+				<th>Visibility</th>
+				<th>Created</th>
+			</tr>
+			{{ range $forum := .Forums }}
+			<tr>
+				<td>{{ $forum.Id }}</td>
+				<td>{{ $forum.SectionId }}</td>
+				<td>{{ $forum.Name }}</td>
+				<td>{{ $forum.Ordering }}</td>
+				<td>{{ $forum.Visibility }}</td>
+				<td>{{ $forum.Created.Format "2006-01-02 15:04:05.000 MST" }}</td>
+			</tr>
+			{{ end }}
+		</table>
+		<hr>
 		<p><a href="/admin/forum/forums/add">Add new forum</a></p>
 	</div>
 </div>

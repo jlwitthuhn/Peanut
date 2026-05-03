@@ -23,6 +23,7 @@ type ForumRow struct {
 type ForumsDao interface {
 	CreateDBObjects(ctx context.Context) error
 	InsertRow(ctx context.Context, sectionId string, name string, ordering float32, visibility string) (string, error)
+	SelectRowAll(ctx context.Context) ([]ForumRow, error)
 }
 
 func NewForumsDao() ForumsDao {
@@ -79,4 +80,28 @@ func (*forumsDaoImpl) InsertRow(ctx context.Context, sectionId string, name stri
 		return "", err
 	}
 	return newId, nil
+}
+
+var sqlSelectForumsRowAll = "SELECT id, section_id, name, ordering, visibility, _created, _updated FROM forums ORDER BY ordering"
+
+func (*forumsDaoImpl) SelectRowAll(ctx context.Context) ([]ForumRow, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
+	rows, err := sqlh.Query(sqlSelectForumsRowAll)
+	if err != nil {
+		logger.Error(ctx, "Got database error on ForumsDao/SelectRowAll query: ", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var result []ForumRow
+	for rows.Next() {
+		thisRow := ForumRow{}
+		err = rows.Scan(&thisRow.Id, &thisRow.SectionId, &thisRow.Name, &thisRow.Ordering, &thisRow.Visibility, &thisRow.Created, &thisRow.Updated)
+		if err != nil {
+			logger.Error(ctx, "Got database error on ForumsDao/SelectRowAll query: ", err)
+			return nil, err
+		}
+		result = append(result, thisRow)
+	}
+	return result, nil
 }

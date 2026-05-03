@@ -12,6 +12,7 @@ import (
 	"peanut/internal/data/datasource"
 	"peanut/internal/endpoints"
 	"peanut/internal/endpoints/ep_admin"
+	"peanut/internal/endpoints/ep_forums"
 	"peanut/internal/logger"
 	"peanut/internal/middleware"
 	"peanut/internal/service"
@@ -90,6 +91,7 @@ func main() {
 		scheduledJobService,
 		sessionService,
 		userService)
+	ep_forums.RegisterForumHandlers(middlewareMux)
 	endpoints.RegisterIndexHandlers(middlewareMux, configService)
 	endpoints.RegisterLoginHandlers(middlewareMux, sessionService)
 	endpoints.RegisterLogoutHandlers(middlewareMux, sessionService)

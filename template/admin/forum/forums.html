@@ -42,6 +42,23 @@
 </div>
 <div class="panel">
 	<div class="panel-header">
+		<h1>Edit Forum</h1>
+	</div>
+	<div class="panel-body">
+		<form class="standard-form" action="/admin/forum/forums/edit" method="post">
+			<label for="edit_forum">Forum:</label>
+			<select id="edit_forum" name="forum">
+				{{ range $forum := .Forums }}
+					<option value="{{ $forum.Id }}">{{ $forum.Name }} [{{ $forum.Id }}]</option>
+				{{ end }}
+			</select>
+			<input type="hidden" name="csrf" value="{{ .CsrfToken  }}">
+			<input type="submit" value="Edit">
+		</form>
+	</div>
+</div>
+<div class="panel">
+	<div class="panel-header">
 		<h1>Delete Forum</h1>
 	</div>
 	<div class="panel-body">

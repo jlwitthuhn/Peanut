@@ -19,7 +19,7 @@
 				<label for="forum_section">Section:</label>
 				<select id="forum_section" name="section_id">
 					{{ range $section := .Sections }}
-						<option value="{{ $section.Id }}">{{ $section.Name }} [{{ $section.Id }}]</option>
+						<option value="{{ $section.Id }}" {{ if $.EditMode }}{{ if eq $section.Id $.Forum.SectionId }}selected{{ end }}{{ end }}>{{ $section.Name }} [{{ $section.Id }}]</option>
 					{{ end }}
 				</select>
 				<label for="forum_name">Name:</label>
@@ -28,8 +28,8 @@
 				<input type="text" id="forum_order" name="order" value="{{ if .EditMode }}{{ .Forum.Ordering }}{{ end }}">
 				<label for="forum_visibility">Visibility:</label>
 				<select id="forum_visibility" name="visibility">
-					<option value="Public">Public</option>
-					<option value="Private">Private</option>
+					<option value="Public" {{ if $.EditMode }}{{ if eq $.Forum.Visibility "Public" }}selected{{ end }}{{ end }}>Public</option>
+					<option value="Private" {{ if $.EditMode }}{{ if eq $.Forum.Visibility "Private" }}selected{{ end }}{{ end }}>Private</option>
 				</select>
 				<input type="hidden" name="csrf" value="{{ .CsrfToken }}">
 				<input id="submit_button" type="submit" value="Submit">

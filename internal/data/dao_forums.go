@@ -6,8 +6,12 @@ package data
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"peanut/internal/logger"
 	"time"
+
+	"github.com/lib/pq"
 )
 
 type ForumRow struct {
@@ -24,6 +28,8 @@ type ForumsDao interface {
 	CreateDBObjects(ctx context.Context) error
 	InsertRow(ctx context.Context, sectionId string, name string, ordering float32, visibility string) (string, error)
 	SelectRowAll(ctx context.Context) ([]ForumRow, error)
+	SelectRowById(ctx context.Context, id string) (*ForumRow, error)
+	UpdateUserConfigById(ctx context.Context, id string, sectionId string, name string, ordering float32, visibility string) error
 	UpdateVisibilityById(ctx context.Context, id string, visibility string) error
 }
 
@@ -117,4 +123,40 @@ func (*forumsDaoImpl) SelectRowAll(ctx context.Context) ([]ForumRow, error) {
 		result = append(result, thisRow)
 	}
 	return result, nil
+}
+
+var sqlSelectForumsRowById = "SELECT id, section_id, name, ordering, visibility, _created, _updated FROM forums WHERE id = $1"
+
+func (*forumsDaoImpl) SelectRowById(ctx context.Context, id string) (*ForumRow, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
+	result := &ForumRow{}
+	row := sqlh.QueryRow(sqlSelectForumsRowById, id)
+	err := row.Scan(&result.Id, &result.SectionId, &result.Name, &result.Ordering, &result.Visibility, &result.Created, &result.Updated)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
+	if err != nil {
+		var pqErr *pq.Error
+		ok := errors.As(err, &pqErr)
+		if ok {
+			if pqErr.Code == "22P02" {
+				return nil, nil
+			}
+		}
+		logger.Error(ctx, "Got database error on ForumsDao/SelectRowById query: ", err)
+		return nil, err
+	}
+	return result, nil
+}
+
+var sqlUpdateForumsUserConfigById = "UPDATE forums SET section_id = $1, name = $2, ordering = $3, visibility = $4 WHERE id = $5"
+
+func (*forumsDaoImpl) UpdateUserConfigById(ctx context.Context, id string, sectionId string, name string, ordering float32, visibility string) error {
+	sqlh := getSqlExecutorFromContext(ctx)
+	_, err := sqlh.Exec(sqlUpdateForumsUserConfigById, sectionId, name, ordering, visibility, id)
+	if err != nil {
+		logger.Error(ctx, "Got database error on ForumsDao/UpdateUserConfigById query: ", err)
+		return err
+	}
+	return nil
 }

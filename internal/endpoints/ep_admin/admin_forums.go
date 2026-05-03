@@ -107,6 +107,98 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 	})
 	mux.Handle("POST /admin/forum/forums/delete", postForumsDeleteHandler)
 
+	getForumsEditHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		forumId := r.PathValue("forumId")
+
+		forumRow, err := forumsService.GetForumRowById(r.Context(), forumId)
+		if err != nil {
+			logger.Error(r.Context(), "Failed to get forum: ", err)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to get forum.", w, r)
+			return
+		}
+		if forumRow == nil {
+			ep_util.RenderErrorHttp400BadRequestWithMessage("The specified forum does not exist.", w, r)
+			return
+		}
+
+		sectionRows, err := forumsService.GetAllSectionRows(r.Context())
+		if err != nil {
+			ep_util.RenderErrorHttp500InternalServerError(w, r)
+			return
+		}
+
+		templateCtx := templatecontext.GetStandardTemplateContext(r)
+		templateCtx["EditMode"] = true
+		templateCtx["Forum"] = forumRow
+		templateCtx["Sections"] = sectionRows
+		ep_util.RenderTemplate("_admin/forum/forums/add_edit", templateCtx, w, r)
+	})
+	mux.Handle("GET /admin/forum/forums/edit/{forumId}", getForumsEditHandler)
+
+	postForumsEditHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !ep_util.RequirePermissionOr403(w, r, perms.Admin_Forums_Structure_Edit) {
+			return
+		}
+
+		forumId := r.PostFormValue("forum")
+
+		forumRow, err := forumsService.GetForumRowById(r.Context(), forumId)
+		if err != nil {
+			logger.Error(r.Context(), "Failed to get forum: ", err)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to get forum.", w, r)
+			return
+		}
+		if forumRow == nil {
+			ep_util.RenderErrorHttp400BadRequestWithMessage("The specified forum does not exist.", w, r)
+			return
+		}
+
+		http.Redirect(w, r, "/admin/forum/forums/edit/"+forumId, http.StatusSeeOther)
+	})
+	mux.Handle("POST /admin/forum/forums/edit", postForumsEditHandler)
+
+	postForumsEditByIdHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !ep_util.RequirePermissionOr403(w, r, perms.Admin_Forums_Structure_Edit) {
+			return
+		}
+
+		urlForumId := r.PathValue("forumId")
+		formForumId := r.PostFormValue("forum")
+
+		if urlForumId != formForumId {
+			ep_util.RenderErrorHttp400BadRequestWithMessage("Forum ID in URL does not match forum ID in form.", w, r)
+			return
+		}
+
+		sectionId := r.PostFormValue("section_id")
+		name := r.PostFormValue("name")
+		orderStr := r.PostFormValue("order")
+		visibility := r.PostFormValue("visibility")
+
+		ordering, err := strconv.ParseFloat(orderStr, 32)
+		if err != nil {
+			ep_util.RenderErrorHttp400BadRequestWithMessage("Order must be a valid number.", w, r)
+			return
+		}
+
+		err = forumsService.UpdateForumUserConfig(r.Context(), urlForumId, sectionId, name, float32(ordering), visibility)
+		if err != nil {
+			logger.Error(r.Context(), "Failed to update forum: ", err)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to update forum.", w, r)
+			return
+		}
+
+		err = ep_util.CommitTransactionForRequest(r)
+		if err != nil {
+			logger.Error(r.Context(), "Failed to commit transaction: ", err)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to commit transaction.", w, r)
+			return
+		}
+
+		RenderSimpleAdminMessage("Success", "Forum '"+name+"' has been updated.", w, r)
+	})
+	mux.Handle("POST /admin/forum/forums/edit/{forumId}", postForumsEditByIdHandler)
+
 	getSectionsHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sectionRows, err := forumsService.GetAllSectionRows(r.Context())
 		if err != nil {

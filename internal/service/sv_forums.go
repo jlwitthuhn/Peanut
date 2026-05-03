@@ -21,7 +21,9 @@ type ForumsService interface {
 	DeleteSection(ctx context.Context, id string) error
 	GetAllForumRows(ctx context.Context) ([]data.ForumRow, error)
 	GetAllSectionRows(ctx context.Context) ([]data.ForumSectionRow, error)
+	GetForumRowById(ctx context.Context, id string) (*data.ForumRow, error)
 	GetSectionRowById(ctx context.Context, id string) (*data.ForumSectionRow, error)
+	UpdateForumUserConfig(ctx context.Context, id string, sectionId string, name string, ordering float32, visibility string) error
 	UpdateSectionUserConfig(ctx context.Context, id string, name string, ordering float32) error
 }
 
@@ -132,6 +134,11 @@ func (this *forumsServiceImpl) GetAllForumRows(ctx context.Context) ([]data.Foru
 	return result, err
 }
 
+func (this *forumsServiceImpl) GetForumRowById(ctx context.Context, id string) (*data.ForumRow, error) {
+	result, err := this.forumsDao.SelectRowById(ctx, id)
+	return result, err
+}
+
 func (this *forumsServiceImpl) GetAllSectionRows(ctx context.Context) ([]data.ForumSectionRow, error) {
 	result, err := this.forumSectionsDao.SelectRowAll(ctx)
 	return result, err
@@ -157,7 +164,30 @@ func (this *forumsServiceImpl) UpdateSectionUserConfig(ctx context.Context, id s
 		return err
 	}
 
-	err = this.systemLogDao.InsertRow(ctx, userId, id, fmt.Sprintf("Updated forum section: %s", name))
+	err = this.systemLogDao.InsertRow(ctx, userId, id, fmt.Sprintf("Updated forum section user config: %s", name))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (this *forumsServiceImpl) UpdateForumUserConfig(ctx context.Context, id string, sectionId string, name string, ordering float32, visibility string) error {
+	if middleutil.ContextHasPermission(ctx, perms.Admin_Forums_Structure_Edit) == false {
+		return errors.New("permission denied")
+	}
+
+	userId, ok := ctx.Value(contextkeys.UserId).(string)
+	if !ok {
+		return errors.New("cannot update forum: no user id in context")
+	}
+
+	err := this.forumsDao.UpdateUserConfigById(ctx, id, sectionId, name, ordering, visibility)
+	if err != nil {
+		return err
+	}
+
+	err = this.systemLogDao.InsertRow(ctx, userId, id, fmt.Sprintf("Updated forum user config: %s", name))
 	if err != nil {
 		return err
 	}

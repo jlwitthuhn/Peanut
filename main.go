@@ -93,7 +93,7 @@ func main() {
 		scheduledJobService,
 		sessionService,
 		userService)
-	ep_forums.RegisterForumHandlers(middlewareMux)
+	ep_forums.RegisterForumHandlers(middlewareMux, forumHomeDvao)
 	endpoints.RegisterIndexHandlers(middlewareMux, configService)
 	endpoints.RegisterLoginHandlers(middlewareMux, sessionService)
 	endpoints.RegisterLogoutHandlers(middlewareMux, sessionService)

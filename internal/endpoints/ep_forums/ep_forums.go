@@ -6,8 +6,9 @@ package ep_forums
 
 import (
 	"net/http"
+	"peanut/internal/data"
 )
 
-func RegisterForumHandlers(mux *http.ServeMux) {
-	registerForumHomeHandlers(mux)
+func RegisterForumHandlers(mux *http.ServeMux, forumHomeDvao data.ForumHomeDvao) {
+	registerForumHomeHandlers(mux, forumHomeDvao)
 }

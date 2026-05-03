@@ -6,12 +6,46 @@ package ep_forums
 
 import (
 	"net/http"
+	"peanut/internal/data"
 	"peanut/internal/endpoints/ep_util"
+	"peanut/internal/endpoints/templatecontext"
 )
 
-func registerForumHomeHandlers(mux *http.ServeMux) {
+type forumHomeSection struct {
+	Name   string
+	Forums []forumHomeForum
+}
+
+type forumHomeForum struct {
+	Name string
+}
+
+func groupForumsBySection(rows []data.ForumHomeViewRow) []forumHomeSection {
+	var sections []forumHomeSection
+	var currentSection *forumHomeSection
+
+	for _, row := range rows {
+		if currentSection == nil || currentSection.Name != row.SectionName {
+			sections = append(sections, forumHomeSection{Name: row.SectionName})
+			currentSection = &sections[len(sections)-1]
+		}
+		currentSection.Forums = append(currentSection.Forums, forumHomeForum{Name: row.ForumName})
+	}
+
+	return sections
+}
+
+func registerForumHomeHandlers(mux *http.ServeMux, forumHomeDvao data.ForumHomeDvao) {
 	getForumHomeHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ep_util.RenderSimpleMessage("Forum", "This page is under construction.", w, r)
+		rows, err := forumHomeDvao.SelectForumHomeViewRowsPublic(r.Context())
+		if err != nil {
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to load forums.", w, r)
+			return
+		}
+
+		templateCtx := templatecontext.GetStandardTemplateContext(r)
+		templateCtx["Sections"] = groupForumsBySection(rows)
+		ep_util.RenderTemplate("_forum/index", templateCtx, w, r)
 	})
 	mux.Handle("GET /forum", getForumHomeHandler)
 }

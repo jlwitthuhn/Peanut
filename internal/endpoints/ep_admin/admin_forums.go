@@ -76,6 +76,37 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 	})
 	mux.Handle("POST /admin/forum/forums/add", postForumsAddHandler)
 
+	postForumsDeleteHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !ep_util.RequirePermissionOr403(w, r, perms.Admin_Forums_Structure_Edit) {
+			return
+		}
+
+		forumId := r.PostFormValue("forum")
+		confirm := r.PostFormValue("confirm")
+
+		if confirm != "on" {
+			ep_util.RenderErrorHttp400BadRequestWithMessage("You must check the 'Confirm' box to delete a forum.", w, r)
+			return
+		}
+
+		err := forumsService.DeleteForum(r.Context(), forumId)
+		if err != nil {
+			logger.Error(r.Context(), "Failed to delete forum: ", err)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to delete forum.", w, r)
+			return
+		}
+
+		err = ep_util.CommitTransactionForRequest(r)
+		if err != nil {
+			logger.Error(r.Context(), "Failed to commit transaction: ", err)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to commit transaction.", w, r)
+			return
+		}
+
+		RenderSimpleAdminMessage("Success", "Forum has been deleted.", w, r)
+	})
+	mux.Handle("POST /admin/forum/forums/delete", postForumsDeleteHandler)
+
 	getSectionsHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sectionRows, err := forumsService.GetAllSectionRows(r.Context())
 		if err != nil {

@@ -1,3 +1,15 @@
+{{ define "admin_head_script"}}
+	document.addEventListener('DOMContentLoaded', function() {
+		let confirm_check = document.getElementById("confirm_check")
+		let submit_button = document.getElementById("submit_button")
+		confirm_check.addEventListener("click", function() {
+			submit_button.disabled = !(confirm_check.checked)
+		});
+		confirm_check.checked = false;
+		submit_button.disabled = true;
+	});
+{{ end }}
+
 {{ define "admin_content" }}
 <div class="panel">
 	<div class="panel-header">
@@ -26,6 +38,24 @@
 		</table>
 		<hr>
 		<p><a href="/admin/forum/forums/add">Add new forum</a></p>
+	</div>
+</div>
+<div class="panel">
+	<div class="panel-header">
+		<h1>Delete Forum</h1>
+	</div>
+	<div class="panel-body">
+		<form class="standard-form" action="/admin/forum/forums/delete" method="post">
+			<label for="forum_name">Forum:</label>
+			<select id="forum_name" name="forum">
+				{{ range $forum := .Forums }}
+					<option value="{{ $forum.Id }}">{{ $forum.Name }} [{{ $forum.Id }}]</option>
+				{{ end }}
+			</select>
+			<div><input id="confirm_check" type="checkbox" name="confirm"><label for="confirm_check">Confirm</label></div>
+			<input type="hidden" name="csrf" value="{{ .CsrfToken  }}">
+			<input class="danger-button" id="submit_button" type="submit" value="Delete">
+		</form>
 	</div>
 </div>
 {{ end }}

@@ -447,6 +447,64 @@
             font-size: 0.85em;
             padding: 0.4rem 0 0.75rem;
         }
+
+        .forum-post {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            border-top: 1px solid var(--border);
+        }
+
+        .forum-post:first-child {
+            border-top: none;
+        }
+
+        .forum-post-author {
+            padding: 0.75rem;
+            background-color: var(--bg-alt-2);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .forum-post-author-name {
+            font-weight: 600;
+        }
+
+        .forum-post-author-name a {
+            color: var(--text);
+        }
+
+        .forum-post-author-name a:hover {
+            color: var(--accent-bright);
+        }
+
+        .forum-post-author-info {
+            font-size: 0.8em;
+            color: var(--text-muted);
+        }
+
+        .forum-post-content {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .forum-post-meta {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.8em;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-muted);
+        }
+
+        .forum-post-body {
+            padding: 0.75rem;
+            flex: 1;
+        }
+
+        .forum-post-body p+p {
+            margin-top: 0.6rem;
+        }
     </style>
 </head>
 
@@ -726,6 +784,44 @@
                 </div>
                 <div class="data-cell">
                     <h2>Something</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<div class="layout">
+    <div class="layout-main">
+        <p class="breadcrumb"><a href="#">Category Name</a> &rsaquo; <a href="#">Forum Name</a> &rsaquo; <a href="#">Thread Title Goes Here</a></p>
+        <div class="panel">
+            <div class="panel-header">
+                <h1>Thread Title Goes Here</h1>
+            </div>
+            <div class="forum-post">
+                <div class="forum-post-author">
+                    <div class="forum-post-author-name"><a href="#">AdminUser</a></div>
+                    <div class="forum-post-author-info">Details</div>
+                </div>
+                <div class="forum-post-content">
+                    <div class="forum-post-meta">Posted: 2026-01-02 03:04:00</div>
+                    <div class="forum-post-body">
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In quis nibh at erat facilisis viverra. Duis imperdiet nec enim vitae sodales. Sed ornare accumsan augue, sit amet placerat orci bibendum vitae. Cras id libero mattis libero porta lobortis. Maecenas at nisl lorem.</p>
+                        <p>Aliquam volutpat sagittis lacus vitae ullamcorper. Cras posuere elit odio, a porta nibh consectetur nec. Pellentesque ultrices nibh nisl, a lobortis odio fringilla sed. Vestibulum nec felis at lectus blandit iaculis vitae vel magna. Fusce sed mattis lorem, vitae auctor dui. Curabitur ultricies ipsum mauris, imperdiet ultrices est molestie non. Vivamus ut scelerisque ante, malesuada bibendum est.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="forum-post">
+                <div class="forum-post-author">
+                    <div class="forum-post-author-name"><a href="#">RegularUser</a></div>
+                    <div class="forum-post-author-info">Details</div>
+                </div>
+                <div class="forum-post-content">
+                    <div class="forum-post-meta">Posted: 2026-01-02 05:06:00</div>
+                    <div class="forum-post-body">
+                        <p>This is a one line reply.</p>
+                    </div>
                 </div>
             </div>
         </div>

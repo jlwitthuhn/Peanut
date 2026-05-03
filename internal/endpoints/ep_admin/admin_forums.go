@@ -21,6 +21,20 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 	})
 	mux.Handle("GET /admin/forum/forums", getForumsHandler)
 
+	getForumsAddHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		sectionRows, err := forumsService.GetAllSectionRows(r.Context())
+		if err != nil {
+			ep_util.RenderErrorHttp500InternalServerError(w, r)
+			return
+		}
+
+		templateCtx := templatecontext.GetStandardTemplateContext(r)
+		templateCtx["AddMode"] = true
+		templateCtx["Sections"] = sectionRows
+		ep_util.RenderTemplate("_admin/forum/forums/add_edit", templateCtx, w, r)
+	})
+	mux.Handle("GET /admin/forum/forums/add", getForumsAddHandler)
+
 	getSectionsHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sectionRows, err := forumsService.GetAllSectionRows(r.Context())
 		if err != nil {

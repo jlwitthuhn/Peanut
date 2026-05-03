@@ -404,6 +404,12 @@
             color: var(--text-muted);
         }
 
+        .breadcrumb-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
         .side-nav {
             background-color: var(--bg-alt);
             border: 1px solid var(--border);
@@ -646,7 +652,10 @@
 
 <div class="layout">
     <div class="layout-main">
-        <p class="breadcrumb"><a href="#">Category Name</a> &rsaquo; <a href="#">Forum Name</a></p>
+        <div class="breadcrumb-row">
+            <p class="breadcrumb"><a href="#">Category Name</a> &rsaquo; <a href="#">Forum Name</a></p>
+            <input type="submit" class="primary-button" value="New Thread">
+        </div>
         <div class="data-table cols-thread">
             <div class="data-row data-header">
                 <div class="data-cell">

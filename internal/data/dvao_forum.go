@@ -20,7 +20,7 @@ type ForumHomeViewRow struct {
 
 type ForumHomeDvao interface {
 	CreateDBObjects(ctx context.Context) error
-	SelectRowAll(ctx context.Context) ([]ForumHomeViewRow, error)
+	SelectForumHomeViewRowsPublic(ctx context.Context) ([]ForumHomeViewRow, error)
 }
 
 func NewForumHomeDvao() ForumHomeDvao {
@@ -57,11 +57,11 @@ func (*forumHomeDvaoImpl) CreateDBObjects(ctx context.Context) error {
 
 var sqlSelectForumHomeViewRowAll = "SELECT section_id, section_name, section_ordering, forum_id, forum_name, forum_ordering FROM view_forum_home_public"
 
-func (*forumHomeDvaoImpl) SelectRowAll(ctx context.Context) ([]ForumHomeViewRow, error) {
+func (*forumHomeDvaoImpl) SelectForumHomeViewRowsPublic(ctx context.Context) ([]ForumHomeViewRow, error) {
 	sqlh := getSqlExecutorFromContext(ctx)
 	rows, err := sqlh.Query(sqlSelectForumHomeViewRowAll)
 	if err != nil {
-		logger.Error(ctx, "Got database error on ForumHomeDvao/SelectRowAll query: ", err)
+		logger.Error(ctx, "Got database error on ForumHomeDvao/SelectForumHomeViewRowsPublic query: ", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -71,7 +71,7 @@ func (*forumHomeDvaoImpl) SelectRowAll(ctx context.Context) ([]ForumHomeViewRow,
 		thisRow := ForumHomeViewRow{}
 		err = rows.Scan(&thisRow.SectionId, &thisRow.SectionName, &thisRow.SectionOrdering, &thisRow.ForumId, &thisRow.ForumName, &thisRow.ForumOrdering)
 		if err != nil {
-			logger.Error(ctx, "Got database error on ForumHomeDvao/SelectRowAll query: ", err)
+			logger.Error(ctx, "Got database error on ForumHomeDvao/SelectForumHomeViewRowsPublic query: ", err)
 			return nil, err
 		}
 		result = append(result, thisRow)

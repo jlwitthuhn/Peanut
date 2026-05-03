@@ -22,19 +22,21 @@ type ForumsService interface {
 	GetAllForumRows(ctx context.Context) ([]data.ForumRow, error)
 	GetAllSectionRows(ctx context.Context) ([]data.ForumSectionRow, error)
 	GetForumRowById(ctx context.Context, id string) (*data.ForumRow, error)
+	GetHomeViewRowsPublic(ctx context.Context) ([]data.ForumHomeViewRow, error)
 	GetSectionRowById(ctx context.Context, id string) (*data.ForumSectionRow, error)
 	IsForumReadable(ctx context.Context, id string) (bool, error)
 	UpdateForumUserConfig(ctx context.Context, id string, sectionId string, name string, ordering float32, visibility string) error
 	UpdateSectionUserConfig(ctx context.Context, id string, name string, ordering float32) error
 }
 
-func NewForumsService(forumsDao data.ForumsDao, forumSectionsDao data.ForumSectionsDao, systemLogDao data.SystemLogDao) ForumsService {
-	return &forumsServiceImpl{forumsDao: forumsDao, forumSectionsDao: forumSectionsDao, systemLogDao: systemLogDao}
+func NewForumsService(forumsDao data.ForumsDao, forumSectionsDao data.ForumSectionsDao, forumHomeDvao data.ForumHomeDvao, systemLogDao data.SystemLogDao) ForumsService {
+	return &forumsServiceImpl{forumsDao: forumsDao, forumSectionsDao: forumSectionsDao, forumHomeDvao: forumHomeDvao, systemLogDao: systemLogDao}
 }
 
 type forumsServiceImpl struct {
 	forumsDao        data.ForumsDao
 	forumSectionsDao data.ForumSectionsDao
+	forumHomeDvao    data.ForumHomeDvao
 	systemLogDao     data.SystemLogDao
 }
 
@@ -132,6 +134,11 @@ func (this *forumsServiceImpl) DeleteSection(ctx context.Context, id string) err
 
 func (this *forumsServiceImpl) GetAllForumRows(ctx context.Context) ([]data.ForumRow, error) {
 	result, err := this.forumsDao.SelectRowAll(ctx)
+	return result, err
+}
+
+func (this *forumsServiceImpl) GetHomeViewRowsPublic(ctx context.Context) ([]data.ForumHomeViewRow, error) {
+	result, err := this.forumHomeDvao.SelectForumHomeViewRowsPublic(ctx)
 	return result, err
 }
 

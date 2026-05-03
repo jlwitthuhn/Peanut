@@ -6,11 +6,10 @@ package ep_forums
 
 import (
 	"net/http"
-	"peanut/internal/data"
 	"peanut/internal/service"
 )
 
-func RegisterForumHandlers(mux *http.ServeMux, forumHomeDvao data.ForumHomeDvao, forumsService service.ForumsService) {
-	registerForumHomeHandlers(mux, forumHomeDvao)
+func RegisterForumHandlers(mux *http.ServeMux, forumsService service.ForumsService) {
+	registerForumHomeHandlers(mux, forumsService)
 	registerForumIndexHandlers(mux, forumsService)
 }

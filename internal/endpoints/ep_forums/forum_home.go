@@ -9,6 +9,7 @@ import (
 	"peanut/internal/data"
 	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
+	"peanut/internal/service"
 )
 
 type forumHomeSection struct {
@@ -36,9 +37,9 @@ func groupForumsBySection(rows []data.ForumHomeViewRow) []forumHomeSection {
 	return sections
 }
 
-func registerForumHomeHandlers(mux *http.ServeMux, forumHomeDvao data.ForumHomeDvao) {
+func registerForumHomeHandlers(mux *http.ServeMux, forumsService service.ForumsService) {
 	getForumHomeHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		rows, err := forumHomeDvao.SelectForumHomeViewRowsPublic(r.Context())
+		rows, err := forumsService.GetHomeViewRowsPublic(r.Context())
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to load forums.", w, r)
 			return

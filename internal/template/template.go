@@ -71,7 +71,7 @@ func LoadTemplates(fs fs.FS) {
 	setupFiles := []string{"base.html", "css/common.css", "setup.html"}
 	loadTemplateOrDie(fs, "_setup", setupFiles...)
 
-	forumIndexFiles := []string{"base.html", "css/common.css", "forum/index.html"}
+	forumIndexFiles := []string{"base.html", "css/common.css", "forum/index.html", "widget/forum_section.html"}
 	loadTemplateOrDie(fs, "_forum/index", forumIndexFiles...)
 
 	simpleMessageFiles := []string{"base.html", "css/common.css", "simple_message.html"}

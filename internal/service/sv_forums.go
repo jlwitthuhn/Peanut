@@ -22,9 +22,11 @@ type ForumsService interface {
 	GetAllForumRows(ctx context.Context) ([]data.ForumRow, error)
 	GetAllSectionRows(ctx context.Context) ([]data.ForumSectionRow, error)
 	GetForumRowById(ctx context.Context, id string) (*data.ForumRow, error)
+	GetHomeViewRowsBySectionPublic(ctx context.Context, sectionId string) ([]data.ForumHomeViewRow, error)
 	GetHomeViewRowsPublic(ctx context.Context) ([]data.ForumHomeViewRow, error)
 	GetSectionRowById(ctx context.Context, id string) (*data.ForumSectionRow, error)
 	IsForumReadable(ctx context.Context, id string) (bool, error)
+	IsSectionReadable(ctx context.Context, id string) (bool, error)
 	UpdateForumUserConfig(ctx context.Context, id string, sectionId string, name string, ordering float32, visibility string) error
 	UpdateSectionUserConfig(ctx context.Context, id string, name string, ordering float32) error
 }
@@ -137,6 +139,11 @@ func (this *forumsServiceImpl) GetAllForumRows(ctx context.Context) ([]data.Foru
 	return result, err
 }
 
+func (this *forumsServiceImpl) GetHomeViewRowsBySectionPublic(ctx context.Context, sectionId string) ([]data.ForumHomeViewRow, error) {
+	result, err := this.forumHomeDvao.SelectForumHomeViewRowsBySectionPublic(ctx, sectionId)
+	return result, err
+}
+
 func (this *forumsServiceImpl) GetHomeViewRowsPublic(ctx context.Context) ([]data.ForumHomeViewRow, error) {
 	result, err := this.forumHomeDvao.SelectForumHomeViewRowsPublic(ctx)
 	return result, err
@@ -166,6 +173,17 @@ func (this *forumsServiceImpl) IsForumReadable(ctx context.Context, id string) (
 		return false, nil
 	}
 	return forum.Visibility == "Public", nil
+}
+
+func (this *forumsServiceImpl) IsSectionReadable(ctx context.Context, id string) (bool, error) {
+	section, err := this.forumSectionsDao.SelectRowById(ctx, id)
+	if err != nil {
+		return false, err
+	}
+	if section == nil {
+		return false, nil
+	}
+	return section.Visibility == "Public", nil
 }
 
 func (this *forumsServiceImpl) UpdateSectionUserConfig(ctx context.Context, id string, name string, ordering float32) error {

@@ -13,6 +13,7 @@ import (
 )
 
 type forumHomeSection struct {
+	Id     string
 	Name   string
 	Forums []forumHomeForum
 }
@@ -27,8 +28,8 @@ func groupForumsBySection(rows []data.ForumHomeViewRow) []forumHomeSection {
 	var currentSection *forumHomeSection
 
 	for _, row := range rows {
-		if currentSection == nil || currentSection.Name != row.SectionName {
-			sections = append(sections, forumHomeSection{Name: row.SectionName})
+		if currentSection == nil || currentSection.Id != row.SectionId {
+			sections = append(sections, forumHomeSection{Id: row.SectionId, Name: row.SectionName})
 			currentSection = &sections[len(sections)-1]
 		}
 		currentSection.Forums = append(currentSection.Forums, forumHomeForum{Name: row.ForumName, Id: row.ForumId})
@@ -50,4 +51,29 @@ func registerForumHomeHandlers(mux *http.ServeMux, forumsService service.ForumsS
 		ep_util.RenderTemplate("view_forum/index", templateCtx, w, r)
 	})
 	mux.Handle("GET /forum", getForumHomeHandler)
+
+	getSectionIndexHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		sectionId := r.PathValue("sectionId")
+
+		readable, err := forumsService.IsSectionReadable(r.Context(), sectionId)
+		if err != nil {
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to load section.", w, r)
+			return
+		}
+		if !readable {
+			ep_util.RenderErrorHttp404NotFoundWithMessage("Page not found.", w, r)
+			return
+		}
+
+		rows, err := forumsService.GetHomeViewRowsBySectionPublic(r.Context(), sectionId)
+		if err != nil {
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to load forums.", w, r)
+			return
+		}
+
+		templateCtx := templatecontext.GetStandardTemplateContext(r)
+		templateCtx["Sections"] = groupForumsBySection(rows)
+		ep_util.RenderTemplate("view_forum/index", templateCtx, w, r)
+	})
+	mux.Handle("GET /forum/section/{sectionId}", getSectionIndexHandler)
 }

@@ -69,7 +69,7 @@ func registerAdminIndexHandlers(
 		templateCtx["WebsiteInfo"] = websiteInfo
 		templateCtx["EnvironmentInfo"] = envInfo
 
-		ep_util.RenderTemplate("_admin/index", templateCtx, w, r)
+		ep_util.RenderTemplate("view_admin/index", templateCtx, w, r)
 	})
 	mux.Handle("GET /admin", getIndexHandler)
 }

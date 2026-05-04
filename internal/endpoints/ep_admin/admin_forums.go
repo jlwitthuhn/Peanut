@@ -24,7 +24,7 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["Forums"] = forumRows
-		ep_util.RenderTemplate("_admin/forum/forums", templateCtx, w, r)
+		ep_util.RenderTemplate("view_admin/forum/forums", templateCtx, w, r)
 	})
 	mux.Handle("GET /admin/forum/forums", getForumsHandler)
 
@@ -38,7 +38,7 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["AddMode"] = true
 		templateCtx["Sections"] = sectionRows
-		ep_util.RenderTemplate("_admin/forum/forums/add_edit", templateCtx, w, r)
+		ep_util.RenderTemplate("view_admin/forum/forums/add_edit", templateCtx, w, r)
 	})
 	mux.Handle("GET /admin/forum/forums/add", getForumsAddHandler)
 
@@ -131,7 +131,7 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 		templateCtx["EditMode"] = true
 		templateCtx["Forum"] = forumRow
 		templateCtx["Sections"] = sectionRows
-		ep_util.RenderTemplate("_admin/forum/forums/add_edit", templateCtx, w, r)
+		ep_util.RenderTemplate("view_admin/forum/forums/add_edit", templateCtx, w, r)
 	})
 	mux.Handle("GET /admin/forum/forums/edit/{forumId}", getForumsEditHandler)
 
@@ -208,14 +208,14 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["Sections"] = sectionRows
-		ep_util.RenderTemplate("_admin/forum/sections", templateCtx, w, r)
+		ep_util.RenderTemplate("view_admin/forum/sections", templateCtx, w, r)
 	})
 	mux.Handle("GET /admin/forum/sections", getSectionsHandler)
 
 	getSectionsAddHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["AddMode"] = true
-		ep_util.RenderTemplate("_admin/forum/sections/add_edit", templateCtx, w, r)
+		ep_util.RenderTemplate("view_admin/forum/sections/add_edit", templateCtx, w, r)
 	})
 	mux.Handle("GET /admin/forum/sections/add", getSectionsAddHandler)
 
@@ -236,7 +236,7 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["EditMode"] = true
 		templateCtx["Section"] = sectionRow
-		ep_util.RenderTemplate("_admin/forum/sections/add_edit", templateCtx, w, r)
+		ep_util.RenderTemplate("view_admin/forum/sections/add_edit", templateCtx, w, r)
 	})
 	mux.Handle("GET /admin/forum/sections/edit/{sectionId}", getSectionsEditHandler)
 

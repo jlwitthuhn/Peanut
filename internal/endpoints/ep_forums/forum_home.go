@@ -47,7 +47,7 @@ func registerForumHomeHandlers(mux *http.ServeMux, forumsService service.ForumsS
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["Sections"] = groupForumsBySection(rows)
-		ep_util.RenderTemplate("_forum/index", templateCtx, w, r)
+		ep_util.RenderTemplate("view_forum/index", templateCtx, w, r)
 	})
 	mux.Handle("GET /forum", getForumHomeHandler)
 }

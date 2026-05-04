@@ -23,7 +23,7 @@ func registerAdminScheduledJobHandlers(mux *http.ServeMux, scheduledJobService s
 		}
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["Jobs"] = jobs
-		ep_util.RenderTemplate("_admin/scheduled_jobs", templateCtx, w, r)
+		ep_util.RenderTemplate("view_admin/scheduled_jobs", templateCtx, w, r)
 	})
 	mux.HandleFunc("GET /admin/scheduled_jobs", getScheduledJobHandler)
 

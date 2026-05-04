@@ -21,61 +21,61 @@ func GetTemplate(name string) *template.Template {
 func LoadTemplates(fs fs.FS) {
 
 	adminIndexFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/index.html"}
-	loadTemplateOrDie(fs, "_admin/index", adminIndexFiles...)
+	loadTemplateOrDie(fs, "view_admin/index", adminIndexFiles...)
 
 	adminForumForumsFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/forum/forums.html"}
-	loadTemplateOrDie(fs, "_admin/forum/forums", adminForumForumsFiles...)
+	loadTemplateOrDie(fs, "view_admin/forum/forums", adminForumForumsFiles...)
 
 	adminForumSectionsFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/forum/sections.html"}
-	loadTemplateOrDie(fs, "_admin/forum/sections", adminForumSectionsFiles...)
+	loadTemplateOrDie(fs, "view_admin/forum/sections", adminForumSectionsFiles...)
 
 	adminForumSectionsAddEditFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/forum/sections_add_edit.html"}
-	loadTemplateOrDie(fs, "_admin/forum/sections/add_edit", adminForumSectionsAddEditFiles...)
+	loadTemplateOrDie(fs, "view_admin/forum/sections/add_edit", adminForumSectionsAddEditFiles...)
 
 	adminForumForumsAddEditFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/forum/forums_add_edit.html"}
-	loadTemplateOrDie(fs, "_admin/forum/forums/add_edit", adminForumForumsAddEditFiles...)
+	loadTemplateOrDie(fs, "view_admin/forum/forums/add_edit", adminForumForumsAddEditFiles...)
 
 	adminFrontPageFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/front_page.html"}
-	loadTemplateOrDie(fs, "_admin/front_page", adminFrontPageFiles...)
+	loadTemplateOrDie(fs, "view_admin/front_page", adminFrontPageFiles...)
 
 	adminGroupsFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/groups.html"}
-	loadTemplateOrDie(fs, "_admin/groups", adminGroupsFiles...)
+	loadTemplateOrDie(fs, "view_admin/groups", adminGroupsFiles...)
 
 	adminGroupsListFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/groups_list.html"}
-	loadTemplateOrDie(fs, "_admin/groups_list", adminGroupsListFiles...)
+	loadTemplateOrDie(fs, "view_admin/groups_list", adminGroupsListFiles...)
 
 	adminScheduledJobFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/scheduled_jobs.html"}
-	loadTemplateOrDie(fs, "_admin/scheduled_jobs", adminScheduledJobFiles...)
+	loadTemplateOrDie(fs, "view_admin/scheduled_jobs", adminScheduledJobFiles...)
 
 	adminSimpleMessageFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/simple_message.html"}
-	loadTemplateOrDie(fs, "_admin/simple_message", adminSimpleMessageFiles...)
+	loadTemplateOrDie(fs, "view_admin/simple_message", adminSimpleMessageFiles...)
 
 	adminUsersFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/users.html"}
-	loadTemplateOrDie(fs, "_admin/users", adminUsersFiles...)
+	loadTemplateOrDie(fs, "view_admin/users", adminUsersFiles...)
 
 	adminUsersListFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/users_list.html"}
-	loadTemplateOrDie(fs, "_admin/users_list", adminUsersListFiles...)
+	loadTemplateOrDie(fs, "view_admin/users_list", adminUsersListFiles...)
 
 	indexFiles := []string{"base.html", "css/common.css", "index.html"}
-	loadTemplateOrDie(fs, "_index", indexFiles...)
+	loadTemplateOrDie(fs, "view_index", indexFiles...)
 
 	loginFiles := []string{"base.html", "css/common.css", "login.html"}
-	loadTemplateOrDie(fs, "_login", loginFiles...)
+	loadTemplateOrDie(fs, "view_login", loginFiles...)
 
 	profileFiles := []string{"base.html", "css/common.css", "profile.html"}
-	loadTemplateOrDie(fs, "_profile", profileFiles...)
+	loadTemplateOrDie(fs, "view_profile", profileFiles...)
 
 	registerFiles := []string{"base.html", "css/common.css", "register.html"}
-	loadTemplateOrDie(fs, "_register", registerFiles...)
+	loadTemplateOrDie(fs, "view_register", registerFiles...)
 
 	setupFiles := []string{"base.html", "css/common.css", "setup.html"}
-	loadTemplateOrDie(fs, "_setup", setupFiles...)
+	loadTemplateOrDie(fs, "view_setup", setupFiles...)
 
 	forumIndexFiles := []string{"base.html", "css/common.css", "forum/index.html", "widget/forum_section.html"}
-	loadTemplateOrDie(fs, "_forum/index", forumIndexFiles...)
+	loadTemplateOrDie(fs, "view_forum/index", forumIndexFiles...)
 
 	simpleMessageFiles := []string{"base.html", "css/common.css", "simple_message.html"}
-	loadTemplateOrDie(fs, "_simple_message", simpleMessageFiles...)
+	loadTemplateOrDie(fs, "view_simple_message", simpleMessageFiles...)
 }
 
 func loadTemplateOrDie(fs fs.FS, name string, files ...string) {

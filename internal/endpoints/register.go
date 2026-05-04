@@ -17,7 +17,7 @@ import (
 func RegisterRegisterHandlers(mux *http.ServeMux, groupService service.GroupService, userService service.UserService) {
 	getRegisterHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
-		ep_util.RenderTemplate("_register", templateCtx, w, r)
+		ep_util.RenderTemplate("view_register", templateCtx, w, r)
 	})
 	mux.Handle("GET /register", getRegisterHandler)
 

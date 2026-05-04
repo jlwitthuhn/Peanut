@@ -38,7 +38,7 @@ func RenderSimpleMessage(title string, message string, w http.ResponseWriter, r 
 	templateCtx := templatecontext.GetStandardTemplateContext(r)
 	templateCtx["MessageBody"] = message
 	templateCtx["MessageTitle"] = title
-	RenderTemplate("_simple_message", templateCtx, w, r)
+	RenderTemplate("view_simple_message", templateCtx, w, r)
 }
 
 // RequirePermissionOr403

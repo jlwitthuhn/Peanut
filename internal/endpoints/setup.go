@@ -17,7 +17,7 @@ func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService
 
 	getSetupHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
-		ep_util.RenderTemplate("_setup", templateCtx, w, r)
+		ep_util.RenderTemplate("view_setup", templateCtx, w, r)
 	})
 	mux.Handle("GET /setup", getSetupHandler)
 

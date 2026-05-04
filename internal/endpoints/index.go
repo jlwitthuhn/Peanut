@@ -24,7 +24,7 @@ func RegisterIndexHandlers(mux *http.ServeMux, configService service.ConfigServi
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["WelcomeMessage"] = welcomeMessage
-		ep_util.RenderTemplate("_index", templateCtx, w, r)
+		ep_util.RenderTemplate("view_index", templateCtx, w, r)
 	})
 	mux.Handle("GET /{$}", getIndexHandler)
 }

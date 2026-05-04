@@ -28,7 +28,7 @@ func registerForumIndexHandlers(mux *http.ServeMux, forumsService service.Forums
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["MessageTitle"] = "Forum"
 		templateCtx["MessageBody"] = "This page is under construction."
-		ep_util.RenderTemplate("_simple_message", templateCtx, w, r)
+		ep_util.RenderTemplate("view_simple_message", templateCtx, w, r)
 	})
 	mux.Handle("GET /forum/index/{forumId}", getForumIndexHandler)
 }

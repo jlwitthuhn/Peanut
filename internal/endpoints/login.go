@@ -23,7 +23,7 @@ func RegisterLoginHandlers(mux *http.ServeMux, sessionService service.SessionSer
 		}
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
-		ep_util.RenderTemplate("_login", templateCtx, w, r)
+		ep_util.RenderTemplate("view_login", templateCtx, w, r)
 	})
 	mux.Handle("GET /login", getLoginHandler)
 

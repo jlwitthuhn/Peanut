@@ -21,7 +21,7 @@ func registerAdminUsersHandlers(mux *http.ServeMux, groupService service.GroupSe
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["Groups"] = groupList
-		ep_util.RenderTemplate("_admin/users", templateCtx, w, r)
+		ep_util.RenderTemplate("view_admin/users", templateCtx, w, r)
 	})
 	mux.Handle("GET /admin/users", getHandler)
 
@@ -34,7 +34,7 @@ func registerAdminUsersHandlers(mux *http.ServeMux, groupService service.GroupSe
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["Users"] = userRows
-		ep_util.RenderTemplate("_admin/users_list", templateCtx, w, r)
+		ep_util.RenderTemplate("view_admin/users_list", templateCtx, w, r)
 	})
 	mux.Handle("GET /admin/users/list/all", getListAllHandler)
 
@@ -47,7 +47,7 @@ func registerAdminUsersHandlers(mux *http.ServeMux, groupService service.GroupSe
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["Users"] = userRows
-		ep_util.RenderTemplate("_admin/users_list", templateCtx, w, r)
+		ep_util.RenderTemplate("view_admin/users_list", templateCtx, w, r)
 	})
 	mux.Handle("POST /admin/users/list/by_group", postListByGroupHandler)
 
@@ -60,7 +60,7 @@ func registerAdminUsersHandlers(mux *http.ServeMux, groupService service.GroupSe
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["Users"] = userRows
-		ep_util.RenderTemplate("_admin/users_list", templateCtx, w, r)
+		ep_util.RenderTemplate("view_admin/users_list", templateCtx, w, r)
 	})
 	mux.Handle("POST /admin/users/list/by_name", postListByNamePatternHandler)
 }

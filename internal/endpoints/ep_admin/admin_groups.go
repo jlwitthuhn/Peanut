@@ -14,7 +14,7 @@ import (
 func registerAdminGroupsHandlers(mux *http.ServeMux, groupService service.GroupService) {
 	getHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
-		ep_util.RenderTemplate("_admin/groups", templateCtx, w, r)
+		ep_util.RenderTemplate("view_admin/groups", templateCtx, w, r)
 	})
 	mux.Handle("GET /admin/groups", getHandler)
 
@@ -27,7 +27,7 @@ func registerAdminGroupsHandlers(mux *http.ServeMux, groupService service.GroupS
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["Groups"] = groupRows
-		ep_util.RenderTemplate("_admin/groups_list", templateCtx, w, r)
+		ep_util.RenderTemplate("view_admin/groups_list", templateCtx, w, r)
 	})
 	mux.Handle("GET /admin/groups/list/all", getListAllHandler)
 }

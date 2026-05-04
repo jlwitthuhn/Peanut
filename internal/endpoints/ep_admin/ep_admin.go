@@ -41,5 +41,5 @@ func RenderSimpleAdminMessage(title string, message string, w http.ResponseWrite
 	templateCtx := templatecontext.GetStandardTemplateContext(r)
 	templateCtx["MessageBody"] = message
 	templateCtx["MessageTitle"] = title
-	ep_util.RenderTemplate("_admin/simple_message", templateCtx, w, r)
+	ep_util.RenderTemplate("view_admin/simple_message", templateCtx, w, r)
 }

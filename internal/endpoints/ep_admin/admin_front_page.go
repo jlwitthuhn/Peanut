@@ -29,7 +29,7 @@ func registerAdminFrontPageHandlers(mux *http.ServeMux, configService service.Co
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["WelcomeMessage"] = welcomeMessage
-		ep_util.RenderTemplate("_admin/front_page", templateCtx, w, r)
+		ep_util.RenderTemplate("view_admin/front_page", templateCtx, w, r)
 	})
 	mux.Handle("GET /admin/front_page", getFrontPageHandler)
 

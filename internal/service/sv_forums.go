@@ -15,7 +15,7 @@ import (
 )
 
 type ForumsService interface {
-	CreateForum(ctx context.Context, sectionId string, name string, ordering float32, visibility string) (string, error)
+	CreateForum(ctx context.Context, sectionId string, name string, description string, ordering float32, visibility string) (string, error)
 	CreateSection(ctx context.Context, name string, ordering float32) (string, error)
 	DeleteForum(ctx context.Context, id string) error
 	DeleteSection(ctx context.Context, id string) error
@@ -27,7 +27,7 @@ type ForumsService interface {
 	GetSectionRowById(ctx context.Context, id string) (*data.ForumSectionRow, error)
 	IsForumReadable(ctx context.Context, id string) (bool, error)
 	IsSectionReadable(ctx context.Context, id string) (bool, error)
-	UpdateForumUserConfig(ctx context.Context, id string, sectionId string, name string, ordering float32, visibility string) error
+	UpdateForumUserConfig(ctx context.Context, id string, sectionId string, name string, description string, ordering float32, visibility string) error
 	UpdateSectionUserConfig(ctx context.Context, id string, name string, ordering float32) error
 }
 
@@ -42,7 +42,7 @@ type forumsServiceImpl struct {
 	systemLogDao     data.SystemLogDao
 }
 
-func (this *forumsServiceImpl) CreateForum(ctx context.Context, sectionId string, name string, ordering float32, visibility string) (string, error) {
+func (this *forumsServiceImpl) CreateForum(ctx context.Context, sectionId string, name string, description string, ordering float32, visibility string) (string, error) {
 	if middleutil.ContextHasPermission(ctx, perms.Admin_Forums_Structure_Edit) == false {
 		return "", errors.New("permission denied")
 	}
@@ -52,7 +52,7 @@ func (this *forumsServiceImpl) CreateForum(ctx context.Context, sectionId string
 		return "", errors.New("cannot create forum: no user id in context")
 	}
 
-	newId, err := this.forumsDao.InsertRow(ctx, sectionId, name, ordering, visibility)
+	newId, err := this.forumsDao.InsertRow(ctx, sectionId, name, description, ordering, visibility)
 	if err != nil {
 		return "", err
 	}
@@ -209,7 +209,7 @@ func (this *forumsServiceImpl) UpdateSectionUserConfig(ctx context.Context, id s
 	return nil
 }
 
-func (this *forumsServiceImpl) UpdateForumUserConfig(ctx context.Context, id string, sectionId string, name string, ordering float32, visibility string) error {
+func (this *forumsServiceImpl) UpdateForumUserConfig(ctx context.Context, id string, sectionId string, name string, description string, ordering float32, visibility string) error {
 	if middleutil.ContextHasPermission(ctx, perms.Admin_Forums_Structure_Edit) == false {
 		return errors.New("permission denied")
 	}
@@ -219,7 +219,7 @@ func (this *forumsServiceImpl) UpdateForumUserConfig(ctx context.Context, id str
 		return errors.New("cannot update forum: no user id in context")
 	}
 
-	err := this.forumsDao.UpdateUserConfigById(ctx, id, sectionId, name, ordering, visibility)
+	err := this.forumsDao.UpdateUserConfigById(ctx, id, sectionId, name, description, ordering, visibility)
 	if err != nil {
 		return err
 	}

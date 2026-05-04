@@ -15,21 +15,22 @@ import (
 )
 
 type ForumRow struct {
-	Id         string
-	SectionId  string
-	Name       string
-	Ordering   float32
-	Visibility string
-	Created    time.Time
-	Updated    time.Time
+	Id          string
+	SectionId   string
+	Name        string
+	Description string
+	Ordering    float32
+	Visibility  string
+	Created     time.Time
+	Updated     time.Time
 }
 
 type ForumsDao interface {
 	CreateDBObjects(ctx context.Context) error
-	InsertRow(ctx context.Context, sectionId string, name string, ordering float32, visibility string) (string, error)
+	InsertRow(ctx context.Context, sectionId string, name string, description string, ordering float32, visibility string) (string, error)
 	SelectRowAll(ctx context.Context) ([]ForumRow, error)
 	SelectRowById(ctx context.Context, id string) (*ForumRow, error)
-	UpdateUserConfigById(ctx context.Context, id string, sectionId string, name string, ordering float32, visibility string) error
+	UpdateUserConfigById(ctx context.Context, id string, sectionId string, name string, description string, ordering float32, visibility string) error
 	UpdateVisibilityById(ctx context.Context, id string, visibility string) error
 }
 
@@ -44,6 +45,7 @@ var sqlCreateTableForums = `
 		id UUID PRIMARY KEY DEFAULT uuidv7(),
 		section_id UUID NOT NULL REFERENCES forum_sections(id) ON DELETE RESTRICT,
 		name VARCHAR(150) NOT NULL,
+		description VARCHAR(250) NOT NULL,
 		ordering REAL NOT NULL,
 		visibility visibility_enum NOT NULL DEFAULT 'Public',
 		_created TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -75,11 +77,11 @@ func (*forumsDaoImpl) CreateDBObjects(ctx context.Context) error {
 	return nil
 }
 
-var sqlInsertForumsRow = "INSERT INTO forums(section_id, name, ordering, visibility) VALUES ($1, $2, $3, $4) RETURNING id"
+var sqlInsertForumsRow = "INSERT INTO forums(section_id, name, description, ordering, visibility) VALUES ($1, $2, $3, $4, $5) RETURNING id"
 
-func (*forumsDaoImpl) InsertRow(ctx context.Context, sectionId string, name string, ordering float32, visibility string) (string, error) {
+func (*forumsDaoImpl) InsertRow(ctx context.Context, sectionId string, name string, description string, ordering float32, visibility string) (string, error) {
 	sqlh := getSqlExecutorFromContext(ctx)
-	row := sqlh.QueryRow(sqlInsertForumsRow, sectionId, name, ordering, visibility)
+	row := sqlh.QueryRow(sqlInsertForumsRow, sectionId, name, description, ordering, visibility)
 	newId := ""
 	err := row.Scan(&newId)
 	if err != nil {
@@ -101,7 +103,7 @@ func (*forumsDaoImpl) UpdateVisibilityById(ctx context.Context, id string, visib
 	return nil
 }
 
-var sqlSelectForumsRowAll = "SELECT id, section_id, name, ordering, visibility, _created, _updated FROM forums ORDER BY ordering"
+var sqlSelectForumsRowAll = "SELECT id, section_id, name, description, ordering, visibility, _created, _updated FROM forums ORDER BY ordering"
 
 func (*forumsDaoImpl) SelectRowAll(ctx context.Context) ([]ForumRow, error) {
 	sqlh := getSqlExecutorFromContext(ctx)
@@ -115,7 +117,7 @@ func (*forumsDaoImpl) SelectRowAll(ctx context.Context) ([]ForumRow, error) {
 	var result []ForumRow
 	for rows.Next() {
 		thisRow := ForumRow{}
-		err = rows.Scan(&thisRow.Id, &thisRow.SectionId, &thisRow.Name, &thisRow.Ordering, &thisRow.Visibility, &thisRow.Created, &thisRow.Updated)
+		err = rows.Scan(&thisRow.Id, &thisRow.SectionId, &thisRow.Name, &thisRow.Description, &thisRow.Ordering, &thisRow.Visibility, &thisRow.Created, &thisRow.Updated)
 		if err != nil {
 			logger.Error(ctx, "Got database error on ForumsDao/SelectRowAll query: ", err)
 			return nil, err
@@ -125,13 +127,13 @@ func (*forumsDaoImpl) SelectRowAll(ctx context.Context) ([]ForumRow, error) {
 	return result, nil
 }
 
-var sqlSelectForumsRowById = "SELECT id, section_id, name, ordering, visibility, _created, _updated FROM forums WHERE id = $1"
+var sqlSelectForumsRowById = "SELECT id, section_id, name, description, ordering, visibility, _created, _updated FROM forums WHERE id = $1"
 
 func (*forumsDaoImpl) SelectRowById(ctx context.Context, id string) (*ForumRow, error) {
 	sqlh := getSqlExecutorFromContext(ctx)
 	result := &ForumRow{}
 	row := sqlh.QueryRow(sqlSelectForumsRowById, id)
-	err := row.Scan(&result.Id, &result.SectionId, &result.Name, &result.Ordering, &result.Visibility, &result.Created, &result.Updated)
+	err := row.Scan(&result.Id, &result.SectionId, &result.Name, &result.Description, &result.Ordering, &result.Visibility, &result.Created, &result.Updated)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, nil
 	}
@@ -149,11 +151,11 @@ func (*forumsDaoImpl) SelectRowById(ctx context.Context, id string) (*ForumRow, 
 	return result, nil
 }
 
-var sqlUpdateForumsUserConfigById = "UPDATE forums SET section_id = $1, name = $2, ordering = $3, visibility = $4 WHERE id = $5"
+var sqlUpdateForumsUserConfigById = "UPDATE forums SET section_id = $1, name = $2, description = $3, ordering = $4, visibility = $5 WHERE id = $6"
 
-func (*forumsDaoImpl) UpdateUserConfigById(ctx context.Context, id string, sectionId string, name string, ordering float32, visibility string) error {
+func (*forumsDaoImpl) UpdateUserConfigById(ctx context.Context, id string, sectionId string, name string, description string, ordering float32, visibility string) error {
 	sqlh := getSqlExecutorFromContext(ctx)
-	_, err := sqlh.Exec(sqlUpdateForumsUserConfigById, sectionId, name, ordering, visibility, id)
+	_, err := sqlh.Exec(sqlUpdateForumsUserConfigById, sectionId, name, description, ordering, visibility, id)
 	if err != nil {
 		logger.Error(ctx, "Got database error on ForumsDao/UpdateUserConfigById query: ", err)
 		return err

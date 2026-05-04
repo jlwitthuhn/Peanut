@@ -24,6 +24,8 @@
 				</select>
 				<label for="forum_name">Name:</label>
 				<input type="text" id="forum_name" name="name" value="{{ if .EditMode }}{{ .Forum.Name }}{{ end }}">
+				<label for="forum_description">Description:</label>
+				<input type="text" id="forum_description" name="description" maxlength="250" value="{{ if .EditMode }}{{ .Forum.Description }}{{ end }}">
 				<label for="forum_order">Order:</label>
 				<input type="text" id="forum_order" name="order" value="{{ if .EditMode }}{{ .Forum.Ordering }}{{ end }}">
 				<label for="forum_visibility">Visibility:</label>

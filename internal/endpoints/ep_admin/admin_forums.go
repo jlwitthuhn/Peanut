@@ -49,6 +49,7 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 
 		sectionId := r.PostFormValue("section_id")
 		name := r.PostFormValue("name")
+		description := r.PostFormValue("description")
 		orderStr := r.PostFormValue("order")
 		visibility := r.PostFormValue("visibility")
 
@@ -58,7 +59,7 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 			return
 		}
 
-		_, err = forumsService.CreateForum(r.Context(), sectionId, name, float32(ordering), visibility)
+		_, err = forumsService.CreateForum(r.Context(), sectionId, name, description, float32(ordering), visibility)
 		if err != nil {
 			logger.Error(r.Context(), "Failed to create forum: ", err)
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to create forum.", w, r)
@@ -172,6 +173,7 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 
 		sectionId := r.PostFormValue("section_id")
 		name := r.PostFormValue("name")
+		description := r.PostFormValue("description")
 		orderStr := r.PostFormValue("order")
 		visibility := r.PostFormValue("visibility")
 
@@ -181,7 +183,7 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 			return
 		}
 
-		err = forumsService.UpdateForumUserConfig(r.Context(), urlForumId, sectionId, name, float32(ordering), visibility)
+		err = forumsService.UpdateForumUserConfig(r.Context(), urlForumId, sectionId, name, description, float32(ordering), visibility)
 		if err != nil {
 			logger.Error(r.Context(), "Failed to update forum: ", err)
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to update forum.", w, r)

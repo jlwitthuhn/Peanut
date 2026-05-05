@@ -57,7 +57,8 @@ hr {
 }
 
 input[type="text"],
-input[type="password"] {
+input[type="password"],
+textarea {
 	padding: var(--pad);
 	color: var(--text);
 	background-color: var(--bg);
@@ -68,7 +69,8 @@ input[type="password"] {
 }
 
 input[type="text"]:focus,
-input[type="password"]:focus {
+input[type="password"]:focus,
+textarea:focus {
 	outline: none;
 	border-color: var(--accent);
 }

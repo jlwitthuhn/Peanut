@@ -64,6 +64,7 @@ func main() {
 	userDao := data.NewUserDao()
 
 	forumHomeDvao := data.NewForumHomeDvao()
+	forumThreadSummaryDvao := data.NewForumThreadSummaryDvao()
 
 	configService := service.NewConfigService(configDao, systemLogDao)
 	setupConfigService := service.NewSetupConfigService(configDao, systemLogDao)
@@ -77,7 +78,8 @@ func main() {
 	setupService := service.NewSetupService(
 		configDao, forumsDao, forumSectionsDao, forumThreadsDao, groupDao, groupMembershipDao, metaDao, scheduledJobDao,
 		scheduledJobRunDao, sessionDao, sessionStringDao, systemLogDao, userDao,
-		forumHomeDvao, setupConfigService, dbService, groupService, scheduledJobService, userService,
+		forumHomeDvao, forumThreadSummaryDvao,
+		setupConfigService, dbService, groupService, scheduledJobService, userService,
 	)
 
 	// Setup mux is separate and is only used from within DatabaseInitCheck

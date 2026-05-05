@@ -86,7 +86,13 @@ func registerForumNewThreadHandlers(mux *http.ServeMux, forumsService service.Fo
 			return
 		}
 
-		_, err = forumThreadService.CreateThread(r.Context(), urlForumId, title)
+		message := r.PostFormValue("message")
+		if message == "" {
+			ep_util.RenderErrorHttp400BadRequestWithMessage("Thread message is required.", w, r)
+			return
+		}
+
+		_, err = forumThreadService.CreateThread(r.Context(), urlForumId, title, message)
 		if err != nil {
 			logger.Error(r.Context(), "Failed to create thread: ", err)
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to create thread.", w, r)

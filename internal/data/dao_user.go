@@ -214,6 +214,7 @@ func (*userDaoImpl) SelectRowsLikeName(ctx context.Context, namePattern string) 
 		logger.Error(ctx, "Got database error on UserDao/SelectRowsLikeName query: ", err)
 		return nil, err
 	}
+	defer rows.Close()
 	var result []UserRow
 	for rows.Next() {
 		thisRow := UserRow{}

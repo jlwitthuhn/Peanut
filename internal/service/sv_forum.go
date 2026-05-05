@@ -172,7 +172,10 @@ func (this *forumServiceImpl) IsForumReadable(ctx context.Context, id string) (b
 	if forum == nil {
 		return false, nil
 	}
-	return forum.Visibility == "Public", nil
+	if forum.Visibility != "Public" {
+		return false, nil
+	}
+	return this.IsSectionReadable(ctx, forum.SectionId)
 }
 
 func (this *forumServiceImpl) IsSectionReadable(ctx context.Context, id string) (bool, error) {

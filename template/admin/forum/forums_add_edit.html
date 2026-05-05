@@ -32,6 +32,7 @@
 				<select id="forum_visibility" name="visibility">
 					<option value="Public" {{ if $.EditMode }}{{ if eq $.Forum.Visibility "Public" }}selected{{ end }}{{ end }}>Public</option>
 					<option value="Private" {{ if $.EditMode }}{{ if eq $.Forum.Visibility "Private" }}selected{{ end }}{{ end }}>Private</option>
+					<option value="Deleted" {{ if $.EditMode }}{{ if eq $.Forum.Visibility "Deleted" }}selected{{ end }}{{ end }}>Deleted</option>
 				</select>
 				<input type="hidden" name="csrf" value="{{ .CsrfToken }}">
 				<input id="submit_button" type="submit" value="Submit">

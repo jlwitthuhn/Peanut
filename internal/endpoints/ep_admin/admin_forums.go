@@ -342,6 +342,7 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 
 		title := r.PostFormValue("title")
 		orderStr := r.PostFormValue("order")
+		visibility := r.PostFormValue("visibility")
 
 		ordering, err := strconv.ParseFloat(orderStr, 32)
 		if err != nil {
@@ -349,7 +350,7 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 			return
 		}
 
-		err = forumsService.UpdateSectionUserConfig(r.Context(), urlSectionId, title, float32(ordering))
+		err = forumsService.UpdateSectionUserConfig(r.Context(), urlSectionId, title, float32(ordering), visibility)
 		if err != nil {
 			logger.Error(r.Context(), "Failed to update forum section: ", err)
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to update forum section.", w, r)

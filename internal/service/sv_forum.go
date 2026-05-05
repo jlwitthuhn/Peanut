@@ -29,7 +29,7 @@ type ForumService interface {
 	IsForumWritable(ctx context.Context, id string) (bool, error)
 	IsSectionReadable(ctx context.Context, id string) (bool, error)
 	UpdateForumUserConfig(ctx context.Context, id string, sectionId string, name string, description string, ordering float32, visibility string) error
-	UpdateSectionUserConfig(ctx context.Context, id string, name string, ordering float32) error
+	UpdateSectionUserConfig(ctx context.Context, id string, name string, ordering float32, visibility string) error
 }
 
 func NewForumService(forumsDao data.ForumsDao, forumSectionsDao data.ForumSectionsDao, forumHomeDvao data.ForumHomeDvao, systemLogDao data.SystemLogDao) ForumService {
@@ -194,7 +194,7 @@ func (this *forumServiceImpl) IsSectionReadable(ctx context.Context, id string) 
 	return section.Visibility == "Public", nil
 }
 
-func (this *forumServiceImpl) UpdateSectionUserConfig(ctx context.Context, id string, name string, ordering float32) error {
+func (this *forumServiceImpl) UpdateSectionUserConfig(ctx context.Context, id string, name string, ordering float32, visibility string) error {
 	if middleutil.ContextHasPermission(ctx, perms.Admin_Forums_Structure_Edit) == false {
 		return errors.New("permission denied")
 	}
@@ -204,7 +204,7 @@ func (this *forumServiceImpl) UpdateSectionUserConfig(ctx context.Context, id st
 		return errors.New("cannot update forum section: no user id in context")
 	}
 
-	err := this.forumSectionsDao.UpdateUserConfigById(ctx, id, name, ordering)
+	err := this.forumSectionsDao.UpdateUserConfigById(ctx, id, name, ordering, visibility)
 	if err != nil {
 		return err
 	}

@@ -20,6 +20,12 @@
 				<input type="text" id="section_title" name="title" value="{{ if .EditMode }}{{ .Section.Name }}{{ end }}">
 				<label for="section_order">Order:</label>
 				<input type="text" id="section_order" name="order" value="{{ if .EditMode }}{{ .Section.Ordering }}{{ end }}">
+				<label for="section_visibility">Visibility:</label>
+				<select id="section_visibility" name="visibility">
+					<option value="Public" {{ if $.EditMode }}{{ if eq $.Section.Visibility "Public" }}selected{{ end }}{{ end }}>Public</option>
+					<option value="Private" {{ if $.EditMode }}{{ if eq $.Section.Visibility "Private" }}selected{{ end }}{{ end }}>Private</option>
+					<option value="Deleted" {{ if $.EditMode }}{{ if eq $.Section.Visibility "Deleted" }}selected{{ end }}{{ end }}>Deleted</option>
+				</select>
 				<input type="hidden" name="csrf" value="{{ .CsrfToken }}">
 				<input id="submit_button" type="submit" value="Submit">
 			</form>

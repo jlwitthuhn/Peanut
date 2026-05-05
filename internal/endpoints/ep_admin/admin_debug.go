@@ -6,11 +6,14 @@ package ep_admin
 
 import (
 	"net/http"
+	"peanut/internal/endpoints/ep_util"
+	"peanut/internal/endpoints/templatecontext"
 )
 
 func registerAdminDebugHandlers(mux *http.ServeMux) {
 	getDataHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		RenderSimpleAdminMessage("Debug Data", "This page is under construction.", w, r)
+		templateCtx := templatecontext.GetStandardTemplateContext(r)
+		ep_util.RenderTemplate("view_admin/debug", templateCtx, w, r)
 	})
 	mux.Handle("GET /admin/debug/data", getDataHandler)
 }

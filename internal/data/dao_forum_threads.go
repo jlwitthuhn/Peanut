@@ -22,6 +22,7 @@ type ForumThreadRow struct {
 
 type ForumThreadsDao interface {
 	CreateDBObjects(ctx context.Context) error
+	InsertRow(ctx context.Context, forumId string, authorId string, title string, visibility string) (string, error)
 }
 
 func NewForumThreadsDao() ForumThreadsDao {
@@ -64,4 +65,25 @@ func (*forumThreadsDaoImpl) CreateDBObjects(ctx context.Context) error {
 		return err
 	}
 	return nil
+}
+
+var sqlInsertForumThreadsRow = `
+	INSERT INTO
+		forum_threads(forum_id, author_id, title, visibility)
+	VALUES
+	    ($1, $2, $3, $4)
+	RETURNING
+	    id
+`
+
+func (*forumThreadsDaoImpl) InsertRow(ctx context.Context, forumId string, authorId string, title string, visibility string) (string, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
+	row := sqlh.QueryRow(sqlInsertForumThreadsRow, forumId, authorId, title, visibility)
+	newId := ""
+	err := row.Scan(&newId)
+	if err != nil {
+		logger.Error(ctx, "Got database error on ForumThreadsDao/InsertRow query: ", err)
+		return "", err
+	}
+	return newId, nil
 }

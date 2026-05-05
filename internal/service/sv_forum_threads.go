@@ -6,19 +6,37 @@ package service
 
 import (
 	"context"
+	"errors"
 	"peanut/internal/data"
+	"peanut/internal/keynames/contextkeys"
 )
 
 type ForumThreadService interface {
+	CreateThread(ctx context.Context, forumId string, title string) (string, error)
 	GetForumThreadSummaryViewRowByForumIdPublic(ctx context.Context, forumId string) ([]data.ForumThreadSummaryViewRow, error)
 }
 
-func NewForumThreadService(forumThreadSummaryDvao data.ForumThreadSummaryDvao) ForumThreadService {
-	return &forumThreadServiceImpl{forumThreadSummaryDvao: forumThreadSummaryDvao}
+func NewForumThreadService(forumThreadsDao data.ForumThreadsDao, forumThreadSummaryDvao data.ForumThreadSummaryDvao) ForumThreadService {
+	return &forumThreadServiceImpl{forumThreadsDao: forumThreadsDao, forumThreadSummaryDvao: forumThreadSummaryDvao}
 }
 
 type forumThreadServiceImpl struct {
+	forumThreadsDao        data.ForumThreadsDao
 	forumThreadSummaryDvao data.ForumThreadSummaryDvao
+}
+
+func (this *forumThreadServiceImpl) CreateThread(ctx context.Context, forumId string, title string) (string, error) {
+	userId, ok := ctx.Value(contextkeys.UserId).(string)
+	if !ok {
+		return "", errors.New("cannot create thread: no user id in context")
+	}
+
+	newId, err := this.forumThreadsDao.InsertRow(ctx, forumId, userId, title, "Public")
+	if err != nil {
+		return "", err
+	}
+
+	return newId, nil
 }
 
 func (this *forumThreadServiceImpl) GetForumThreadSummaryViewRowByForumIdPublic(ctx context.Context, forumId string) ([]data.ForumThreadSummaryViewRow, error) {

@@ -3,7 +3,9 @@
 	<div class="layout-main">
 		<div class="breadcrumb-row">
 			<p class="breadcrumb"><a href="/forum/section/{{ .SectionId }}">{{ .SectionName }}</a> &rsaquo; <a href="/forum/index/{{ .ForumId }}">{{ .ForumName }}</a></p>
-			<input type="submit" class="primary-button" value="New Thread">
+			<form action="/forum/new_thread/{{ .ForumId }}" method="get">
+				<input type="submit" class="primary-button" value="New Thread">
+			</form>
 		</div>
 		<div class="data-table cols-thread">
 			<div class="data-row data-header">
@@ -43,7 +45,7 @@
 					<h2>{{ $thread.ReplyCount }}</h2>
 				</div>
 				<div class="data-cell">
-					<h2>{{ $thread.LastPostDate }}</h2>
+					<h2>{{ $thread.LastPostDate.Format "2006-01-02 15:04 MST" }}</h2>
 				</div>
 			</div>
 			{{ end }}

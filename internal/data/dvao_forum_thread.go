@@ -11,14 +11,15 @@ import (
 )
 
 type ForumThreadSummaryViewRow struct {
-	ThreadId        string
-	ForumId         string
-	ThreadName      string
-	AuthorName      string
-	ReplyCount      int
-	ThreadCreated   time.Time
-	LastPostDate    time.Time
-	UnreadPostCount *int
+	ThreadId         string
+	ForumId          string
+	ThreadVisibility string
+	ThreadName       string
+	AuthorName       string
+	ReplyCount       int
+	ThreadCreated    time.Time
+	LastPostDate     time.Time
+	UnreadPostCount  *int
 }
 
 type ForumThreadSummaryDvao interface {
@@ -36,6 +37,7 @@ var sqlCreateViewForumThreadSummary = `
 	SELECT
 		ft.id AS thread_id,
 		ft.forum_id AS forum_id,
+		ft.visibility as thread_visibility,
 		ft.title AS thread_name,
 		'' AS author_name,
 		0 AS reply_count,

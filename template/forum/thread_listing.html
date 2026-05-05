@@ -1,0 +1,53 @@
+{{ define "content" }}
+<div class="layout">
+	<div class="layout-main">
+		<div class="breadcrumb-row">
+			<p class="breadcrumb"><a href="#">Category Name</a> &rsaquo; <a href="#">Forum Name</a></p>
+			<input type="submit" class="primary-button" value="New Thread">
+		</div>
+		<div class="data-table cols-thread">
+			<div class="data-row data-header">
+				<div class="data-cell">
+					<h1>Thread</h1>
+				</div>
+				<div class="data-cell">
+					<h1>Author</h1>
+				</div>
+				<div class="data-cell">
+					<h1>Replies</h1>
+				</div>
+				<div class="data-cell">
+					<h1>Last Post</h1>
+				</div>
+			</div>
+
+			{{ range $thread := .Threads }}
+			<div class="data-row">
+				<div class="data-cell">
+					<div class="thread-title-row">
+						<div>
+							<h1><a href="#">{{ $thread.ThreadName }}</a></h1>
+						</div>
+						{{ if $thread.UnreadPostCount }}
+						<span class="unread-badge">
+							<a href="#">{{ $thread.UnreadPostCount }}</a>
+							<a href="#" class="clear" title="Mark as read">&times;</a>
+						</span>
+						{{ end }}
+					</div>
+				</div>
+				<div class="data-cell">
+					<h2>{{ $thread.AuthorName }}</h2>
+				</div>
+				<div class="data-cell">
+					<h2>{{ $thread.ReplyCount }}</h2>
+				</div>
+				<div class="data-cell">
+					<h2>{{ $thread.LastPostDate }}</h2>
+				</div>
+			</div>
+			{{ end }}
+		</div>
+	</div>
+</div>
+{{ end }}

@@ -11,7 +11,7 @@ import (
 	"peanut/internal/service"
 )
 
-func registerForumIndexHandlers(mux *http.ServeMux, forumsService service.ForumsService) {
+func registerForumThreadListingHandlers(mux *http.ServeMux, forumsService service.ForumsService, forumThreadService service.ForumThreadService) {
 	getForumIndexHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		forumId := r.PathValue("forumId")
 
@@ -25,10 +25,15 @@ func registerForumIndexHandlers(mux *http.ServeMux, forumsService service.Forums
 			return
 		}
 
+		threads, err := forumThreadService.GetForumThreadSummaryViewRowByForumIdPublic(r.Context(), forumId)
+		if err != nil {
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to load threads.", w, r)
+			return
+		}
+
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
-		templateCtx["MessageTitle"] = "Forum"
-		templateCtx["MessageBody"] = "This page is under construction."
-		ep_util.RenderTemplate("view_simple_message", templateCtx, w, r)
+		templateCtx["Threads"] = threads
+		ep_util.RenderTemplate("view_forum/thread_listing", templateCtx, w, r)
 	})
 	mux.Handle("GET /forum/index/{forumId}", getForumIndexHandler)
 }

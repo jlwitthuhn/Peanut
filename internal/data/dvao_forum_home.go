@@ -7,6 +7,7 @@ package data
 import (
 	"context"
 	"peanut/internal/logger"
+	"time"
 )
 
 type ForumHomeViewRow struct {
@@ -19,6 +20,7 @@ type ForumHomeViewRow struct {
 	ForumOrdering    float32
 	ThreadCount      int32
 	PostCount        int32
+	LastTimestamp     *time.Time
 }
 
 type ForumHomeDvao interface {
@@ -48,22 +50,22 @@ var sqlCreateViewForumHomePublic = `
 				forum_id
 		),
 
-		q_post_count_by_thread_id AS (
+		q_data_by_thread_id AS (
 			SELECT
-				thread_id, COUNT(*) AS post_count
+				thread_id, COUNT(*) AS post_count, MAX(_created) AS last_timestamp
 			FROM
 				forum_posts
 			GROUP BY
 				thread_id
 		),
 
-		q_post_count_by_forum_id AS (
+		q_thread_data_by_forum_id AS (
 			SELECT
-				ft.forum_id, SUM(pc.post_count) AS post_count
+				ft.forum_id, SUM(td.post_count) AS post_count, MAX(td.last_timestamp) AS last_timestamp
 			FROM
 				forum_threads ft
 				INNER JOIN
-					q_post_count_by_thread_id pc ON ft.id = pc.thread_id
+					q_data_by_thread_id td ON ft.id = td.thread_id
 			GROUP BY
 				ft.forum_id
 		)
@@ -77,7 +79,8 @@ var sqlCreateViewForumHomePublic = `
 			f.description AS forum_description,
 			f.ordering AS forum_ordering,
 			COALESCE(tc.thread_count, 0) AS thread_count,
-			COALESCE(pc.post_count, 0) AS post_count
+			COALESCE(td.post_count, 0) AS post_count,
+			td.last_timestamp AS last_timestamp
 		FROM
 			forums f
 			INNER JOIN
@@ -85,14 +88,14 @@ var sqlCreateViewForumHomePublic = `
 			LEFT JOIN
 				q_thread_count_by_forum_id tc ON f.id = tc.forum_id
 			LEFT JOIN
-				q_post_count_by_forum_id pc ON f.id = pc.forum_id
+				q_thread_data_by_forum_id td ON f.id = td.forum_id
 		WHERE
 			f.visibility = 'Public'
 			AND
 			fs.visibility = 'Public'
 		ORDER BY
 			fs.ordering ASC, f.ordering ASC
-	);
+	)
 `
 
 func (*forumHomeDvaoImpl) CreateDBObjects(ctx context.Context) error {
@@ -107,7 +110,7 @@ func (*forumHomeDvaoImpl) CreateDBObjects(ctx context.Context) error {
 
 var sqlSelectForumHomeViewRowBySection = `
 	SELECT
-		section_id, section_name, section_ordering, forum_id, forum_name, forum_description, forum_ordering, thread_count, post_count
+		section_id, section_name, section_ordering, forum_id, forum_name, forum_description, forum_ordering, thread_count, post_count, last_timestamp
 	FROM
 		view_forum_home_public
 	WHERE
@@ -126,7 +129,7 @@ func (*forumHomeDvaoImpl) SelectForumHomeViewRowsBySectionPublic(ctx context.Con
 	var result []ForumHomeViewRow
 	for rows.Next() {
 		thisRow := ForumHomeViewRow{}
-		err = rows.Scan(&thisRow.SectionId, &thisRow.SectionName, &thisRow.SectionOrdering, &thisRow.ForumId, &thisRow.ForumName, &thisRow.ForumDescription, &thisRow.ForumOrdering, &thisRow.ThreadCount, &thisRow.PostCount)
+		err = rows.Scan(&thisRow.SectionId, &thisRow.SectionName, &thisRow.SectionOrdering, &thisRow.ForumId, &thisRow.ForumName, &thisRow.ForumDescription, &thisRow.ForumOrdering, &thisRow.ThreadCount, &thisRow.PostCount, &thisRow.LastTimestamp)
 		if err != nil {
 			logger.Error(ctx, "Got database error on ForumHomeDvao/SelectForumHomeViewRowsBySectionPublic query: ", err)
 			return nil, err
@@ -138,7 +141,7 @@ func (*forumHomeDvaoImpl) SelectForumHomeViewRowsBySectionPublic(ctx context.Con
 
 var sqlSelectForumHomeViewRowAll = `
 	SELECT
-		section_id, section_name, section_ordering, forum_id, forum_name, forum_description, forum_ordering, thread_count, post_count
+		section_id, section_name, section_ordering, forum_id, forum_name, forum_description, forum_ordering, thread_count, post_count, last_timestamp
 	FROM
 		view_forum_home_public
 `
@@ -155,7 +158,7 @@ func (*forumHomeDvaoImpl) SelectForumHomeViewRowsPublic(ctx context.Context) ([]
 	var result []ForumHomeViewRow
 	for rows.Next() {
 		thisRow := ForumHomeViewRow{}
-		err = rows.Scan(&thisRow.SectionId, &thisRow.SectionName, &thisRow.SectionOrdering, &thisRow.ForumId, &thisRow.ForumName, &thisRow.ForumDescription, &thisRow.ForumOrdering, &thisRow.ThreadCount, &thisRow.PostCount)
+		err = rows.Scan(&thisRow.SectionId, &thisRow.SectionName, &thisRow.SectionOrdering, &thisRow.ForumId, &thisRow.ForumName, &thisRow.ForumDescription, &thisRow.ForumOrdering, &thisRow.ThreadCount, &thisRow.PostCount, &thisRow.LastTimestamp)
 		if err != nil {
 			logger.Error(ctx, "Got database error on ForumHomeDvao/SelectForumHomeViewRowsPublic query: ", err)
 			return nil, err

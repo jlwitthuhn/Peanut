@@ -19,11 +19,12 @@ type forumHomeSection struct {
 }
 
 type forumHomeForum struct {
-	Name        string
-	Id          string
-	Description string
-	ThreadCount int32
-	PostCount   int32
+	Name          string
+	Id            string
+	Description   string
+	ThreadCount   int32
+	PostCount     int32
+	LastPostDate  string
 }
 
 func groupForumsBySection(rows []data.ForumHomeViewRow) []forumHomeSection {
@@ -35,7 +36,11 @@ func groupForumsBySection(rows []data.ForumHomeViewRow) []forumHomeSection {
 			sections = append(sections, forumHomeSection{Id: row.SectionId, Name: row.SectionName})
 			currentSection = &sections[len(sections)-1]
 		}
-		currentSection.Forums = append(currentSection.Forums, forumHomeForum{Name: row.ForumName, Id: row.ForumId, Description: row.ForumDescription, ThreadCount: row.ThreadCount, PostCount: row.PostCount})
+		lastPostDate := "Never"
+		if row.LastTimestamp != nil {
+			lastPostDate = row.LastTimestamp.Format("2006-01-02 15:04 MST")
+		}
+		currentSection.Forums = append(currentSection.Forums, forumHomeForum{Name: row.ForumName, Id: row.ForumId, Description: row.ForumDescription, ThreadCount: row.ThreadCount, PostCount: row.PostCount, LastPostDate: lastPostDate})
 	}
 
 	return sections

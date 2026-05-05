@@ -39,7 +39,7 @@ func groupForumsBySection(rows []data.ForumHomeViewRow) []forumHomeSection {
 	return sections
 }
 
-func registerForumHomeHandlers(mux *http.ServeMux, forumsService service.ForumsService) {
+func registerForumListingHandlers(mux *http.ServeMux, forumsService service.ForumsService) {
 	getForumHomeHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		rows, err := forumsService.GetHomeViewRowsPublic(r.Context())
 		if err != nil {
@@ -49,7 +49,7 @@ func registerForumHomeHandlers(mux *http.ServeMux, forumsService service.ForumsS
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["Sections"] = groupForumsBySection(rows)
-		ep_util.RenderTemplate("view_forum/index", templateCtx, w, r)
+		ep_util.RenderTemplate("view_forum/forum_listing", templateCtx, w, r)
 	})
 	mux.Handle("GET /forum", getForumHomeHandler)
 
@@ -74,7 +74,7 @@ func registerForumHomeHandlers(mux *http.ServeMux, forumsService service.ForumsS
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["Sections"] = groupForumsBySection(rows)
-		ep_util.RenderTemplate("view_forum/index", templateCtx, w, r)
+		ep_util.RenderTemplate("view_forum/forum_listing", templateCtx, w, r)
 	})
 	mux.Handle("GET /forum/section/{sectionId}", getSectionIndexHandler)
 }

@@ -10,6 +10,6 @@ import (
 )
 
 func RegisterForumHandlers(mux *http.ServeMux, forumsService service.ForumsService, forumThreadService service.ForumThreadService) {
-	registerForumHomeHandlers(mux, forumsService)
+	registerForumListingHandlers(mux, forumsService)
 	registerForumThreadListingHandlers(mux, forumsService, forumThreadService)
 }

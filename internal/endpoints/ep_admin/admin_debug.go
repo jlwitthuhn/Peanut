@@ -12,7 +12,7 @@ import (
 	"peanut/internal/service"
 )
 
-func registerAdminDebugHandlers(mux *http.ServeMux, forumsService service.ForumsService) {
+func registerAdminDebugHandlers(mux *http.ServeMux, forumsService service.ForumService) {
 	getDataHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		ep_util.RenderTemplate("view_admin/debug", templateCtx, w, r)

@@ -17,7 +17,7 @@ func RegisterAdminHandlers(
 	mux *http.ServeMux,
 	configService service.ConfigService,
 	databaseService service.DatabaseService,
-	forumsService service.ForumsService,
+	forumsService service.ForumService,
 	groupService service.GroupService,
 	scheduledJobService service.ScheduledJobService,
 	sessionService service.SessionService,

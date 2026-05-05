@@ -39,7 +39,7 @@ func groupForumsBySection(rows []data.ForumHomeViewRow) []forumHomeSection {
 	return sections
 }
 
-func registerForumListingHandlers(mux *http.ServeMux, forumsService service.ForumsService) {
+func registerForumListingHandlers(mux *http.ServeMux, forumsService service.ForumService) {
 	getForumHomeHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		rows, err := forumsService.GetHomeViewRowsPublic(r.Context())
 		if err != nil {

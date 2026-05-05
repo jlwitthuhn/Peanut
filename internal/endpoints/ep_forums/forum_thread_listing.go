@@ -11,7 +11,7 @@ import (
 	"peanut/internal/service"
 )
 
-func registerForumThreadListingHandlers(mux *http.ServeMux, forumsService service.ForumsService, forumThreadService service.ForumThreadService) {
+func registerForumThreadListingHandlers(mux *http.ServeMux, forumsService service.ForumService, forumThreadService service.ForumThreadService) {
 	getForumIndexHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		forumId := r.PathValue("forumId")
 

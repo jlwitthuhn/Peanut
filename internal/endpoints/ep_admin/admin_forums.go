@@ -14,7 +14,7 @@ import (
 	"strconv"
 )
 
-func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.ForumsService) {
+func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.ForumService) {
 	getForumsHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		forumRows, err := forumsService.GetAllForumRows(r.Context())
 		if err != nil {

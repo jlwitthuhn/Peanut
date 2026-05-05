@@ -70,7 +70,7 @@ func main() {
 	setupConfigService := service.NewSetupConfigService(configDao, systemLogDao)
 	dbService := service.NewDatabaseService(metaDao)
 	forumThreadService := service.NewForumThreadService(forumThreadsDao, forumThreadSummaryDvao)
-	forumsService := service.NewForumsService(forumsDao, forumSectionsDao, forumHomeDvao, systemLogDao)
+	forumsService := service.NewForumService(forumsDao, forumSectionsDao, forumHomeDvao, systemLogDao)
 	groupService := service.NewGroupService(groupDao, groupMembershipDao, multiTableDao)
 	scheduledJobService := service.NewScheduledJobService(metaDao, multiTableDao, scheduledJobDao, scheduledJobRunDao, sessionDao, dbService)
 	sessionService := service.NewSessionService(sessionDao, sessionStringDao, userDao)

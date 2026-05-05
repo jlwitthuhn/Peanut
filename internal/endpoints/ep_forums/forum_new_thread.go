@@ -12,7 +12,7 @@ import (
 	"peanut/internal/service"
 )
 
-func registerForumNewThreadHandlers(mux *http.ServeMux, forumsService service.ForumsService, forumThreadService service.ForumThreadService) {
+func registerForumNewThreadHandlers(mux *http.ServeMux, forumsService service.ForumService, forumThreadService service.ForumThreadService) {
 	getNewThreadHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		forumId := r.PathValue("forumId")
 

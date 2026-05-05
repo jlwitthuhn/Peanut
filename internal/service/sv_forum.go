@@ -14,7 +14,7 @@ import (
 	"peanut/internal/security/perms"
 )
 
-type ForumsService interface {
+type ForumService interface {
 	CreateForum(ctx context.Context, sectionId string, name string, description string, ordering float32, visibility string) (string, error)
 	CreateSection(ctx context.Context, name string, ordering float32) (string, error)
 	DeleteForum(ctx context.Context, id string) error
@@ -31,18 +31,18 @@ type ForumsService interface {
 	UpdateSectionUserConfig(ctx context.Context, id string, name string, ordering float32) error
 }
 
-func NewForumsService(forumsDao data.ForumsDao, forumSectionsDao data.ForumSectionsDao, forumHomeDvao data.ForumHomeDvao, systemLogDao data.SystemLogDao) ForumsService {
-	return &forumsServiceImpl{forumsDao: forumsDao, forumSectionsDao: forumSectionsDao, forumHomeDvao: forumHomeDvao, systemLogDao: systemLogDao}
+func NewForumService(forumsDao data.ForumsDao, forumSectionsDao data.ForumSectionsDao, forumHomeDvao data.ForumHomeDvao, systemLogDao data.SystemLogDao) ForumService {
+	return &forumServiceImpl{forumsDao: forumsDao, forumSectionsDao: forumSectionsDao, forumHomeDvao: forumHomeDvao, systemLogDao: systemLogDao}
 }
 
-type forumsServiceImpl struct {
+type forumServiceImpl struct {
 	forumsDao        data.ForumsDao
 	forumSectionsDao data.ForumSectionsDao
 	forumHomeDvao    data.ForumHomeDvao
 	systemLogDao     data.SystemLogDao
 }
 
-func (this *forumsServiceImpl) CreateForum(ctx context.Context, sectionId string, name string, description string, ordering float32, visibility string) (string, error) {
+func (this *forumServiceImpl) CreateForum(ctx context.Context, sectionId string, name string, description string, ordering float32, visibility string) (string, error) {
 	if middleutil.ContextHasPermission(ctx, perms.Admin_Forums_Structure_Edit) == false {
 		return "", errors.New("permission denied")
 	}
@@ -65,7 +65,7 @@ func (this *forumsServiceImpl) CreateForum(ctx context.Context, sectionId string
 	return newId, nil
 }
 
-func (this *forumsServiceImpl) CreateSection(ctx context.Context, name string, ordering float32) (string, error) {
+func (this *forumServiceImpl) CreateSection(ctx context.Context, name string, ordering float32) (string, error) {
 	if middleutil.ContextHasPermission(ctx, perms.Admin_Forums_Structure_Edit) == false {
 		return "", errors.New("permission denied")
 	}
@@ -88,7 +88,7 @@ func (this *forumsServiceImpl) CreateSection(ctx context.Context, name string, o
 	return newId, nil
 }
 
-func (this *forumsServiceImpl) DeleteForum(ctx context.Context, id string) error {
+func (this *forumServiceImpl) DeleteForum(ctx context.Context, id string) error {
 	if middleutil.ContextHasPermission(ctx, perms.Admin_Forums_Structure_Edit) == false {
 		return errors.New("permission denied")
 	}
@@ -111,7 +111,7 @@ func (this *forumsServiceImpl) DeleteForum(ctx context.Context, id string) error
 	return nil
 }
 
-func (this *forumsServiceImpl) DeleteSection(ctx context.Context, id string) error {
+func (this *forumServiceImpl) DeleteSection(ctx context.Context, id string) error {
 	if middleutil.ContextHasPermission(ctx, perms.Admin_Forums_Structure_Edit) == false {
 		return errors.New("permission denied")
 	}
@@ -134,37 +134,37 @@ func (this *forumsServiceImpl) DeleteSection(ctx context.Context, id string) err
 	return nil
 }
 
-func (this *forumsServiceImpl) GetAllForumRows(ctx context.Context) ([]data.ForumRow, error) {
+func (this *forumServiceImpl) GetAllForumRows(ctx context.Context) ([]data.ForumRow, error) {
 	result, err := this.forumsDao.SelectRowAll(ctx)
 	return result, err
 }
 
-func (this *forumsServiceImpl) GetHomeViewRowsBySectionPublic(ctx context.Context, sectionId string) ([]data.ForumHomeViewRow, error) {
+func (this *forumServiceImpl) GetHomeViewRowsBySectionPublic(ctx context.Context, sectionId string) ([]data.ForumHomeViewRow, error) {
 	result, err := this.forumHomeDvao.SelectForumHomeViewRowsBySectionPublic(ctx, sectionId)
 	return result, err
 }
 
-func (this *forumsServiceImpl) GetHomeViewRowsPublic(ctx context.Context) ([]data.ForumHomeViewRow, error) {
+func (this *forumServiceImpl) GetHomeViewRowsPublic(ctx context.Context) ([]data.ForumHomeViewRow, error) {
 	result, err := this.forumHomeDvao.SelectForumHomeViewRowsPublic(ctx)
 	return result, err
 }
 
-func (this *forumsServiceImpl) GetForumRowById(ctx context.Context, id string) (*data.ForumRow, error) {
+func (this *forumServiceImpl) GetForumRowById(ctx context.Context, id string) (*data.ForumRow, error) {
 	result, err := this.forumsDao.SelectRowById(ctx, id)
 	return result, err
 }
 
-func (this *forumsServiceImpl) GetAllSectionRows(ctx context.Context) ([]data.ForumSectionRow, error) {
+func (this *forumServiceImpl) GetAllSectionRows(ctx context.Context) ([]data.ForumSectionRow, error) {
 	result, err := this.forumSectionsDao.SelectRowAll(ctx)
 	return result, err
 }
 
-func (this *forumsServiceImpl) GetSectionRowById(ctx context.Context, id string) (*data.ForumSectionRow, error) {
+func (this *forumServiceImpl) GetSectionRowById(ctx context.Context, id string) (*data.ForumSectionRow, error) {
 	result, err := this.forumSectionsDao.SelectRowById(ctx, id)
 	return result, err
 }
 
-func (this *forumsServiceImpl) IsForumReadable(ctx context.Context, id string) (bool, error) {
+func (this *forumServiceImpl) IsForumReadable(ctx context.Context, id string) (bool, error) {
 	forum, err := this.forumsDao.SelectRowById(ctx, id)
 	if err != nil {
 		return false, err
@@ -175,7 +175,7 @@ func (this *forumsServiceImpl) IsForumReadable(ctx context.Context, id string) (
 	return forum.Visibility == "Public", nil
 }
 
-func (this *forumsServiceImpl) IsSectionReadable(ctx context.Context, id string) (bool, error) {
+func (this *forumServiceImpl) IsSectionReadable(ctx context.Context, id string) (bool, error) {
 	section, err := this.forumSectionsDao.SelectRowById(ctx, id)
 	if err != nil {
 		return false, err
@@ -186,7 +186,7 @@ func (this *forumsServiceImpl) IsSectionReadable(ctx context.Context, id string)
 	return section.Visibility == "Public", nil
 }
 
-func (this *forumsServiceImpl) UpdateSectionUserConfig(ctx context.Context, id string, name string, ordering float32) error {
+func (this *forumServiceImpl) UpdateSectionUserConfig(ctx context.Context, id string, name string, ordering float32) error {
 	if middleutil.ContextHasPermission(ctx, perms.Admin_Forums_Structure_Edit) == false {
 		return errors.New("permission denied")
 	}
@@ -209,7 +209,7 @@ func (this *forumsServiceImpl) UpdateSectionUserConfig(ctx context.Context, id s
 	return nil
 }
 
-func (this *forumsServiceImpl) UpdateForumUserConfig(ctx context.Context, id string, sectionId string, name string, description string, ordering float32, visibility string) error {
+func (this *forumServiceImpl) UpdateForumUserConfig(ctx context.Context, id string, sectionId string, name string, description string, ordering float32, visibility string) error {
 	if middleutil.ContextHasPermission(ctx, perms.Admin_Forums_Structure_Edit) == false {
 		return errors.New("permission denied")
 	}

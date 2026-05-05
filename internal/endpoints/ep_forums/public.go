@@ -9,7 +9,7 @@ import (
 	"peanut/internal/service"
 )
 
-func RegisterForumHandlers(mux *http.ServeMux, forumsService service.ForumsService, forumThreadService service.ForumThreadService) {
+func RegisterForumHandlers(mux *http.ServeMux, forumsService service.ForumService, forumThreadService service.ForumThreadService) {
 	registerForumListingHandlers(mux, forumsService)
 	registerForumNewThreadHandlers(mux, forumsService, forumThreadService)
 	registerForumThreadListingHandlers(mux, forumsService, forumThreadService)

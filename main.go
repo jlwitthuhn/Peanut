@@ -50,6 +50,7 @@ func main() {
 
 	configDao := data.NewConfigDao()
 	forumsDao := data.NewForumsDao()
+	forumPostsDao := data.NewForumPostsDao()
 	forumSectionsDao := data.NewForumSectionsDao()
 	forumThreadsDao := data.NewForumThreadsDao()
 	groupDao := data.NewGroupDao()
@@ -77,8 +78,8 @@ func main() {
 	userService := service.NewUserService(sessionDao, userDao)
 
 	setupService := service.NewSetupService(
-		configDao, forumsDao, forumSectionsDao, forumThreadsDao, groupDao, groupMembershipDao, metaDao, scheduledJobDao,
-		scheduledJobRunDao, sessionDao, sessionStringDao, systemLogDao, userDao,
+		configDao, forumsDao, forumPostsDao, forumSectionsDao, forumThreadsDao, groupDao, groupMembershipDao, metaDao,
+		scheduledJobDao, scheduledJobRunDao, sessionDao, sessionStringDao, systemLogDao, userDao,
 		forumHomeDvao, forumThreadSummaryDvao,
 		setupConfigService, dbService, groupService, scheduledJobService, userService,
 	)

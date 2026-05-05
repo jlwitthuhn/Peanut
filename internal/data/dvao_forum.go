@@ -10,12 +10,13 @@ import (
 )
 
 type ForumHomeViewRow struct {
-	SectionId       string
-	SectionName     string
-	SectionOrdering float32
-	ForumId         string
-	ForumName       string
-	ForumOrdering   float32
+	SectionId        string
+	SectionName      string
+	SectionOrdering  float32
+	ForumId          string
+	ForumName        string
+	ForumDescription string
+	ForumOrdering    float32
 }
 
 type ForumHomeDvao interface {
@@ -38,6 +39,7 @@ var sqlCreateViewForumHomePublic = `
 		fs.ordering AS section_ordering,
 		f.id AS forum_id,
 		f.name AS forum_name,
+		f.description AS forum_description,
 		f.ordering AS forum_ordering
 	FROM forums f
 	INNER JOIN forum_sections fs ON f.section_id = fs.id
@@ -56,7 +58,7 @@ func (*forumHomeDvaoImpl) CreateDBObjects(ctx context.Context) error {
 	return nil
 }
 
-var sqlSelectForumHomeViewRowBySection = "SELECT section_id, section_name, section_ordering, forum_id, forum_name, forum_ordering FROM view_forum_home_public WHERE section_id = $1"
+var sqlSelectForumHomeViewRowBySection = "SELECT section_id, section_name, section_ordering, forum_id, forum_name, forum_description, forum_ordering FROM view_forum_home_public WHERE section_id = $1"
 
 func (*forumHomeDvaoImpl) SelectForumHomeViewRowsBySectionPublic(ctx context.Context, sectionId string) ([]ForumHomeViewRow, error) {
 	sqlh := getSqlExecutorFromContext(ctx)
@@ -70,7 +72,7 @@ func (*forumHomeDvaoImpl) SelectForumHomeViewRowsBySectionPublic(ctx context.Con
 	var result []ForumHomeViewRow
 	for rows.Next() {
 		thisRow := ForumHomeViewRow{}
-		err = rows.Scan(&thisRow.SectionId, &thisRow.SectionName, &thisRow.SectionOrdering, &thisRow.ForumId, &thisRow.ForumName, &thisRow.ForumOrdering)
+		err = rows.Scan(&thisRow.SectionId, &thisRow.SectionName, &thisRow.SectionOrdering, &thisRow.ForumId, &thisRow.ForumName, &thisRow.ForumDescription, &thisRow.ForumOrdering)
 		if err != nil {
 			logger.Error(ctx, "Got database error on ForumHomeDvao/SelectForumHomeViewRowsBySectionPublic query: ", err)
 			return nil, err
@@ -80,7 +82,7 @@ func (*forumHomeDvaoImpl) SelectForumHomeViewRowsBySectionPublic(ctx context.Con
 	return result, nil
 }
 
-var sqlSelectForumHomeViewRowAll = "SELECT section_id, section_name, section_ordering, forum_id, forum_name, forum_ordering FROM view_forum_home_public"
+var sqlSelectForumHomeViewRowAll = "SELECT section_id, section_name, section_ordering, forum_id, forum_name, forum_description, forum_ordering FROM view_forum_home_public"
 
 func (*forumHomeDvaoImpl) SelectForumHomeViewRowsPublic(ctx context.Context) ([]ForumHomeViewRow, error) {
 	sqlh := getSqlExecutorFromContext(ctx)
@@ -94,7 +96,7 @@ func (*forumHomeDvaoImpl) SelectForumHomeViewRowsPublic(ctx context.Context) ([]
 	var result []ForumHomeViewRow
 	for rows.Next() {
 		thisRow := ForumHomeViewRow{}
-		err = rows.Scan(&thisRow.SectionId, &thisRow.SectionName, &thisRow.SectionOrdering, &thisRow.ForumId, &thisRow.ForumName, &thisRow.ForumOrdering)
+		err = rows.Scan(&thisRow.SectionId, &thisRow.SectionName, &thisRow.SectionOrdering, &thisRow.ForumId, &thisRow.ForumName, &thisRow.ForumDescription, &thisRow.ForumOrdering)
 		if err != nil {
 			logger.Error(ctx, "Got database error on ForumHomeDvao/SelectForumHomeViewRowsPublic query: ", err)
 			return nil, err

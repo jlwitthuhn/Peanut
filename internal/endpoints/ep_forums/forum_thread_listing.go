@@ -15,6 +15,16 @@ func registerForumThreadListingHandlers(mux *http.ServeMux, forumsService servic
 	getForumIndexHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		forumId := r.PathValue("forumId")
 
+		forum, err := forumsService.GetForumRowById(r.Context(), forumId)
+		if err != nil {
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to load forum.", w, r)
+			return
+		}
+		if forum == nil {
+			ep_util.RenderErrorHttp404NotFoundWithMessage("Page not found.", w, r)
+			return
+		}
+
 		readable, err := forumsService.IsForumReadable(r.Context(), forumId)
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to load forum.", w, r)
@@ -25,6 +35,12 @@ func registerForumThreadListingHandlers(mux *http.ServeMux, forumsService servic
 			return
 		}
 
+		section, err := forumsService.GetSectionRowById(r.Context(), forum.SectionId)
+		if err != nil {
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to load forum.", w, r)
+			return
+		}
+
 		threads, err := forumThreadService.GetForumThreadSummaryViewRowByForumIdPublic(r.Context(), forumId)
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to load threads.", w, r)
@@ -32,6 +48,10 @@ func registerForumThreadListingHandlers(mux *http.ServeMux, forumsService servic
 		}
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
+		templateCtx["ForumId"] = forum.Id
+		templateCtx["ForumName"] = forum.Name
+		templateCtx["SectionId"] = section.Id
+		templateCtx["SectionName"] = section.Name
 		templateCtx["Threads"] = threads
 		ep_util.RenderTemplate("view_forum/thread_listing", templateCtx, w, r)
 	})

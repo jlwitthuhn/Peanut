@@ -26,6 +26,7 @@ type ForumService interface {
 	GetHomeViewRowsPublic(ctx context.Context) ([]data.ForumHomeViewRow, error)
 	GetSectionRowById(ctx context.Context, id string) (*data.ForumSectionRow, error)
 	IsForumReadable(ctx context.Context, id string) (bool, error)
+	IsForumWritable(ctx context.Context, id string) (bool, error)
 	IsSectionReadable(ctx context.Context, id string) (bool, error)
 	UpdateForumUserConfig(ctx context.Context, id string, sectionId string, name string, description string, ordering float32, visibility string) error
 	UpdateSectionUserConfig(ctx context.Context, id string, name string, ordering float32) error
@@ -176,6 +177,10 @@ func (this *forumServiceImpl) IsForumReadable(ctx context.Context, id string) (b
 		return false, nil
 	}
 	return this.IsSectionReadable(ctx, forum.SectionId)
+}
+
+func (this *forumServiceImpl) IsForumWritable(ctx context.Context, id string) (bool, error) {
+	return this.IsForumReadable(ctx, id)
 }
 
 func (this *forumServiceImpl) IsSectionReadable(ctx context.Context, id string) (bool, error) {

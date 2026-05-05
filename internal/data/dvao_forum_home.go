@@ -18,6 +18,7 @@ type ForumHomeViewRow struct {
 	ForumDescription string
 	ForumOrdering    float32
 	ThreadCount      int32
+	PostCount        int32
 }
 
 type ForumHomeDvao interface {
@@ -40,11 +41,31 @@ var sqlCreateViewForumHomePublic = `
 		WITH
 		q_thread_count_by_forum_id AS (
 			SELECT
-				forum_id, count(*) AS thread_count
+				forum_id, COUNT(*) AS thread_count
 			FROM
 				forum_threads
 			GROUP BY
 				forum_id
+		),
+
+		q_post_count_by_thread_id AS (
+			SELECT
+				thread_id, COUNT(*) AS post_count
+			FROM
+				forum_posts
+			GROUP BY
+				thread_id
+		),
+
+		q_post_count_by_forum_id AS (
+			SELECT
+				ft.forum_id, SUM(pc.post_count) AS post_count
+			FROM
+				forum_threads ft
+				INNER JOIN
+					q_post_count_by_thread_id pc ON ft.id = pc.thread_id
+			GROUP BY
+				ft.forum_id
 		)
 		
 		SELECT
@@ -55,13 +76,16 @@ var sqlCreateViewForumHomePublic = `
 			f.name AS forum_name,
 			f.description AS forum_description,
 			f.ordering AS forum_ordering,
-			COALESCE(tc.thread_count, 0) AS thread_count
+			COALESCE(tc.thread_count, 0) AS thread_count,
+			COALESCE(pc.post_count, 0) AS post_count
 		FROM
 			forums f
 			INNER JOIN
 				forum_sections fs ON f.section_id = fs.id
 			LEFT JOIN
 				q_thread_count_by_forum_id tc ON f.id = tc.forum_id
+			LEFT JOIN
+				q_post_count_by_forum_id pc ON f.id = pc.forum_id
 		WHERE
 			f.visibility = 'Public'
 			AND
@@ -83,7 +107,7 @@ func (*forumHomeDvaoImpl) CreateDBObjects(ctx context.Context) error {
 
 var sqlSelectForumHomeViewRowBySection = `
 	SELECT
-		section_id, section_name, section_ordering, forum_id, forum_name, forum_description, forum_ordering, thread_count 
+		section_id, section_name, section_ordering, forum_id, forum_name, forum_description, forum_ordering, thread_count, post_count
 	FROM
 		view_forum_home_public
 	WHERE
@@ -102,7 +126,7 @@ func (*forumHomeDvaoImpl) SelectForumHomeViewRowsBySectionPublic(ctx context.Con
 	var result []ForumHomeViewRow
 	for rows.Next() {
 		thisRow := ForumHomeViewRow{}
-		err = rows.Scan(&thisRow.SectionId, &thisRow.SectionName, &thisRow.SectionOrdering, &thisRow.ForumId, &thisRow.ForumName, &thisRow.ForumDescription, &thisRow.ForumOrdering, &thisRow.ThreadCount)
+		err = rows.Scan(&thisRow.SectionId, &thisRow.SectionName, &thisRow.SectionOrdering, &thisRow.ForumId, &thisRow.ForumName, &thisRow.ForumDescription, &thisRow.ForumOrdering, &thisRow.ThreadCount, &thisRow.PostCount)
 		if err != nil {
 			logger.Error(ctx, "Got database error on ForumHomeDvao/SelectForumHomeViewRowsBySectionPublic query: ", err)
 			return nil, err
@@ -114,7 +138,7 @@ func (*forumHomeDvaoImpl) SelectForumHomeViewRowsBySectionPublic(ctx context.Con
 
 var sqlSelectForumHomeViewRowAll = `
 	SELECT
-		section_id, section_name, section_ordering, forum_id, forum_name, forum_description, forum_ordering, thread_count
+		section_id, section_name, section_ordering, forum_id, forum_name, forum_description, forum_ordering, thread_count, post_count
 	FROM
 		view_forum_home_public
 `
@@ -131,7 +155,7 @@ func (*forumHomeDvaoImpl) SelectForumHomeViewRowsPublic(ctx context.Context) ([]
 	var result []ForumHomeViewRow
 	for rows.Next() {
 		thisRow := ForumHomeViewRow{}
-		err = rows.Scan(&thisRow.SectionId, &thisRow.SectionName, &thisRow.SectionOrdering, &thisRow.ForumId, &thisRow.ForumName, &thisRow.ForumDescription, &thisRow.ForumOrdering, &thisRow.ThreadCount)
+		err = rows.Scan(&thisRow.SectionId, &thisRow.SectionName, &thisRow.SectionOrdering, &thisRow.ForumId, &thisRow.ForumName, &thisRow.ForumDescription, &thisRow.ForumOrdering, &thisRow.ThreadCount, &thisRow.PostCount)
 		if err != nil {
 			logger.Error(ctx, "Got database error on ForumHomeDvao/SelectForumHomeViewRowsPublic query: ", err)
 			return nil, err

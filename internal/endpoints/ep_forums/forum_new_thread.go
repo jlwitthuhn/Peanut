@@ -70,12 +70,12 @@ func registerForumNewThreadHandlers(mux *http.ServeMux, forumsService service.Fo
 			return
 		}
 
-		readable, err := forumsService.IsForumWritable(r.Context(), urlForumId)
+		writable, err := forumsService.IsForumWritable(r.Context(), urlForumId)
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to load forum.", w, r)
 			return
 		}
-		if !readable {
+		if !writable {
 			ep_util.RenderErrorHttp404NotFoundWithMessage("Page not found.", w, r)
 			return
 		}

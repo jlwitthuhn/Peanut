@@ -5,7 +5,7 @@
 			<p class="breadcrumb">
 				<a href="/forum/section/{{ .SectionId }}">{{ .SectionName }}</a> &rsaquo; <a href="/forum/index/{{ .ForumId }}">{{ .ForumName }}</a> &rsaquo; <a href="/forum/thread/{{ .ThreadId }}">{{ .ThreadTitle }}</a>
 			</p>
-			<a href="/forum/thread/{{ .ThreadId }}/reply" class="primary-button">Reply</a>
+			{{ if .CanReply }}<a href="/forum/thread/{{ .ThreadId }}/reply" class="primary-button">Reply</a>{{ end }}
 		</div>
 		<div class="panel">
 			<div class="panel-header">
@@ -31,9 +31,11 @@
 			</div>
 			{{ end }}
 		</div>
+		{{ if .CanReply }}
 		<div style="text-align: right;">
 			<a href="/forum/thread/{{ .ThreadId }}/reply" class="primary-button">Reply</a>
 		</div>
+		{{ end }}
 	</div>
 </div>
 {{ end }}

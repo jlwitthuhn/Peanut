@@ -57,7 +57,14 @@ func registerForumPostListingHandlers(mux *http.ServeMux, forumsService service.
 			return
 		}
 
+		canReply, err := forumThreadService.CanPostReplyInThread(r.Context(), thread.ForumId)
+		if err != nil {
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to check permissions.", w, r)
+			return
+		}
+
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
+		templateCtx["CanReply"] = canReply
 		templateCtx["ThreadId"] = thread.Id
 		templateCtx["ThreadTitle"] = thread.Title
 		templateCtx["ForumId"] = forum.Id

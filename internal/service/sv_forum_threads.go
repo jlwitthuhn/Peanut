@@ -12,6 +12,7 @@ import (
 )
 
 type ForumThreadService interface {
+	AddThreadPost(ctx context.Context, threadId string, message string) (string, error)
 	CreateThread(ctx context.Context, forumId string, title string, message string) (string, error)
 	GetForumThreadSummaryViewRowByForumIdPublic(ctx context.Context, forumId string) ([]data.ForumThreadSummaryViewRow, error)
 	GetThreadRowById(ctx context.Context, id string) (*data.ForumThreadRow, error)
@@ -27,6 +28,20 @@ type forumThreadServiceImpl struct {
 	forumThreadsDao        data.ForumThreadsDao
 	forumThreadSummaryDvao data.ForumThreadSummaryDvao
 	forumPostListingDvao   data.ForumPostListingDvao
+}
+
+func (this *forumThreadServiceImpl) AddThreadPost(ctx context.Context, threadId string, message string) (string, error) {
+	userId, ok := ctx.Value(contextkeys.UserId).(string)
+	if !ok {
+		return "", errors.New("cannot add post: no user id in context")
+	}
+
+	postId, err := this.forumPostsDao.InsertRow(ctx, threadId, userId, message)
+	if err != nil {
+		return "", err
+	}
+
+	return postId, nil
 }
 
 func (this *forumThreadServiceImpl) CreateThread(ctx context.Context, forumId string, title string, message string) (string, error) {

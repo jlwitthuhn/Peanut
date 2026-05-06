@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
+	"peanut/internal/logger"
 	"peanut/internal/service"
 )
 
@@ -61,4 +62,55 @@ func registerForumReplyHandlers(mux *http.ServeMux, forumsService service.ForumS
 		ep_util.RenderTemplate("view_forum/reply", templateCtx, w, r)
 	})
 	mux.Handle("GET /forum/thread/{threadId}/reply", getReplyHandler)
+
+	postReplyHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		threadId := r.PathValue("threadId")
+
+		thread, err := forumThreadService.GetThreadRowById(r.Context(), threadId)
+		if err != nil {
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to load thread.", w, r)
+			return
+		}
+		if thread == nil {
+			ep_util.RenderErrorHttp404NotFoundWithMessage("Page not found.", w, r)
+			return
+		}
+		if thread.Visibility != "Public" {
+			ep_util.RenderErrorHttp404NotFoundWithMessage("Page not found.", w, r)
+			return
+		}
+
+		writable, err := forumsService.IsForumWritable(r.Context(), thread.ForumId)
+		if err != nil {
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to load forum.", w, r)
+			return
+		}
+		if !writable {
+			ep_util.RenderErrorHttp404NotFoundWithMessage("Page not found.", w, r)
+			return
+		}
+
+		message := r.PostFormValue("message")
+		if message == "" {
+			ep_util.RenderErrorHttp400BadRequestWithMessage("Message is required.", w, r)
+			return
+		}
+
+		_, err = forumThreadService.AddThreadPost(r.Context(), threadId, message)
+		if err != nil {
+			logger.Error(r.Context(), "Failed to add reply: ", err)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to add reply.", w, r)
+			return
+		}
+
+		err = ep_util.CommitTransactionForRequest(r)
+		if err != nil {
+			logger.Error(r.Context(), "Failed to commit transaction: ", err)
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to commit transaction.", w, r)
+			return
+		}
+
+		http.Redirect(w, r, "/forum/thread/"+threadId, http.StatusSeeOther)
+	})
+	mux.Handle("POST /forum/thread/{threadId}/reply", postReplyHandler)
 }

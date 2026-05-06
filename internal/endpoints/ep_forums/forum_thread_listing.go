@@ -47,12 +47,19 @@ func registerForumThreadListingHandlers(mux *http.ServeMux, forumsService servic
 			return
 		}
 
+		writable, err := forumsService.IsForumWritable(r.Context(), forumId)
+		if err != nil {
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to load forum.", w, r)
+			return
+		}
+
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["ForumId"] = forum.Id
 		templateCtx["ForumName"] = forum.Name
 		templateCtx["SectionId"] = section.Id
 		templateCtx["SectionName"] = section.Name
 		templateCtx["Threads"] = threads
+		templateCtx["CanPostThread"] = writable
 		ep_util.RenderTemplate("view_forum/thread_listing", templateCtx, w, r)
 	})
 	mux.Handle("GET /forum/index/{forumId}", getForumIndexHandler)

@@ -3,7 +3,7 @@
 	<div class="layout-main">
 		<div class="breadcrumb-row">
 			<p class="breadcrumb"><a href="/forum/section/{{ .SectionId }}">{{ .SectionName }}</a> &rsaquo; <a href="/forum/index/{{ .ForumId }}">{{ .ForumName }}</a></p>
-			<a href="/forum/new_thread/{{ .ForumId }}" class="primary-button">New Thread</a>
+			{{ if .CanPostThread }}<a href="/forum/new_thread/{{ .ForumId }}" class="primary-button">New Thread</a>{{ end }}
 		</div>
 		<div class="data-table cols-thread">
 			<div class="data-row data-header">

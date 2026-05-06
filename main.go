@@ -105,6 +105,10 @@ func main() {
 	endpoints.RegisterLogoutHandlers(middlewareMux, sessionService)
 	endpoints.RegisterProfileHandlers(middlewareMux, userService)
 	endpoints.RegisterRegisterHandlers(middlewareMux, groupService, userService)
+
+	// This one has to be last, it catches everything that did not match an above route
+	endpoints.RegisterUnroutedHandlers(middlewareMux)
+
 	wrappedMiddlewareMux := middleware.WrapHandler(middlewareMux,
 		middleware.RequestId(),
 		middleware.RequestLog(),

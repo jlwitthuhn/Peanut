@@ -9,21 +9,26 @@ import (
 	"errors"
 	"peanut/internal/data"
 	"peanut/internal/keynames/contextkeys"
+	"peanut/internal/middleutil"
+	"peanut/internal/security/perms"
 )
 
 type ForumThreadService interface {
 	AddThreadPost(ctx context.Context, threadId string, message string) (string, error)
+	CanPostReplyInThread(ctx context.Context, forumId string) (bool, error)
+	CanPostThreadInForum(ctx context.Context, forumId string) (bool, error)
 	CreateThread(ctx context.Context, forumId string, title string, message string) (string, error)
 	GetForumThreadSummaryViewRowByForumIdPublic(ctx context.Context, forumId string) ([]data.ForumThreadSummaryViewRow, error)
 	GetThreadRowById(ctx context.Context, id string) (*data.ForumThreadRow, error)
 	GetPostsByThreadId(ctx context.Context, threadId string) ([]data.ForumPostListingViewRow, error)
 }
 
-func NewForumThreadService(forumPostsDao data.ForumPostsDao, forumThreadsDao data.ForumThreadsDao, forumThreadSummaryDvao data.ForumThreadSummaryDvao, forumPostListingDvao data.ForumPostListingDvao) ForumThreadService {
-	return &forumThreadServiceImpl{forumPostsDao: forumPostsDao, forumThreadsDao: forumThreadsDao, forumThreadSummaryDvao: forumThreadSummaryDvao, forumPostListingDvao: forumPostListingDvao}
+func NewForumThreadService(forumService ForumService, forumPostsDao data.ForumPostsDao, forumThreadsDao data.ForumThreadsDao, forumThreadSummaryDvao data.ForumThreadSummaryDvao, forumPostListingDvao data.ForumPostListingDvao) ForumThreadService {
+	return &forumThreadServiceImpl{forumService: forumService, forumPostsDao: forumPostsDao, forumThreadsDao: forumThreadsDao, forumThreadSummaryDvao: forumThreadSummaryDvao, forumPostListingDvao: forumPostListingDvao}
 }
 
 type forumThreadServiceImpl struct {
+	forumService           ForumService
 	forumPostsDao          data.ForumPostsDao
 	forumThreadsDao        data.ForumThreadsDao
 	forumThreadSummaryDvao data.ForumThreadSummaryDvao
@@ -61,6 +66,20 @@ func (this *forumThreadServiceImpl) CreateThread(ctx context.Context, forumId st
 	}
 
 	return threadId, nil
+}
+
+func (this *forumThreadServiceImpl) CanPostThreadInForum(ctx context.Context, forumId string) (bool, error) {
+	if !middleutil.ContextHasPermission(ctx, perms.Forum_Thread_Post) {
+		return false, nil
+	}
+	return this.forumService.IsForumReadable(ctx, forumId)
+}
+
+func (this *forumThreadServiceImpl) CanPostReplyInThread(ctx context.Context, forumId string) (bool, error) {
+	if !middleutil.ContextHasPermission(ctx, perms.Forum_Thread_Reply) {
+		return false, nil
+	}
+	return this.forumService.IsForumReadable(ctx, forumId)
 }
 
 func (this *forumThreadServiceImpl) GetForumThreadSummaryViewRowByForumIdPublic(ctx context.Context, forumId string) ([]data.ForumThreadSummaryViewRow, error) {

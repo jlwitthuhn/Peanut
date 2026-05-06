@@ -70,7 +70,7 @@ func registerForumNewThreadHandlers(mux *http.ServeMux, forumsService service.Fo
 			return
 		}
 
-		writable, err := forumsService.IsForumWritable(r.Context(), urlForumId)
+		writable, err := forumThreadService.CanPostThreadInForum(r.Context(), urlForumId)
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to load forum.", w, r)
 			return

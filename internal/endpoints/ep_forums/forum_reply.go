@@ -80,7 +80,7 @@ func registerForumReplyHandlers(mux *http.ServeMux, forumsService service.ForumS
 			return
 		}
 
-		writable, err := forumsService.IsForumWritable(r.Context(), thread.ForumId)
+		writable, err := forumThreadService.CanPostReplyInThread(r.Context(), thread.ForumId)
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to load forum.", w, r)
 			return

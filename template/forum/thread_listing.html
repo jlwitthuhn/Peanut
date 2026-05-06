@@ -3,9 +3,7 @@
 	<div class="layout-main">
 		<div class="breadcrumb-row">
 			<p class="breadcrumb"><a href="/forum/section/{{ .SectionId }}">{{ .SectionName }}</a> &rsaquo; <a href="/forum/index/{{ .ForumId }}">{{ .ForumName }}</a></p>
-			<form action="/forum/new_thread/{{ .ForumId }}" method="get">
-				<input type="submit" class="primary-button" value="New Thread">
-			</form>
+			<a href="/forum/new_thread/{{ .ForumId }}" class="primary-button">New Thread</a>
 		</div>
 		<div class="data-table cols-thread">
 			<div class="data-row data-header">

@@ -21,7 +21,7 @@ func registerForumThreadListingHandlers(mux *http.ServeMux, forumsService servic
 			return
 		}
 		if forum == nil {
-			ep_util.RenderErrorHttp404NotFoundWithMessage("Page not found.", w, r)
+			ep_util.RenderErrorHttp404NotFound(w, r)
 			return
 		}
 
@@ -31,7 +31,7 @@ func registerForumThreadListingHandlers(mux *http.ServeMux, forumsService servic
 			return
 		}
 		if !readable {
-			ep_util.RenderErrorHttp404NotFoundWithMessage("Page not found.", w, r)
+			ep_util.RenderErrorHttp404NotFound(w, r)
 			return
 		}
 

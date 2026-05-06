@@ -20,6 +20,10 @@ func RenderErrorHttp403Forbidden(w http.ResponseWriter, r *http.Request) {
 	RenderSimpleMessage("403 - Forbidden", "You do not have permission to access this page.", w, r)
 }
 
+func RenderErrorHttp404NotFound(w http.ResponseWriter, r *http.Request) {
+	RenderErrorHttp404NotFoundWithMessage("Page not found", w, r)
+}
+
 func RenderErrorHttp404NotFoundWithMessage(message string, w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotFound)
 	RenderSimpleMessage("404 - Not Found", message, w, r)

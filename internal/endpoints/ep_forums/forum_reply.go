@@ -22,11 +22,11 @@ func registerForumReplyHandlers(mux *http.ServeMux, forumsService service.ForumS
 			return
 		}
 		if thread == nil {
-			ep_util.RenderErrorHttp404NotFoundWithMessage("Page not found.", w, r)
+			ep_util.RenderErrorHttp404NotFound(w, r)
 			return
 		}
 		if thread.Visibility != "Public" {
-			ep_util.RenderErrorHttp404NotFoundWithMessage("Page not found.", w, r)
+			ep_util.RenderErrorHttp404NotFound(w, r)
 			return
 		}
 
@@ -42,7 +42,7 @@ func registerForumReplyHandlers(mux *http.ServeMux, forumsService service.ForumS
 			return
 		}
 		if !canReply {
-			ep_util.RenderErrorHttp404NotFoundWithMessage("Page not found.", w, r)
+			ep_util.RenderErrorHttp404NotFound(w, r)
 			return
 		}
 
@@ -72,11 +72,11 @@ func registerForumReplyHandlers(mux *http.ServeMux, forumsService service.ForumS
 			return
 		}
 		if thread == nil {
-			ep_util.RenderErrorHttp404NotFoundWithMessage("Page not found.", w, r)
+			ep_util.RenderErrorHttp404NotFound(w, r)
 			return
 		}
 		if thread.Visibility != "Public" {
-			ep_util.RenderErrorHttp404NotFoundWithMessage("Page not found.", w, r)
+			ep_util.RenderErrorHttp404NotFound(w, r)
 			return
 		}
 
@@ -86,7 +86,7 @@ func registerForumReplyHandlers(mux *http.ServeMux, forumsService service.ForumS
 			return
 		}
 		if !writable {
-			ep_util.RenderErrorHttp404NotFoundWithMessage("Page not found.", w, r)
+			ep_util.RenderErrorHttp404NotFound(w, r)
 			return
 		}
 

@@ -21,7 +21,7 @@ func RegisterProfileHandlers(mux *http.ServeMux, userService service.UserService
 		}
 
 		if user == nil {
-			ep_util.RenderErrorHttp404NotFoundWithMessage("Failed to find specified user", w, r)
+			ep_util.RenderErrorHttp404NotFoundWithMessage("User not found", w, r)
 			return
 		}
 

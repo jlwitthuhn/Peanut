@@ -19,12 +19,12 @@ type forumHomeSection struct {
 }
 
 type forumHomeForum struct {
-	Name          string
-	Id            string
-	Description   string
-	ThreadCount   int32
-	PostCount     int32
-	LastPostDate  string
+	Name         string
+	Id           string
+	Description  string
+	ThreadCount  int32
+	PostCount    int32
+	LastPostDate string
 }
 
 func groupForumsBySection(rows []data.ForumHomeViewRow) []forumHomeSection {
@@ -69,7 +69,7 @@ func registerForumListingHandlers(mux *http.ServeMux, forumsService service.Foru
 			return
 		}
 		if !readable {
-			ep_util.RenderErrorHttp404NotFoundWithMessage("Page not found.", w, r)
+			ep_util.RenderErrorHttp404NotFound(w, r)
 			return
 		}
 

@@ -21,11 +21,11 @@ func registerForumPostListingHandlers(mux *http.ServeMux, forumsService service.
 			return
 		}
 		if thread == nil {
-			ep_util.RenderErrorHttp404NotFoundWithMessage("Page not found.", w, r)
+			ep_util.RenderErrorHttp404NotFound(w, r)
 			return
 		}
 		if thread.Visibility != "Public" {
-			ep_util.RenderErrorHttp404NotFoundWithMessage("Page not found.", w, r)
+			ep_util.RenderErrorHttp404NotFound(w, r)
 			return
 		}
 
@@ -41,7 +41,7 @@ func registerForumPostListingHandlers(mux *http.ServeMux, forumsService service.
 			return
 		}
 		if !readable {
-			ep_util.RenderErrorHttp404NotFoundWithMessage("Page not found.", w, r)
+			ep_util.RenderErrorHttp404NotFound(w, r)
 			return
 		}
 

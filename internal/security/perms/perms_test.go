@@ -70,7 +70,7 @@ func TestGetGranularPermissionsForGroups_Empty(t *testing.T) {
 		t.Fatalf("no groups: got %d perms, want 0", len(got))
 	}
 
-	got = GetGranularPermissionsForGroups(permgroups.Guest, permgroups.User)
+	got = GetGranularPermissionsForGroups(permgroups.Guest)
 	if len(got) != 0 {
 		t.Fatalf("Guest+User: got %d perms, want 0", len(got))
 	}

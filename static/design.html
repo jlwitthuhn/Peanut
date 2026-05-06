@@ -108,18 +108,30 @@
             opacity: 0.5;
         }
 
-        input[type="submit"].primary-button {
+        input[type="submit"].primary-button,
+        a.primary-button {
             background-color: var(--accent);
             color: var(--bg);
             border: none;
         }
 
-        input[type="submit"].primary-button:hover {
+        a.primary-button {
+            display: inline-block;
+            padding: var(--pad);
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-family: inherit;
+            text-decoration: none;
+        }
+
+        input[type="submit"].primary-button:hover,
+        a.primary-button:hover {
             background-color: var(--accent-bright);
             border: none;
         }
 
-        input[type="submit"].primary-button:not(:disabled):active {
+        input[type="submit"].primary-button:not(:disabled):active,
+        a.primary-button:active {
             background-color: var(--accent-bright);
         }
 
@@ -679,7 +691,7 @@
     <div class="layout-main">
         <div class="breadcrumb-row">
             <p class="breadcrumb"><a href="#">Category Name</a> &rsaquo; <a href="#">Forum Name</a></p>
-            <input type="submit" class="primary-button" value="New Thread">
+            <a href="#" class="primary-button">New Thread</a>
         </div>
         <div class="data-table cols-thread">
             <div class="data-row data-header">
@@ -830,7 +842,7 @@
     <div class="layout-main">
         <div class="breadcrumb-row">
             <p class="breadcrumb"><a href="#">Category Name</a> &rsaquo; <a href="#">Forum Name</a> &rsaquo; <a href="#">Thread Title Goes Here</a></p>
-            <input type="submit" class="primary-button" value="Reply">
+            <a href="#" class="primary-button">Reply</a>
         </div>
         <div class="panel">
             <div class="panel-header">
@@ -873,7 +885,7 @@
             </div>
         </div>
         <div style="text-align: right;">
-            <input type="submit" class="primary-button" value="Reply">
+            <a href="#" class="primary-button">Reply</a>
         </div>
     </div>
 </div>

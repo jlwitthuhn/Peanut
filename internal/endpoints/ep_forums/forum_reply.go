@@ -36,12 +36,12 @@ func registerForumReplyHandlers(mux *http.ServeMux, forumsService service.ForumS
 			return
 		}
 
-		readable, err := forumsService.IsForumReadable(r.Context(), thread.ForumId)
+		canReply, err := forumThreadService.CanPostReplyInThread(r.Context(), thread.ForumId)
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to load forum.", w, r)
 			return
 		}
-		if !readable {
+		if !canReply {
 			ep_util.RenderErrorHttp404NotFoundWithMessage("Page not found.", w, r)
 			return
 		}

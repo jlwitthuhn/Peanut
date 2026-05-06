@@ -36,6 +36,7 @@ func NewSetupService(
 	systemLogDao data.SystemLogDao,
 	userDao data.UserDao,
 	forumHomeDvao data.ForumHomeDvao,
+	forumPostListingDvao data.ForumPostListingDvao,
 	forumThreadSummaryDvao data.ForumThreadSummaryDvao,
 	setupConfigService SetupConfigService,
 	databaseService DatabaseService,
@@ -60,6 +61,7 @@ func NewSetupService(
 		systemLogDao:        systemLogDao,
 		userDao:             userDao,
 		forumHomeDvao:          forumHomeDvao,
+		forumPostListingDvao:   forumPostListingDvao,
 		forumThreadSummaryDvao: forumThreadSummaryDvao,
 		setupConfigService:     setupConfigService,
 		groupService:        groupService,
@@ -84,6 +86,7 @@ type setupServiceImpl struct {
 	systemLogDao        data.SystemLogDao
 	userDao             data.UserDao
 	forumHomeDvao          data.ForumHomeDvao
+	forumPostListingDvao   data.ForumPostListingDvao
 	forumThreadSummaryDvao data.ForumThreadSummaryDvao
 	setupConfigService     SetupConfigService
 	databaseService     DatabaseService
@@ -177,6 +180,10 @@ func (this *setupServiceImpl) InitializeDatabase(ctx context.Context, adminName 
 		return err
 	}
 	err = this.forumHomeDvao.CreateDBObjects(ctx)
+	if err != nil {
+		return err
+	}
+	err = this.forumPostListingDvao.CreateDBObjects(ctx)
 	if err != nil {
 		return err
 	}

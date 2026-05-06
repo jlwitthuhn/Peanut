@@ -5,7 +5,7 @@
 			<p class="breadcrumb">
 				<a href="/forum/section/{{ .SectionId }}">{{ .SectionName }}</a> &rsaquo; <a href="/forum/index/{{ .ForumId }}">{{ .ForumName }}</a> &rsaquo; <a href="/forum/thread/{{ .ThreadId }}">{{ .ThreadTitle }}</a>
 			</p>
-			<input type="submit" class="primary-button" value="Reply">
+			<a href="/forum/thread/{{ .ThreadId }}/reply" class="primary-button">Reply</a>
 		</div>
 		<div class="panel">
 			<div class="panel-header">
@@ -32,7 +32,7 @@
 			{{ end }}
 		</div>
 		<div style="text-align: right;">
-			<input type="submit" class="primary-button" value="Reply">
+			<a href="/forum/thread/{{ .ThreadId }}/reply" class="primary-button">Reply</a>
 		</div>
 	</div>
 </div>

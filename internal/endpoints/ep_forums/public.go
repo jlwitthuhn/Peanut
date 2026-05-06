@@ -13,5 +13,6 @@ func RegisterForumHandlers(mux *http.ServeMux, forumsService service.ForumServic
 	registerForumListingHandlers(mux, forumsService)
 	registerForumNewThreadHandlers(mux, forumsService, forumThreadService)
 	registerForumPostListingHandlers(mux, forumsService, forumThreadService)
+	registerForumReplyHandlers(mux, forumsService, forumThreadService)
 	registerForumThreadListingHandlers(mux, forumsService, forumThreadService)
 }

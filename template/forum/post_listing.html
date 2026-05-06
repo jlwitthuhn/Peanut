@@ -1,0 +1,39 @@
+{{ define "content" }}
+<div class="layout">
+	<div class="layout-main">
+		<div class="breadcrumb-row">
+			<p class="breadcrumb">
+				<a href="/forum/section/{{ .SectionId }}">{{ .SectionName }}</a> &rsaquo; <a href="/forum/index/{{ .ForumId }}">{{ .ForumName }}</a> &rsaquo; <a href="/forum/thread/{{ .ThreadId }}">{{ .ThreadTitle }}</a>
+			</p>
+			<input type="submit" class="primary-button" value="Reply">
+		</div>
+		<div class="panel">
+			<div class="panel-header">
+				<h1>{{ .ThreadTitle }}</h1>
+			</div>
+			{{ range $post := .Posts }}
+			<div class="forum-post">
+				<div class="forum-post-author">
+					<div class="forum-post-author-name"><a href="#">{{ $post.AuthorName }}</a></div>
+					<div class="forum-post-author-info">Details</div>
+				</div>
+				<div class="forum-post-content">
+					<div class="forum-post-meta">Posted: {{ $post.PostTimestamp.Format "2006-01-02 15:04:05" }}</div>
+					<div class="forum-post-body">
+						<p>{{ $post.PostMessage }}</p>
+					</div>
+					<div class="forum-post-actions">
+						<a href="#">Quote</a>
+						<a href="#">Edit</a>
+						<a href="#">Report</a>
+					</div>
+				</div>
+			</div>
+			{{ end }}
+		</div>
+		<div style="text-align: right;">
+			<input type="submit" class="primary-button" value="Reply">
+		</div>
+	</div>
+</div>
+{{ end }}

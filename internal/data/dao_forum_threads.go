@@ -6,6 +6,9 @@ package data
 
 import (
 	"context"
+	"database/sql"
+	"errors"
+	"github.com/lib/pq"
 	"peanut/internal/logger"
 	"time"
 )
@@ -23,6 +26,7 @@ type ForumThreadRow struct {
 type ForumThreadsDao interface {
 	CreateDBObjects(ctx context.Context) error
 	InsertRow(ctx context.Context, forumId string, authorId string, title string, visibility string) (string, error)
+	SelectRowById(ctx context.Context, id string) (*ForumThreadRow, error)
 }
 
 func NewForumThreadsDao() ForumThreadsDao {
@@ -86,4 +90,28 @@ func (*forumThreadsDaoImpl) InsertRow(ctx context.Context, forumId string, autho
 		return "", err
 	}
 	return newId, nil
+}
+
+var sqlSelectForumThreadsRowById = "SELECT id, forum_id, author_id, title, visibility, _created, _updated FROM forum_threads WHERE id = $1"
+
+func (*forumThreadsDaoImpl) SelectRowById(ctx context.Context, id string) (*ForumThreadRow, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
+	result := &ForumThreadRow{}
+	row := sqlh.QueryRow(sqlSelectForumThreadsRowById, id)
+	err := row.Scan(&result.Id, &result.ForumId, &result.AuthorId, &result.Title, &result.Visibility, &result.Created, &result.Updated)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
+	if err != nil {
+		var pqErr *pq.Error
+		ok := errors.As(err, &pqErr)
+		if ok {
+			if pqErr.Code == "22P02" {
+				return nil, nil
+			}
+		}
+		logger.Error(ctx, "Got database error on ForumThreadsDao/SelectRowById query: ", err)
+		return nil, err
+	}
+	return result, nil
 }

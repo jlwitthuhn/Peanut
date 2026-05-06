@@ -20,6 +20,7 @@ type ForumPostListingViewRow struct {
 
 type ForumPostListingDvao interface {
 	CreateDBObjects(ctx context.Context) error
+	SelectByThreadId(ctx context.Context, threadId string) ([]ForumPostListingViewRow, error)
 }
 
 func NewForumPostListingDvao() ForumPostListingDvao {
@@ -53,4 +54,37 @@ func (*forumPostListingDvaoImpl) CreateDBObjects(ctx context.Context) error {
 		return err
 	}
 	return nil
+}
+
+var sqlSelectForumPostListingByThreadId = `
+	SELECT
+		post_id, thread_id, author_name, post_message, post_timestamp
+	FROM
+		view_forum_post_listing
+	WHERE
+		thread_id = $1
+	ORDER BY
+		post_timestamp ASC
+`
+
+func (*forumPostListingDvaoImpl) SelectByThreadId(ctx context.Context, threadId string) ([]ForumPostListingViewRow, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
+	rows, err := sqlh.Query(sqlSelectForumPostListingByThreadId, threadId)
+	if err != nil {
+		logger.Error(ctx, "Got database error on ForumPostListingDvao/SelectByThreadId query: ", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var result []ForumPostListingViewRow
+	for rows.Next() {
+		thisRow := ForumPostListingViewRow{}
+		err = rows.Scan(&thisRow.PostId, &thisRow.ThreadId, &thisRow.AuthorName, &thisRow.PostMessage, &thisRow.PostTimestamp)
+		if err != nil {
+			logger.Error(ctx, "Got database error on ForumPostListingDvao/SelectByThreadId scan: ", err)
+			return nil, err
+		}
+		result = append(result, thisRow)
+	}
+	return result, nil
 }

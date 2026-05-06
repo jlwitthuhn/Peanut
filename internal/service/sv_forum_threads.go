@@ -14,16 +14,19 @@ import (
 type ForumThreadService interface {
 	CreateThread(ctx context.Context, forumId string, title string, message string) (string, error)
 	GetForumThreadSummaryViewRowByForumIdPublic(ctx context.Context, forumId string) ([]data.ForumThreadSummaryViewRow, error)
+	GetThreadRowById(ctx context.Context, id string) (*data.ForumThreadRow, error)
+	GetPostsByThreadId(ctx context.Context, threadId string) ([]data.ForumPostListingViewRow, error)
 }
 
-func NewForumThreadService(forumPostsDao data.ForumPostsDao, forumThreadsDao data.ForumThreadsDao, forumThreadSummaryDvao data.ForumThreadSummaryDvao) ForumThreadService {
-	return &forumThreadServiceImpl{forumPostsDao: forumPostsDao, forumThreadsDao: forumThreadsDao, forumThreadSummaryDvao: forumThreadSummaryDvao}
+func NewForumThreadService(forumPostsDao data.ForumPostsDao, forumThreadsDao data.ForumThreadsDao, forumThreadSummaryDvao data.ForumThreadSummaryDvao, forumPostListingDvao data.ForumPostListingDvao) ForumThreadService {
+	return &forumThreadServiceImpl{forumPostsDao: forumPostsDao, forumThreadsDao: forumThreadsDao, forumThreadSummaryDvao: forumThreadSummaryDvao, forumPostListingDvao: forumPostListingDvao}
 }
 
 type forumThreadServiceImpl struct {
 	forumPostsDao          data.ForumPostsDao
 	forumThreadsDao        data.ForumThreadsDao
 	forumThreadSummaryDvao data.ForumThreadSummaryDvao
+	forumPostListingDvao   data.ForumPostListingDvao
 }
 
 func (this *forumThreadServiceImpl) CreateThread(ctx context.Context, forumId string, title string, message string) (string, error) {
@@ -48,4 +51,12 @@ func (this *forumThreadServiceImpl) CreateThread(ctx context.Context, forumId st
 func (this *forumThreadServiceImpl) GetForumThreadSummaryViewRowByForumIdPublic(ctx context.Context, forumId string) ([]data.ForumThreadSummaryViewRow, error) {
 	result, err := this.forumThreadSummaryDvao.SelectForumThreadSummaryViewRowByForumIdPublic(ctx, forumId)
 	return result, err
+}
+
+func (this *forumThreadServiceImpl) GetThreadRowById(ctx context.Context, id string) (*data.ForumThreadRow, error) {
+	return this.forumThreadsDao.SelectRowById(ctx, id)
+}
+
+func (this *forumThreadServiceImpl) GetPostsByThreadId(ctx context.Context, threadId string) ([]data.ForumPostListingViewRow, error) {
+	return this.forumPostListingDvao.SelectByThreadId(ctx, threadId)
 }

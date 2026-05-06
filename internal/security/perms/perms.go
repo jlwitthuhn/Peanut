@@ -13,6 +13,8 @@ const Admin_Forums_Structure_Edit = "Admin/Forums/Structure/Edit"
 const Admin_FrontPage_Edit = "Admin/FrontPage/Edit"
 const Admin_Gui_View = "Admin/Gui/View"
 const Admin_ScheduledJob_Run = "Admin/ScheduledJob/Run"
+const Forum_Thread_Post = "Forum/Thread/Post"
+const Forum_Thread_Reply = "Forum/Thread/Reply"
 
 func GetPermissionsForGroup(group string) map[string]struct{} {
 	result := make(map[string]struct{})
@@ -26,6 +28,9 @@ func GetPermissionsForGroup(group string) map[string]struct{} {
 		result[Admin_ScheduledJob_Run] = struct{}{}
 		fallthrough
 	case permgroups.User:
+		result[Forum_Thread_Post] = struct{}{}
+		result[Forum_Thread_Reply] = struct{}{}
+		fallthrough
 	case permgroups.Guest:
 	default:
 		logger.Error(nil, "Attempted to get perms for illegal group: ", group)

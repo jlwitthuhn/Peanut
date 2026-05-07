@@ -6,6 +6,7 @@ package ep_forums
 
 import (
 	"net/http"
+	"peanut/internal/data"
 	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/logger"
@@ -13,36 +14,33 @@ import (
 )
 
 func registerForumReplyHandlers(mux *http.ServeMux, forumsService service.ForumService, forumThreadService service.ForumThreadService) {
-	getReplyHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	enforceReplyAccess := func(w http.ResponseWriter, r *http.Request) *data.ForumThreadRow {
 		threadId := r.PathValue("threadId")
 
 		thread, err := forumThreadService.GetThreadRowById(r.Context(), threadId)
-		if err != nil {
-			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to load thread.", w, r)
-			return
+		if err != nil || thread == nil || thread.Visibility != "Public" {
+			ep_util.RenderErrorHttp404NotFound(w, r)
+			return nil
 		}
+
+		canReply, err := forumThreadService.CanPostReplyInThread(r.Context(), thread.ForumId)
+		if err != nil || !canReply {
+			ep_util.RenderErrorHttp404NotFound(w, r)
+			return nil
+		}
+
+		return thread
+	}
+
+	getReplyHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		thread := enforceReplyAccess(w, r)
 		if thread == nil {
-			ep_util.RenderErrorHttp404NotFound(w, r)
-			return
-		}
-		if thread.Visibility != "Public" {
-			ep_util.RenderErrorHttp404NotFound(w, r)
 			return
 		}
 
 		forum, err := forumsService.GetForumRowById(r.Context(), thread.ForumId)
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to load forum.", w, r)
-			return
-		}
-
-		canReply, err := forumThreadService.CanPostReplyInThread(r.Context(), thread.ForumId)
-		if err != nil {
-			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to load forum.", w, r)
-			return
-		}
-		if !canReply {
-			ep_util.RenderErrorHttp404NotFound(w, r)
 			return
 		}
 
@@ -64,29 +62,8 @@ func registerForumReplyHandlers(mux *http.ServeMux, forumsService service.ForumS
 	mux.Handle("GET /forum/thread/{threadId}/reply", getReplyHandler)
 
 	postReplyHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		threadId := r.PathValue("threadId")
-
-		thread, err := forumThreadService.GetThreadRowById(r.Context(), threadId)
-		if err != nil {
-			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to load thread.", w, r)
-			return
-		}
+		thread := enforceReplyAccess(w, r)
 		if thread == nil {
-			ep_util.RenderErrorHttp404NotFound(w, r)
-			return
-		}
-		if thread.Visibility != "Public" {
-			ep_util.RenderErrorHttp404NotFound(w, r)
-			return
-		}
-
-		writable, err := forumThreadService.CanPostReplyInThread(r.Context(), thread.ForumId)
-		if err != nil {
-			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to load forum.", w, r)
-			return
-		}
-		if !writable {
-			ep_util.RenderErrorHttp404NotFound(w, r)
 			return
 		}
 
@@ -96,7 +73,7 @@ func registerForumReplyHandlers(mux *http.ServeMux, forumsService service.ForumS
 			return
 		}
 
-		_, err = forumThreadService.AddThreadPost(r.Context(), threadId, message)
+		_, err := forumThreadService.AddThreadPost(r.Context(), thread.Id, message)
 		if err != nil {
 			logger.Error(r.Context(), "Failed to add reply: ", err)
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to add reply.", w, r)
@@ -110,7 +87,7 @@ func registerForumReplyHandlers(mux *http.ServeMux, forumsService service.ForumS
 			return
 		}
 
-		http.Redirect(w, r, "/forum/thread/"+threadId, http.StatusSeeOther)
+		http.Redirect(w, r, "/forum/thread/"+thread.Id, http.StatusSeeOther)
 	})
 	mux.Handle("POST /forum/thread/{threadId}/reply", postReplyHandler)
 }

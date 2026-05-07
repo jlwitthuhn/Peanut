@@ -29,14 +29,14 @@ func registerAdminDebugHandlers(mux *http.ServeMux, forumsService service.ForumS
 			return
 		}
 
-		_, err = forumsService.CreateForum(ctx, section1Id, "Forum 1", "", 1, "Public")
+		_, err = forumsService.CreateForum(ctx, section1Id, "Forum 1", "The first forum", 1, "Public")
 		if err != nil {
 			logger.Error(ctx, "Failed to create Forum 1: ", err)
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to create Forum 1.", w, r)
 			return
 		}
 
-		_, err = forumsService.CreateForum(ctx, section1Id, "Forum 2", "", 2, "Public")
+		_, err = forumsService.CreateForum(ctx, section1Id, "Forum 2", "The second forum", 2, "Public")
 		if err != nil {
 			logger.Error(ctx, "Failed to create Forum 2: ", err)
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to create Forum 2.", w, r)
@@ -50,7 +50,7 @@ func registerAdminDebugHandlers(mux *http.ServeMux, forumsService service.ForumS
 			return
 		}
 
-		_, err = forumsService.CreateForum(ctx, section2Id, "Forum 3", "", 1, "Public")
+		_, err = forumsService.CreateForum(ctx, section2Id, "Forum 3", "This is also a forum", 1, "Public")
 		if err != nil {
 			logger.Error(ctx, "Failed to create Forum 3: ", err)
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to create Forum 3.", w, r)

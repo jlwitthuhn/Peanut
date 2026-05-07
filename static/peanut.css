@@ -1,4 +1,3 @@
-{{ define "common_css" }}
 :root {
 	--bg: #101014;
 	--bg-alt: #181b24;
@@ -528,4 +527,3 @@ td {
 	display: flex;
 	gap: 1rem;
 }
-{{ end }}

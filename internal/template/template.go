@@ -20,76 +20,76 @@ func GetTemplate(name string) *template.Template {
 // Because of the way go manages templates, this needs to be kept separately from template content.
 func LoadTemplates(fs fs.FS) {
 
-	adminIndexFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/index.html"}
+	adminIndexFiles := []string{"base.html", "admin/base.html", "admin/index.html"}
 	loadTemplateOrDie(fs, "view_admin/index", adminIndexFiles...)
 
-	adminDebugFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/debug.html"}
+	adminDebugFiles := []string{"base.html", "admin/base.html", "admin/debug.html"}
 	loadTemplateOrDie(fs, "view_admin/debug", adminDebugFiles...)
 
-	adminForumForumsFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/forum/forums.html"}
+	adminForumForumsFiles := []string{"base.html", "admin/base.html", "admin/forum/forums.html"}
 	loadTemplateOrDie(fs, "view_admin/forum/forums", adminForumForumsFiles...)
 
-	adminForumSectionsFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/forum/sections.html"}
+	adminForumSectionsFiles := []string{"base.html", "admin/base.html", "admin/forum/sections.html"}
 	loadTemplateOrDie(fs, "view_admin/forum/sections", adminForumSectionsFiles...)
 
-	adminForumSectionsAddEditFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/forum/sections_add_edit.html"}
+	adminForumSectionsAddEditFiles := []string{"base.html", "admin/base.html", "admin/forum/sections_add_edit.html"}
 	loadTemplateOrDie(fs, "view_admin/forum/sections/add_edit", adminForumSectionsAddEditFiles...)
 
-	adminForumForumsAddEditFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/forum/forums_add_edit.html"}
+	adminForumForumsAddEditFiles := []string{"base.html", "admin/base.html", "admin/forum/forums_add_edit.html"}
 	loadTemplateOrDie(fs, "view_admin/forum/forums/add_edit", adminForumForumsAddEditFiles...)
 
-	adminFrontPageFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/front_page.html"}
+	adminFrontPageFiles := []string{"base.html", "admin/base.html", "admin/front_page.html"}
 	loadTemplateOrDie(fs, "view_admin/front_page", adminFrontPageFiles...)
 
-	adminGroupsFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/groups.html"}
+	adminGroupsFiles := []string{"base.html", "admin/base.html", "admin/groups.html"}
 	loadTemplateOrDie(fs, "view_admin/groups", adminGroupsFiles...)
 
-	adminGroupsListFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/groups_list.html"}
+	adminGroupsListFiles := []string{"base.html", "admin/base.html", "admin/groups_list.html"}
 	loadTemplateOrDie(fs, "view_admin/groups_list", adminGroupsListFiles...)
 
-	adminScheduledJobFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/scheduled_jobs.html"}
+	adminScheduledJobFiles := []string{"base.html", "admin/base.html", "admin/scheduled_jobs.html"}
 	loadTemplateOrDie(fs, "view_admin/scheduled_jobs", adminScheduledJobFiles...)
 
-	adminSimpleMessageFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/simple_message.html"}
+	adminSimpleMessageFiles := []string{"base.html", "admin/base.html", "admin/simple_message.html"}
 	loadTemplateOrDie(fs, "view_admin/simple_message", adminSimpleMessageFiles...)
 
-	adminUsersFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/users.html"}
+	adminUsersFiles := []string{"base.html", "admin/base.html", "admin/users.html"}
 	loadTemplateOrDie(fs, "view_admin/users", adminUsersFiles...)
 
-	adminUsersListFiles := []string{"base.html", "css/common.css", "admin/base.html", "admin/users_list.html"}
+	adminUsersListFiles := []string{"base.html", "admin/base.html", "admin/users_list.html"}
 	loadTemplateOrDie(fs, "view_admin/users_list", adminUsersListFiles...)
 
-	indexFiles := []string{"base.html", "css/common.css", "index.html"}
+	indexFiles := []string{"base.html", "index.html"}
 	loadTemplateOrDie(fs, "view_index", indexFiles...)
 
-	loginFiles := []string{"base.html", "css/common.css", "login.html"}
+	loginFiles := []string{"base.html", "login.html"}
 	loadTemplateOrDie(fs, "view_login", loginFiles...)
 
-	profileFiles := []string{"base.html", "css/common.css", "profile.html"}
+	profileFiles := []string{"base.html", "profile.html"}
 	loadTemplateOrDie(fs, "view_profile", profileFiles...)
 
-	registerFiles := []string{"base.html", "css/common.css", "register.html"}
+	registerFiles := []string{"base.html", "register.html"}
 	loadTemplateOrDie(fs, "view_register", registerFiles...)
 
-	setupFiles := []string{"base.html", "css/common.css", "setup.html"}
+	setupFiles := []string{"base.html", "setup.html"}
 	loadTemplateOrDie(fs, "view_setup", setupFiles...)
 
-	forumListingFiles := []string{"base.html", "css/common.css", "forum/forum_listing.html", "widget/forum_section.html"}
+	forumListingFiles := []string{"base.html", "forum/forum_listing.html", "widget/forum_section.html"}
 	loadTemplateOrDie(fs, "view_forum/forum_listing", forumListingFiles...)
 
-	forumNewThreadFiles := []string{"base.html", "css/common.css", "forum/new_thread.html"}
+	forumNewThreadFiles := []string{"base.html", "forum/new_thread.html"}
 	loadTemplateOrDie(fs, "view_forum/new_thread", forumNewThreadFiles...)
 
-	forumPostListingFiles := []string{"base.html", "css/common.css", "forum/post_listing.html"}
+	forumPostListingFiles := []string{"base.html", "forum/post_listing.html"}
 	loadTemplateOrDie(fs, "view_forum/post_listing", forumPostListingFiles...)
 
-	forumReplyFiles := []string{"base.html", "css/common.css", "forum/reply.html"}
+	forumReplyFiles := []string{"base.html", "forum/reply.html"}
 	loadTemplateOrDie(fs, "view_forum/reply", forumReplyFiles...)
 
-	forumThreadFiles := []string{"base.html", "css/common.css", "forum/thread_listing.html"}
+	forumThreadFiles := []string{"base.html", "forum/thread_listing.html"}
 	loadTemplateOrDie(fs, "view_forum/thread_listing", forumThreadFiles...)
 
-	simpleMessageFiles := []string{"base.html", "css/common.css", "simple_message.html"}
+	simpleMessageFiles := []string{"base.html", "simple_message.html"}
 	loadTemplateOrDie(fs, "view_simple_message", simpleMessageFiles...)
 }
 

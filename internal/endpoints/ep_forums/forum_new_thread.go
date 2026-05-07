@@ -26,12 +26,8 @@ func registerForumNewThreadHandlers(mux *http.ServeMux, forumsService service.Fo
 			return
 		}
 
-		readable, err := forumsService.IsForumReadable(r.Context(), forumId)
-		if err != nil {
-			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to load forum.", w, r)
-			return
-		}
-		if !readable {
+		canPost, err := forumThreadService.CanPostThreadInForum(r.Context(), forumId)
+		if err != nil || !canPost {
 			ep_util.RenderErrorHttp404NotFound(w, r)
 			return
 		}
@@ -60,22 +56,8 @@ func registerForumNewThreadHandlers(mux *http.ServeMux, forumsService service.Fo
 			return
 		}
 
-		forum, err := forumsService.GetForumRowById(r.Context(), urlForumId)
-		if err != nil {
-			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to load forum.", w, r)
-			return
-		}
-		if forum == nil {
-			ep_util.RenderErrorHttp404NotFound(w, r)
-			return
-		}
-
-		writable, err := forumThreadService.CanPostThreadInForum(r.Context(), urlForumId)
-		if err != nil {
-			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to load forum.", w, r)
-			return
-		}
-		if !writable {
+		canPost, err := forumThreadService.CanPostThreadInForum(r.Context(), urlForumId)
+		if err != nil || !canPost {
 			ep_util.RenderErrorHttp404NotFound(w, r)
 			return
 		}

@@ -37,7 +37,7 @@ func main() {
 	rootMux.Handle("/static/", rawMux)
 
 	logger.Info(nil, "Preparing static files...")
-	rawMux.Handle("/static/", http.FileServer(http.FS(staticFs)))
+	rawMux.Handle("/static/", staticCacheControl(http.FileServer(http.FS(staticFs))))
 
 	logger.Info(nil, "Preparing templates...")
 	justTemplates, err := fs.Sub(templateFs, "template")
@@ -128,4 +128,11 @@ func main() {
 
 	logger.Info(nil, "Startup complete, listening on :8080")
 	logger.Fatal(nil, http.ListenAndServe(":8080", rootMux))
+}
+
+func staticCacheControl(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "public, max-age=3600")
+		h.ServeHTTP(w, r)
+	})
 }

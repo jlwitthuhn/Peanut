@@ -14,7 +14,7 @@
 			{{ range $post := .Posts }}
 			<div class="forum-post">
 				<div class="forum-post-author">
-					<div class="forum-post-author-name"><a href="#">{{ $post.AuthorName }}</a></div>
+					<div class="forum-post-author-name"><a href="/profile/{{ $post.AuthorId }}">{{ $post.AuthorName }}</a></div>
 					<div class="forum-post-author-info">Details</div>
 				</div>
 				<div class="forum-post-content">

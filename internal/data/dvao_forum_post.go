@@ -13,6 +13,7 @@ import (
 type ForumPostListingViewRow struct {
 	PostId        string
 	ThreadId      string
+	AuthorId      string
 	AuthorName    string
 	PostMessage   string
 	PostTimestamp time.Time
@@ -37,6 +38,7 @@ var sqlCreateViewForumPostListing = `
 		SELECT
 			fp.id AS post_id,
 			fp.thread_id AS thread_id,
+			fp.author_id AS author_id,
 			users.display_name AS author_name,
 			fp.message AS post_message,
 			fp._created AS post_timestamp
@@ -58,7 +60,7 @@ func (*forumPostListingDvaoImpl) CreateDBObjects(ctx context.Context) error {
 
 var sqlSelectForumPostListingByThreadId = `
 	SELECT
-		post_id, thread_id, author_name, post_message, post_timestamp
+		post_id, thread_id, author_id, author_name, post_message, post_timestamp
 	FROM
 		view_forum_post_listing
 	WHERE
@@ -79,7 +81,7 @@ func (*forumPostListingDvaoImpl) SelectByThreadId(ctx context.Context, threadId 
 	var result []ForumPostListingViewRow
 	for rows.Next() {
 		thisRow := ForumPostListingViewRow{}
-		err = rows.Scan(&thisRow.PostId, &thisRow.ThreadId, &thisRow.AuthorName, &thisRow.PostMessage, &thisRow.PostTimestamp)
+		err = rows.Scan(&thisRow.PostId, &thisRow.ThreadId, &thisRow.AuthorId, &thisRow.AuthorName, &thisRow.PostMessage, &thisRow.PostTimestamp)
 		if err != nil {
 			logger.Error(ctx, "Got database error on ForumPostListingDvao/SelectByThreadId scan: ", err)
 			return nil, err

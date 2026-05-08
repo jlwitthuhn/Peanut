@@ -17,18 +17,18 @@ func Format(message string) string {
 }
 
 // formatBlocks groups consecutive lines by quote depth and renders them.
+// Empty normal lines are dropped so the output never contains <p></p>.
 func formatBlocks(lines []string) string {
-	var out strings.Builder
+	var blocks []string
 
 	i := 0
 	for i < len(lines) {
 		depth, _ := quotePrefix(lines[i])
 
 		if depth == 0 {
-			if i > 0 {
-				out.WriteByte('\n')
+			if rendered := formatLine(lines[i]); rendered != "" {
+				blocks = append(blocks, rendered)
 			}
-			out.WriteString(formatLine(lines[i]))
 			i++
 			continue
 		}
@@ -50,15 +50,10 @@ func formatBlocks(lines []string) string {
 			inner[j-start] = rest
 		}
 
-		if start > 0 {
-			out.WriteByte('\n')
-		}
-		out.WriteString("<blockquote>")
-		out.WriteString(formatBlocks(inner))
-		out.WriteString("</blockquote>")
+		blocks = append(blocks, "<blockquote>"+formatBlocks(inner)+"</blockquote>")
 	}
 
-	return out.String()
+	return strings.Join(blocks, "\n")
 }
 
 // quotePrefix returns how many leading `&gt;` markers the line has and the
@@ -93,7 +88,10 @@ func formatLine(line string) string {
 	if level, content, ok := parseHeading(line); ok {
 		return fmt.Sprintf("<h%d>%s</h%d>", level, formatInline(content), level)
 	}
-	return formatInline(line)
+	if strings.TrimSpace(line) == "" {
+		return ""
+	}
+	return "<p>" + formatInline(line) + "</p>"
 }
 
 // parseHeading recognises a markdown `# Title`.

@@ -15,32 +15,32 @@ func TestFormatMessage_Blockquotes(t *testing.T) {
 		{
 			name:  "simple quote",
 			input: "> hello",
-			want:  "<blockquote>hello</blockquote>",
+			want:  "<blockquote><p>hello</p></blockquote>",
 		},
 		{
 			name:  "grouped multi-line quote",
 			input: "> line one\n> line two",
-			want:  "<blockquote>line one\nline two</blockquote>",
+			want:  "<blockquote><p>line one</p>\n<p>line two</p></blockquote>",
 		},
 		{
 			name:  "nested quote",
 			input: ">> inner",
-			want:  "<blockquote><blockquote>inner</blockquote></blockquote>",
+			want:  "<blockquote><blockquote><p>inner</p></blockquote></blockquote>",
 		},
 		{
 			name:  "nested then outer",
 			input: ">> inner\n> outer",
-			want:  "<blockquote><blockquote>inner</blockquote>\nouter</blockquote>",
+			want:  "<blockquote><blockquote><p>inner</p></blockquote>\n<p>outer</p></blockquote>",
 		},
 		{
 			name:  "text before and after quote",
 			input: "before\n> quoted\nafter",
-			want:  "before\n<blockquote>quoted</blockquote>\nafter",
+			want:  "<p>before</p>\n<blockquote><p>quoted</p></blockquote>\n<p>after</p>",
 		},
 		{
 			name:  "inline formatting inside quote",
 			input: "> **bold** and *italic*",
-			want:  "<blockquote><b>bold</b> and <i>italic</i></blockquote>",
+			want:  "<blockquote><p><b>bold</b> and <i>italic</i></p></blockquote>",
 		},
 		{
 			name:  "heading inside quote",
@@ -50,22 +50,22 @@ func TestFormatMessage_Blockquotes(t *testing.T) {
 		{
 			name:  "link inside quote",
 			input: "> [click](https://example.com)",
-			want:  `<blockquote><a href="https://example.com" rel="nofollow">click</a></blockquote>`,
+			want:  `<blockquote><p><a href="https://example.com" rel="nofollow">click</a></p></blockquote>`,
 		},
 		{
 			name:  "triple nested",
 			input: ">>> deep",
-			want:  "<blockquote><blockquote><blockquote>deep</blockquote></blockquote></blockquote>",
+			want:  "<blockquote><blockquote><blockquote><p>deep</p></blockquote></blockquote></blockquote>",
 		},
 		{
 			name:  "html escaped in quote",
 			input: "> <script>alert('xss')</script>",
-			want:  "<blockquote>&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;</blockquote>",
+			want:  "<blockquote><p>&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;</p></blockquote>",
 		},
 		{
 			name:  "no space after arrow",
 			input: ">nospace",
-			want:  "<blockquote>nospace</blockquote>",
+			want:  "<blockquote><p>nospace</p></blockquote>",
 		},
 		{
 			name:  "empty quote",
@@ -75,7 +75,7 @@ func TestFormatMessage_Blockquotes(t *testing.T) {
 		{
 			name:  "mixed depths",
 			input: "> a\n>> b\n>> c\n> d",
-			want:  "<blockquote>a\n<blockquote>b\nc</blockquote>\nd</blockquote>",
+			want:  "<blockquote><p>a</p>\n<blockquote><p>b</p>\n<p>c</p></blockquote>\n<p>d</p></blockquote>",
 		},
 	}
 
@@ -98,17 +98,17 @@ func TestFormatMessage_PerLineTags(t *testing.T) {
 		{
 			name:  "bold",
 			input: "**hello**",
-			want:  "<b>hello</b>",
+			want:  "<p><b>hello</b></p>",
 		},
 		{
 			name:  "italic",
 			input: "*hello*",
-			want:  "<i>hello</i>",
+			want:  "<p><i>hello</i></p>",
 		},
 		{
 			name:  "strikethrough",
 			input: "~~hello~~",
-			want:  "<s>hello</s>",
+			want:  "<p><s>hello</s></p>",
 		},
 		{
 			name:  "heading",
@@ -118,27 +118,42 @@ func TestFormatMessage_PerLineTags(t *testing.T) {
 		{
 			name:  "link",
 			input: "[text](https://example.com)",
-			want:  `<a href="https://example.com" rel="nofollow">text</a>`,
+			want:  `<p><a href="https://example.com" rel="nofollow">text</a></p>`,
 		},
 		{
 			name:  "image",
 			input: "![alt](https://example.com/img.png)",
-			want:  `<img src="https://example.com/img.png" alt="alt">`,
+			want:  `<p><img src="https://example.com/img.png" alt="alt"></p>`,
 		},
 		{
 			name:  "multi-line",
 			input: "line one\nline two\nline three",
-			want:  "line one\nline two\nline three",
+			want:  "<p>line one</p>\n<p>line two</p>\n<p>line three</p>",
+		},
+		{
+			name:  "blank lines dropped",
+			input: "line one\n\nline two",
+			want:  "<p>line one</p>\n<p>line two</p>",
+		},
+		{
+			name:  "only blank lines",
+			input: "\n\n",
+			want:  "",
+		},
+		{
+			name:  "heading then paragraph",
+			input: "# Title\nbody",
+			want:  "<h1>Title</h1>\n<p>body</p>",
 		},
 		{
 			name:  "html escaping",
 			input: "<b>not bold</b>",
-			want:  "&lt;b&gt;not bold&lt;/b&gt;",
+			want:  "<p>&lt;b&gt;not bold&lt;/b&gt;</p>",
 		},
 		{
 			name:  "script injection",
 			input: "<script>alert('xss')</script>",
-			want:  "&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;",
+			want:  "<p>&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;</p>",
 		},
 	}
 

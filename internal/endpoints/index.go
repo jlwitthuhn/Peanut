@@ -5,11 +5,13 @@
 package endpoints
 
 import (
+	"html/template"
 	"net/http"
 	"peanut/internal/data/configkey"
 	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/logger"
+	"peanut/internal/msgfmt"
 	"peanut/internal/service"
 )
 
@@ -23,7 +25,7 @@ func RegisterIndexHandlers(mux *http.ServeMux, configService service.ConfigServi
 		}
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
-		templateCtx["WelcomeMessage"] = welcomeMessage
+		templateCtx["WelcomeMessage"] = template.HTML(msgfmt.Format(welcomeMessage))
 		ep_util.RenderTemplate("view_index", templateCtx, w, r)
 	})
 	mux.Handle("GET /{$}", getIndexHandler)

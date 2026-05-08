@@ -520,6 +520,19 @@ td {
 	margin-top: 0.6rem;
 }
 
+.forum-post-body blockquote {
+	margin: 0.6rem 0;
+	padding: 0.5rem 0.75rem;
+	border: 1px solid var(--border);
+	border-left: 3px solid var(--accent);
+	border-radius: var(--radius-sm);
+	background-color: var(--accent-transparent);
+}
+
+.forum-post-body blockquote blockquote {
+	margin: 0.4rem 0;
+}
+
 .forum-post-actions {
 	padding: 0.4rem 0.75rem;
 	font-size: 0.8em;

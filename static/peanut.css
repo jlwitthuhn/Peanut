@@ -254,7 +254,7 @@ td {
 	padding: var(--pad);
 }
 
-.panel-body>p+p {
+.panel-body > p + p {
 	margin-top: 0.3rem;
 }
 
@@ -335,7 +335,7 @@ td {
 	justify-content: center;
 }
 
-.data-row.data-header>.data-cell {
+.data-row.data-header > .data-cell {
 	color: var(--text);
 	font-weight: 600;
 	font-size: 0.78em;
@@ -344,7 +344,7 @@ td {
 	border-top: none;
 }
 
-.data-row:nth-child(odd)>.data-cell {
+.data-row:nth-child(odd) > .data-cell {
 	background-color: var(--bg-alt-2);
 }
 
@@ -520,7 +520,7 @@ td {
 	flex: 1;
 }
 
-.forum-post-body p+p {
+.forum-post-body p + p {
 	margin-top: 0.6rem;
 }
 

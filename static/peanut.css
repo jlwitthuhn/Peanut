@@ -581,8 +581,29 @@ td {
 
 .forum-post-actions {
 	padding: 0.4rem 0.75rem;
-	font-size: 0.8em;
 	border-top: 1px solid var(--border-muted);
 	display: flex;
-	gap: 1rem;
+	gap: 0.5rem;
+}
+
+.forum-post-actions button {
+	padding: 0.15rem 0.5rem;
+	font-size: 0.8em;
+	background-color: var(--bg-alt-2);
+	color: var(--text);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-sm);
+	font-weight: 600;
+	font-family: inherit;
+}
+
+.forum-post-actions button:hover {
+	background-color: var(--border);
+	border-color: var(--text-muted);
+}
+
+.forum-post-actions button:not(:disabled):active {
+	transform: translateY(1px);
+	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25);
+	filter: brightness(0.9);
 }

@@ -35,11 +35,12 @@
 					<div class="forum-post-body">
 						<p>{{ $post.PostMessage }}</p>
 					</div>
-					<div class="forum-post-actions">
-						<a href="#">Quote</a>
-						<a href="#">Edit</a>
-						<a href="#">Report</a>
-					</div>
+					<form class="forum-post-actions" method="post">
+						<input type="hidden" name="csrf" value="{{ $.CsrfToken }}">
+						<button type="submit">Quote</button>
+						<button type="submit">Edit</button>
+						<button type="submit">Report</button>
+					</form>
 				</div>
 			</div>
 			{{ end }}

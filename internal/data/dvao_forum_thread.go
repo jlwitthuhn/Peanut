@@ -36,19 +36,32 @@ type forumThreadSummaryDvaoImpl struct{}
 
 var sqlCreateViewForumThreadSummary = `
 	CREATE VIEW view_forum_thread_summary AS
-	SELECT
-		ft.id AS thread_id,
-		ft.forum_id AS forum_id,
-		ft.author_id AS author_id,
-		ft.visibility as thread_visibility,
-		ft.title AS thread_name,
-		us.display_name AS author_name,
-		0 AS reply_count,
-		ft._created AS thread_created,
-		ft._created AS last_post_date,
-		NULL::INTEGER AS unread_post_count
-	FROM forum_threads ft
-		INNER JOIN users us ON ft.author_id = us.id
+	(
+		WITH
+		q_post_stats_by_thread_id AS (
+			SELECT
+				thread_id, COUNT(*) AS post_count, MAX(_created) AS last_post_date
+			FROM
+				forum_posts
+			GROUP BY
+				thread_id
+		)
+
+		SELECT
+			ft.id AS thread_id,
+			ft.forum_id AS forum_id,
+			ft.author_id AS author_id,
+			ft.visibility as thread_visibility,
+			ft.title AS thread_name,
+			us.display_name AS author_name,
+			(ps.post_count - 1) AS reply_count,
+			ft._created AS thread_created,
+			ps.last_post_date AS last_post_date,
+			NULL::INTEGER AS unread_post_count
+		FROM forum_threads ft
+			INNER JOIN users us ON ft.author_id = us.id
+			INNER JOIN q_post_stats_by_thread_id ps ON ft.id = ps.thread_id
+	)
 `
 
 func (*forumThreadSummaryDvaoImpl) CreateDBObjects(ctx context.Context) error {

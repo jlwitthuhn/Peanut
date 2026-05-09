@@ -3,7 +3,24 @@
 	<div class="layout-main">
 		<div class="breadcrumb-row">
 			<p class="breadcrumb"><a href="/forum/section/{{ .SectionId }}">{{ .SectionName }}</a> &rsaquo; <a href="/forum/index/{{ .ForumId }}">{{ .ForumName }}</a></p>
-			{{ if .CanPostThread }}<a href="/forum/new_thread/{{ .ForumId }}" class="primary-button">New Thread</a>{{ end }}
+		</div>
+		<div class="action-row">
+			{{ if .CanPostThread }}<a href="/forum/new_thread/{{ .ForumId }}" class="primary-button">New Thread</a>{{ else }}<span></span>{{ end }}
+			<nav class="pagination">
+				<a href="#" class="step" title="Previous page">&lsaquo;</a>
+				<a href="#">1</a>
+				<span class="ellipsis">&hellip;</span>
+				<a href="#">7</a>
+				<a href="#">8</a>
+				<a href="#">9</a>
+				<span class="current" aria-current="page">10</span>
+				<a href="#">11</a>
+				<a href="#">12</a>
+				<a href="#">13</a>
+				<span class="ellipsis">&hellip;</span>
+				<a href="#">42</a>
+				<a href="#" class="step" title="Next page">&rsaquo;</a>
+			</nav>
 		</div>
 		<div class="data-table cols-thread">
 			<div class="data-row data-header">

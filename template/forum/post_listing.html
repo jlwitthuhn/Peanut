@@ -5,7 +5,20 @@
 			<p class="breadcrumb">
 				<a href="/forum/section/{{ .SectionId }}">{{ .SectionName }}</a> &rsaquo; <a href="/forum/index/{{ .ForumId }}">{{ .ForumName }}</a> &rsaquo; <a href="/forum/thread/{{ .ThreadId }}">{{ .ThreadTitle }}</a>
 			</p>
-			{{ if .CanReply }}<a href="/forum/thread/{{ .ThreadId }}/reply" class="primary-button">Reply</a>{{ end }}
+		</div>
+		<div class="action-row">
+			{{ if .CanReply }}<a href="/forum/thread/{{ .ThreadId }}/reply" class="primary-button">Reply</a>{{ else }}<span></span>{{ end }}
+			<nav class="pagination">
+				<a href="#" class="step" title="Previous page">&lsaquo;</a>
+				<a href="#">1</a>
+				<span class="current" aria-current="page">2</span>
+				<a href="#">3</a>
+				<a href="#">4</a>
+				<a href="#">5</a>
+				<span class="ellipsis">&hellip;</span>
+				<a href="#">17</a>
+				<a href="#" class="step" title="Next page">&rsaquo;</a>
+			</nav>
 		</div>
 		<div class="panel">
 			<div class="panel-header">

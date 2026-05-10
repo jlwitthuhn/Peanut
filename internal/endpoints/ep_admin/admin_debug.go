@@ -13,7 +13,7 @@ import (
 	"peanut/internal/service"
 )
 
-func registerAdminDebugHandlers(mux *http.ServeMux, forumService service.ForumService, forumThreadhreadService service.ForumThreadService) {
+func registerAdminDebugHandlers(mux *http.ServeMux, forumService service.ForumService, forumThreadService service.ForumThreadService) {
 	getDataHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		ep_util.RenderTemplate("view_admin/debug", templateCtx, w, r)
@@ -37,7 +37,7 @@ func registerAdminDebugHandlers(mux *http.ServeMux, forumService service.ForumSe
 			return
 		}
 
-		_, err = forumService.CreateForum(ctx, section1Id, "Forum 2", "The second forum", 2, "Public")
+		forum2Id, err := forumService.CreateForum(ctx, section1Id, "Forum 2", "The second forum", 2, "Public")
 		if err != nil {
 			logger.Error(ctx, "Failed to create Forum 2: ", err)
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to create Forum 2.", w, r)
@@ -65,29 +65,35 @@ This is a thread for testing threads.
 ## Subtitle
 *Markdown* formatting works here. This thread has **many** replies.
 `
-		thread1Id, err := forumThreadhreadService.CreateThread(ctx, forum1Id, "Test Thread 1", message1)
+		thread1Id, err := forumThreadService.CreateThread(ctx, forum1Id, "Test Thread 1", message1)
 		if err != nil {
 			logger.Error(ctx, "Failed to create test thread 1: ", err)
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to create test thread 1.", w, r)
 			return
 		}
 
-		thread2Id, err := forumThreadhreadService.CreateThread(ctx, forum1Id, "Test Thread 2", "This is another test thread.")
+		thread2Id, err := forumThreadService.CreateThread(ctx, forum1Id, "Test Thread 2", "This is another test thread.")
 		if err != nil {
 			logger.Error(ctx, "Failed to create test thread 2: ", err)
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("This thread only has a few replies.", w, r)
 			return
 		}
 
-		for i := 1; i <= 100; i++ {
-			_, err = forumThreadhreadService.AddThreadPost(ctx, thread1Id, fmt.Sprintf("Reply %d", i))
+		for i := 1; i <= 120; i++ {
+			_, err = forumThreadService.AddThreadPost(ctx, thread1Id, fmt.Sprintf("Reply %d", i))
 			if err != nil {
 				logger.Error(ctx, "Failed to add reply to thread1: ", err)
 				ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to add reply thread1.", w, r)
 				return
 			}
+			_, err = forumThreadService.CreateThread(ctx, forum2Id, fmt.Sprintf("Multi thread %d", i), "Empty thread")
+			if err != nil {
+				logger.Error(ctx, "Failed to add thread to forum2: ", err)
+				ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to add thread to forum2.", w, r)
+				return
+			}
 			if i < 10 {
-				_, err = forumThreadhreadService.AddThreadPost(ctx, thread2Id, fmt.Sprintf("Reply %d", i))
+				_, err = forumThreadService.AddThreadPost(ctx, thread2Id, fmt.Sprintf("Reply %d", i))
 				if err != nil {
 					logger.Error(ctx, "Failed to add reply to thread2: ", err)
 					ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to add reply thread2.", w, r)

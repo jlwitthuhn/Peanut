@@ -71,8 +71,8 @@ func main() {
 	configService := service.NewConfigService(configDao, systemLogDao)
 	setupConfigService := service.NewSetupConfigService(configDao, systemLogDao)
 	dbService := service.NewDatabaseService(metaDao)
-	forumsService := service.NewForumService(forumsDao, forumSectionsDao, forumHomeDvao, systemLogDao)
-	forumThreadService := service.NewForumThreadService(forumsService, forumPostsDao, forumThreadsDao, forumThreadSummaryDvao, forumPostListingDvao)
+	forumService := service.NewForumService(forumsDao, forumSectionsDao, forumHomeDvao, systemLogDao)
+	forumThreadService := service.NewForumThreadService(forumService, forumPostsDao, forumThreadsDao, forumThreadSummaryDvao, forumPostListingDvao)
 	groupService := service.NewGroupService(groupDao, groupMembershipDao, multiTableDao)
 	scheduledJobService := service.NewScheduledJobService(metaDao, multiTableDao, scheduledJobDao, scheduledJobRunDao, sessionDao, dbService)
 	sessionService := service.NewSessionService(sessionDao, sessionStringDao, userDao)
@@ -94,12 +94,13 @@ func main() {
 		middlewareMux,
 		configService,
 		dbService,
-		forumsService,
+		forumService,
+		forumThreadService,
 		groupService,
 		scheduledJobService,
 		sessionService,
 		userService)
-	ep_forums.RegisterForumHandlers(middlewareMux, forumsService, forumThreadService)
+	ep_forums.RegisterForumHandlers(middlewareMux, forumService, forumThreadService)
 	endpoints.RegisterIndexHandlers(middlewareMux, configService)
 	endpoints.RegisterLoginHandlers(middlewareMux, sessionService)
 	endpoints.RegisterLogoutHandlers(middlewareMux, sessionService)

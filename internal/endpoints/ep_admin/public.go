@@ -17,7 +17,8 @@ func RegisterAdminHandlers(
 	mux *http.ServeMux,
 	configService service.ConfigService,
 	databaseService service.DatabaseService,
-	forumsService service.ForumService,
+	forumService service.ForumService,
+	forumThreadService service.ForumThreadService,
 	groupService service.GroupService,
 	scheduledJobService service.ScheduledJobService,
 	sessionService service.SessionService,
@@ -25,12 +26,12 @@ func RegisterAdminHandlers(
 ) {
 	adminMux := http.NewServeMux()
 	registerAdminIndexHandlers(adminMux, configService, databaseService, sessionService, userService)
-	registerAdminForumsHandlers(adminMux, forumsService)
+	registerAdminForumsHandlers(adminMux, forumService)
 	registerAdminFrontPageHandlers(adminMux, configService)
 	registerAdminGroupsHandlers(adminMux, groupService)
 	registerAdminScheduledJobHandlers(adminMux, scheduledJobService)
 	registerAdminUsersHandlers(adminMux, groupService, userService)
-	registerAdminDebugHandlers(adminMux, forumsService)
+	registerAdminDebugHandlers(adminMux, forumService, forumThreadService)
 
 	wrappedAdminMux := middleware.WrapHandler(adminMux, middleware.CheckPermissions(perms.Admin_Gui_View))
 

@@ -13,12 +13,20 @@ import (
 	"peanut/internal/security/perms"
 )
 
+const ForumThreadsPerPage = 20
+
+type ForumThreadListing struct {
+	Threads     []data.ForumThreadSummaryViewRow
+	CurrentPage int
+	TotalPages  int
+}
+
 type ForumThreadService interface {
 	AddThreadPost(ctx context.Context, threadId string, message string) (string, error)
 	CanPostReplyInThread(ctx context.Context, forumId string) (bool, error)
 	CanPostThreadInForum(ctx context.Context, forumId string) (bool, error)
 	CreateThread(ctx context.Context, forumId string, title string, message string) (string, error)
-	GetForumThreadSummaryViewRowByForumIdPublic(ctx context.Context, forumId string) ([]data.ForumThreadSummaryViewRow, error)
+	GetForumThreadListingPublic(ctx context.Context, forumId string, pageNum int) (*ForumThreadListing, error)
 	GetThreadRowById(ctx context.Context, id string) (*data.ForumThreadRow, error)
 	GetPostsByThreadId(ctx context.Context, threadId string) ([]data.ForumPostListingViewRow, error)
 }
@@ -82,9 +90,32 @@ func (this *forumThreadServiceImpl) CanPostReplyInThread(ctx context.Context, fo
 	return this.forumService.IsForumReadable(ctx, forumId)
 }
 
-func (this *forumThreadServiceImpl) GetForumThreadSummaryViewRowByForumIdPublic(ctx context.Context, forumId string) ([]data.ForumThreadSummaryViewRow, error) {
-	result, err := this.forumThreadSummaryDvao.SelectForumThreadSummaryViewRowByForumIdPublic(ctx, forumId)
-	return result, err
+func (this *forumThreadServiceImpl) GetForumThreadListingPublic(ctx context.Context, forumId string, pageNum int) (*ForumThreadListing, error) {
+	totalThreads, err := this.forumThreadSummaryDvao.CountForumThreadSummaryViewRowByForumIdPublic(ctx, forumId)
+	if err != nil {
+		return nil, err
+	}
+
+	totalPages := int((totalThreads + ForumThreadsPerPage - 1) / ForumThreadsPerPage)
+	if totalPages < 1 {
+		totalPages = 1
+	}
+
+	if pageNum < 1 || pageNum > totalPages {
+		return nil, nil
+	}
+
+	beginIndex := (pageNum - 1) * ForumThreadsPerPage
+	threads, err := this.forumThreadSummaryDvao.SelectPageForumThreadSummaryViewRowByForumIdPublic(ctx, forumId, beginIndex, ForumThreadsPerPage)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ForumThreadListing{
+		Threads:     threads,
+		CurrentPage: pageNum,
+		TotalPages:  totalPages,
+	}, nil
 }
 
 func (this *forumThreadServiceImpl) GetThreadRowById(ctx context.Context, id string) (*data.ForumThreadRow, error) {

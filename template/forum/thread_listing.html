@@ -6,21 +6,19 @@
 		</div>
 		<div class="action-row">
 			{{ if .CanPostThread }}<a href="/forum/new_thread/{{ .ForumId }}" class="primary-button">New Thread</a>{{ else }}<span></span>{{ end }}
+			{{ if .Pagination.Show }}
 			<nav class="pagination">
-				<a href="#" class="step" title="Previous page">&lsaquo;</a>
-				<a href="#">1</a>
-				<span class="ellipsis">&hellip;</span>
-				<a href="#">7</a>
-				<a href="#">8</a>
-				<a href="#">9</a>
-				<span class="current" aria-current="page">10</span>
-				<a href="#">11</a>
-				<a href="#">12</a>
-				<a href="#">13</a>
-				<span class="ellipsis">&hellip;</span>
-				<a href="#">42</a>
-				<a href="#" class="step" title="Next page">&rsaquo;</a>
+				{{ if .Pagination.HasPrev }}<a href="{{ .Pagination.PrevUrl }}" class="step" title="Previous page">&lsaquo;</a>{{ end }}
+				{{ range $item := .Pagination.Items }}
+					{{ if $item.IsEllipsis }}<span class="ellipsis">&hellip;</span>
+					{{ else if $item.IsCurrent }}<span class="current" aria-current="page">{{ $item.Number }}</span>
+					{{ else }}<a href="{{ $item.Url }}">{{ $item.Number }}</a>{{ end }}
+				{{ end }}
+				{{ if .Pagination.HasNext }}<a href="{{ .Pagination.NextUrl }}" class="step" title="Next page">&rsaquo;</a>{{ end }}
 			</nav>
+			{{ else }}
+			<span></span>
+			{{ end }}
 		</div>
 		<div class="data-table cols-thread">
 			<div class="data-row data-header">

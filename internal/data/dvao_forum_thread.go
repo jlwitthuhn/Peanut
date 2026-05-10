@@ -25,7 +25,8 @@ type ForumThreadSummaryViewRow struct {
 
 type ForumThreadSummaryDvao interface {
 	CreateDBObjects(ctx context.Context) error
-	SelectForumThreadSummaryViewRowByForumIdPublic(ctx context.Context, forumId string) ([]ForumThreadSummaryViewRow, error)
+	CountForumThreadSummaryViewRowByForumIdPublic(ctx context.Context, forumId string) (int64, error)
+	SelectPageForumThreadSummaryViewRowByForumIdPublic(ctx context.Context, forumId string, beginIndex int, count int) ([]ForumThreadSummaryViewRow, error)
 }
 
 func NewForumThreadSummaryDvao() ForumThreadSummaryDvao {
@@ -61,8 +62,6 @@ var sqlCreateViewForumThreadSummary = `
 		FROM forum_threads ft
 			INNER JOIN users us ON ft.author_id = us.id
 			INNER JOIN q_post_stats_by_thread_id ps ON ft.id = ps.thread_id
-		ORDER BY
-			ft._created DESC, ft.id DESC
 	)
 `
 
@@ -76,7 +75,28 @@ func (*forumThreadSummaryDvaoImpl) CreateDBObjects(ctx context.Context) error {
 	return nil
 }
 
-var sqlSelectForumThreadSummaryViewRowByForumIdPublic = `
+var sqlCountForumThreadSummaryViewRowByForumIdPublic = `
+	SELECT
+		COUNT(*)
+	FROM
+		view_forum_thread_summary
+	WHERE
+	    forum_id = $1 AND thread_visibility = 'Public'
+`
+
+func (*forumThreadSummaryDvaoImpl) CountForumThreadSummaryViewRowByForumIdPublic(ctx context.Context, forumId string) (int64, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
+	var count int64
+	row := sqlh.QueryRow(sqlCountForumThreadSummaryViewRowByForumIdPublic, forumId)
+	err := row.Scan(&count)
+	if err != nil {
+		logger.Error(ctx, "Got database error on ForumThreadSummaryDvao/CountForumThreadSummaryViewRowByForumIdPublic query: ", err)
+		return 0, err
+	}
+	return count, nil
+}
+
+var sqlSelectForumThreadSummaryViewRowByForumIdPublicPaged = `
 	SELECT
 		thread_id, forum_id, author_id, thread_visibility, thread_name, author_name, reply_count, thread_created, last_post_date, unread_post_count
 	FROM
@@ -84,14 +104,15 @@ var sqlSelectForumThreadSummaryViewRowByForumIdPublic = `
 	WHERE
 	    forum_id = $1 AND thread_visibility = 'Public'
 	ORDER BY
-	    last_post_date DESC
+	    last_post_date DESC, thread_id DESC
+	LIMIT $2 OFFSET $3
 `
 
-func (*forumThreadSummaryDvaoImpl) SelectForumThreadSummaryViewRowByForumIdPublic(ctx context.Context, forumId string) ([]ForumThreadSummaryViewRow, error) {
+func (*forumThreadSummaryDvaoImpl) SelectPageForumThreadSummaryViewRowByForumIdPublic(ctx context.Context, forumId string, beginIndex int, count int) ([]ForumThreadSummaryViewRow, error) {
 	sqlh := getSqlExecutorFromContext(ctx)
-	rows, err := sqlh.Query(sqlSelectForumThreadSummaryViewRowByForumIdPublic, forumId)
+	rows, err := sqlh.Query(sqlSelectForumThreadSummaryViewRowByForumIdPublicPaged, forumId, count, beginIndex)
 	if err != nil {
-		logger.Error(ctx, "Got database error on ForumThreadSummaryDvao/SelectForumThreadSummaryViewRowByForumIdPublic query: ", err)
+		logger.Error(ctx, "Got database error on ForumThreadSummaryDvao/SelectPageForumThreadSummaryViewRowByForumIdPublic query: ", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -101,7 +122,7 @@ func (*forumThreadSummaryDvaoImpl) SelectForumThreadSummaryViewRowByForumIdPubli
 		thisRow := ForumThreadSummaryViewRow{}
 		err = rows.Scan(&thisRow.ThreadId, &thisRow.ForumId, &thisRow.AuthorId, &thisRow.ThreadVisibility, &thisRow.ThreadName, &thisRow.AuthorName, &thisRow.ReplyCount, &thisRow.ThreadCreated, &thisRow.LastPostDate, &thisRow.UnreadPostCount)
 		if err != nil {
-			logger.Error(ctx, "Got database error on ForumThreadSummaryDvao/SelectForumThreadSummaryViewRowByForumIdPublic scan: ", err)
+			logger.Error(ctx, "Got database error on ForumThreadSummaryDvao/SelectPageForumThreadSummaryViewRowByForumIdPublic scan: ", err)
 			return nil, err
 		}
 		result = append(result, thisRow)

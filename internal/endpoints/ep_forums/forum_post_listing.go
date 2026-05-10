@@ -5,11 +5,19 @@
 package ep_forums
 
 import (
+	"html/template"
 	"net/http"
+	"peanut/internal/data"
 	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
+	"peanut/internal/msgfmt"
 	"peanut/internal/service"
 )
+
+type forumPostListingItem struct {
+	data.ForumPostListingViewRow
+	FormattedMessage template.HTML
+}
 
 func registerForumPostListingHandlers(mux *http.ServeMux, forumsService service.ForumService, forumThreadService service.ForumThreadService) {
 	getPostListingHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -57,6 +65,14 @@ func registerForumPostListingHandlers(mux *http.ServeMux, forumsService service.
 			return
 		}
 
+		postItems := make([]forumPostListingItem, len(posts))
+		for i, post := range posts {
+			postItems[i] = forumPostListingItem{
+				ForumPostListingViewRow: post,
+				FormattedMessage:        template.HTML(msgfmt.Format(post.PostMessage)),
+			}
+		}
+
 		canReply, err := forumThreadService.CanPostReplyInThread(r.Context(), thread.ForumId)
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to check permissions.", w, r)
@@ -71,7 +87,7 @@ func registerForumPostListingHandlers(mux *http.ServeMux, forumsService service.
 		templateCtx["ForumName"] = forum.Name
 		templateCtx["SectionId"] = section.Id
 		templateCtx["SectionName"] = section.Name
-		templateCtx["Posts"] = posts
+		templateCtx["Posts"] = postItems
 		ep_util.RenderTemplate("view_forum/post_listing", templateCtx, w, r)
 	})
 	mux.Handle("GET /forum/thread/{threadId}", getPostListingHandler)

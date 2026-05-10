@@ -33,7 +33,7 @@
 				<div class="forum-post-content">
 					<div class="forum-post-meta">Posted: {{ $post.PostTimestamp.Format "2006-01-02 15:04:05" }}</div>
 					<div class="forum-post-body">
-						<p>{{ $post.PostMessage }}</p>
+						{{ $post.FormattedMessage }}
 					</div>
 					<form class="forum-post-actions" method="post">
 						<input type="hidden" name="csrf" value="{{ $.CsrfToken }}">

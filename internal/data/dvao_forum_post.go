@@ -66,7 +66,7 @@ var sqlSelectForumPostListingByThreadId = `
 	WHERE
 		thread_id = $1
 	ORDER BY
-		post_timestamp ASC
+		post_timestamp, post_id
 `
 
 func (*forumPostListingDvaoImpl) SelectByThreadId(ctx context.Context, threadId string) ([]ForumPostListingViewRow, error) {

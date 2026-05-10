@@ -11,7 +11,6 @@ import (
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/logger"
 	"peanut/internal/service"
-	"time"
 )
 
 func registerAdminDebugHandlers(mux *http.ServeMux, forumService service.ForumService, forumThreadhreadService service.ForumThreadService) {
@@ -81,7 +80,6 @@ This is a thread for testing threads.
 		}
 
 		for i := 1; i <= 100; i++ {
-			time.Sleep(time.Millisecond)
 			_, err = forumThreadhreadService.AddThreadPost(ctx, thread1Id, fmt.Sprintf("Reply %d", i))
 			if err != nil {
 				logger.Error(ctx, "Failed to add reply to thread1: ", err)

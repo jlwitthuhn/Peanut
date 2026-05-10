@@ -10,86 +10,17 @@ import (
 	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/service"
-	"sort"
 	"strconv"
 )
 
-type paginationItem struct {
-	Number     int
-	Url        string
-	IsCurrent  bool
-	IsEllipsis bool
-}
-
-type paginationWidget struct {
-	Show    bool
-	Items   []paginationItem
-	HasPrev bool
-	PrevUrl string
-	HasNext bool
-	NextUrl string
-}
-
-func buildThreadListingPagination(forumId string, currentPage int, totalPages int) paginationWidget {
-	pageUrl := func(p int) string {
+func registerForumThreadListingHandlers(mux *http.ServeMux, forumsService service.ForumService, forumThreadService service.ForumThreadService) {
+	pageUrl := func(forumId string, p int) string {
 		if p == 1 {
 			return "/forum/index/" + forumId
 		}
 		return fmt.Sprintf("/forum/index/%s/page/%d", forumId, p)
 	}
 
-	pageSet := map[int]bool{}
-	addPage := func(p int) {
-		if p >= 1 && p <= totalPages {
-			pageSet[p] = true
-		}
-	}
-	addPage(1)
-	addPage(2)
-	addPage(currentPage - 2)
-	addPage(currentPage - 1)
-	addPage(currentPage)
-	addPage(currentPage + 1)
-	addPage(currentPage + 2)
-	addPage(totalPages - 1)
-	addPage(totalPages)
-
-	sorted := make([]int, 0, len(pageSet))
-	for p := range pageSet {
-		sorted = append(sorted, p)
-	}
-	sort.Ints(sorted)
-
-	items := make([]paginationItem, 0, len(sorted))
-	prev := 0
-	for _, p := range sorted {
-		if prev != 0 && p > prev+1 {
-			items = append(items, paginationItem{IsEllipsis: true})
-		}
-		items = append(items, paginationItem{
-			Number:    p,
-			Url:       pageUrl(p),
-			IsCurrent: p == currentPage,
-		})
-		prev = p
-	}
-
-	widget := paginationWidget{
-		Show:    totalPages > 1,
-		Items:   items,
-		HasPrev: currentPage > 1,
-		HasNext: currentPage < totalPages,
-	}
-	if widget.HasPrev {
-		widget.PrevUrl = pageUrl(currentPage - 1)
-	}
-	if widget.HasNext {
-		widget.NextUrl = pageUrl(currentPage + 1)
-	}
-	return widget
-}
-
-func registerForumThreadListingHandlers(mux *http.ServeMux, forumsService service.ForumService, forumThreadService service.ForumThreadService) {
 	renderPage := func(w http.ResponseWriter, r *http.Request, forumId string, pageNum int) {
 		forum, err := forumsService.GetForumRowById(r.Context(), forumId)
 		if err != nil {
@@ -133,6 +64,10 @@ func registerForumThreadListingHandlers(mux *http.ServeMux, forumsService servic
 			return
 		}
 
+		pagination := ep_util.BuildPagination(page.CurrentPage, page.TotalPages, func(p int) string {
+			return pageUrl(forum.Id, p)
+		})
+
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["ForumId"] = forum.Id
 		templateCtx["ForumName"] = forum.Name
@@ -140,7 +75,7 @@ func registerForumThreadListingHandlers(mux *http.ServeMux, forumsService servic
 		templateCtx["SectionName"] = section.Name
 		templateCtx["Threads"] = page.Threads
 		templateCtx["CanPostThread"] = writable
-		templateCtx["Pagination"] = buildThreadListingPagination(forum.Id, page.CurrentPage, page.TotalPages)
+		templateCtx["Pagination"] = pagination
 		ep_util.RenderTemplate("view_forum/thread_listing", templateCtx, w, r)
 	}
 
@@ -159,7 +94,7 @@ func registerForumThreadListingHandlers(mux *http.ServeMux, forumsService servic
 			return
 		}
 		if pageNum == 1 {
-			http.Redirect(w, r, "/forum/index/"+forumId, http.StatusMovedPermanently)
+			http.Redirect(w, r, pageUrl(forumId, 1), http.StatusMovedPermanently)
 			return
 		}
 		renderPage(w, r, forumId, pageNum)

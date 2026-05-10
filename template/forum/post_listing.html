@@ -8,17 +8,19 @@
 		</div>
 		<div class="action-row">
 			{{ if .CanReply }}<a href="/forum/thread/{{ .ThreadId }}/reply" class="primary-button">Reply</a>{{ else }}<span></span>{{ end }}
+			{{ if .Pagination.Show }}
 			<nav class="pagination">
-				<a href="#" class="step" title="Previous page">&lsaquo;</a>
-				<a href="#">1</a>
-				<span class="current" aria-current="page">2</span>
-				<a href="#">3</a>
-				<a href="#">4</a>
-				<a href="#">5</a>
-				<span class="ellipsis">&hellip;</span>
-				<a href="#">17</a>
-				<a href="#" class="step" title="Next page">&rsaquo;</a>
+				{{ if .Pagination.HasPrev }}<a href="{{ .Pagination.PrevUrl }}" class="step" title="Previous page">&lsaquo;</a>{{ end }}
+				{{ range $item := .Pagination.Items }}
+					{{ if $item.IsEllipsis }}<span class="ellipsis">&hellip;</span>
+					{{ else if $item.IsCurrent }}<span class="current" aria-current="page">{{ $item.Number }}</span>
+					{{ else }}<a href="{{ $item.Url }}">{{ $item.Number }}</a>{{ end }}
+				{{ end }}
+				{{ if .Pagination.HasNext }}<a href="{{ .Pagination.NextUrl }}" class="step" title="Next page">&rsaquo;</a>{{ end }}
 			</nav>
+			{{ else }}
+			<span></span>
+			{{ end }}
 		</div>
 		<div class="panel">
 			<div class="panel-header">
@@ -47,17 +49,19 @@
 		</div>
 		<div class="action-row">
 			{{ if .CanReply }}<a href="/forum/thread/{{ .ThreadId }}/reply" class="primary-button">Reply</a>{{ else }}<span></span>{{ end }}
+			{{ if .Pagination.Show }}
 			<nav class="pagination">
-				<a href="#" class="step" title="Previous page">&lsaquo;</a>
-				<a href="#">1</a>
-				<span class="current" aria-current="page">2</span>
-				<a href="#">3</a>
-				<a href="#">4</a>
-				<a href="#">5</a>
-				<span class="ellipsis">&hellip;</span>
-				<a href="#">17</a>
-				<a href="#" class="step" title="Next page">&rsaquo;</a>
+				{{ if .Pagination.HasPrev }}<a href="{{ .Pagination.PrevUrl }}" class="step" title="Previous page">&lsaquo;</a>{{ end }}
+				{{ range $item := .Pagination.Items }}
+					{{ if $item.IsEllipsis }}<span class="ellipsis">&hellip;</span>
+					{{ else if $item.IsCurrent }}<span class="current" aria-current="page">{{ $item.Number }}</span>
+					{{ else }}<a href="{{ $item.Url }}">{{ $item.Number }}</a>{{ end }}
+				{{ end }}
+				{{ if .Pagination.HasNext }}<a href="{{ .Pagination.NextUrl }}" class="step" title="Next page">&rsaquo;</a>{{ end }}
 			</nav>
+			{{ else }}
+			<span></span>
+			{{ end }}
 		</div>
 	</div>
 </div>

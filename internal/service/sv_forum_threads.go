@@ -14,9 +14,16 @@ import (
 )
 
 const ForumThreadsPerPage = 20
+const ForumPostsPerPage = 20
 
 type ForumThreadListing struct {
 	Threads     []data.ForumThreadSummaryViewRow
+	CurrentPage int
+	TotalPages  int
+}
+
+type ForumPostListing struct {
+	Posts       []data.ForumPostListingViewRow
 	CurrentPage int
 	TotalPages  int
 }
@@ -28,7 +35,7 @@ type ForumThreadService interface {
 	CreateThread(ctx context.Context, forumId string, title string, message string) (string, error)
 	GetForumThreadListingPublic(ctx context.Context, forumId string, pageNum int) (*ForumThreadListing, error)
 	GetThreadRowById(ctx context.Context, id string) (*data.ForumThreadRow, error)
-	GetPostsByThreadId(ctx context.Context, threadId string) ([]data.ForumPostListingViewRow, error)
+	GetForumPostListing(ctx context.Context, threadId string, pageNum int) (*ForumPostListing, error)
 }
 
 func NewForumThreadService(forumService ForumService, forumPostsDao data.ForumPostsDao, forumThreadsDao data.ForumThreadsDao, forumThreadSummaryDvao data.ForumThreadSummaryDvao, forumPostListingDvao data.ForumPostListingDvao) ForumThreadService {
@@ -122,6 +129,30 @@ func (this *forumThreadServiceImpl) GetThreadRowById(ctx context.Context, id str
 	return this.forumThreadsDao.SelectRowById(ctx, id)
 }
 
-func (this *forumThreadServiceImpl) GetPostsByThreadId(ctx context.Context, threadId string) ([]data.ForumPostListingViewRow, error) {
-	return this.forumPostListingDvao.SelectByThreadId(ctx, threadId)
+func (this *forumThreadServiceImpl) GetForumPostListing(ctx context.Context, threadId string, pageNum int) (*ForumPostListing, error) {
+	totalPosts, err := this.forumPostListingDvao.CountForumPostListingViewRowByThreadId(ctx, threadId)
+	if err != nil {
+		return nil, err
+	}
+
+	totalPages := int((totalPosts + ForumPostsPerPage - 1) / ForumPostsPerPage)
+	if totalPages < 1 {
+		totalPages = 1
+	}
+
+	if pageNum < 1 || pageNum > totalPages {
+		return nil, nil
+	}
+
+	beginIndex := (pageNum - 1) * ForumPostsPerPage
+	posts, err := this.forumPostListingDvao.SelectPageForumPostListingViewRowByThreadId(ctx, threadId, beginIndex, ForumPostsPerPage)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ForumPostListing{
+		Posts:       posts,
+		CurrentPage: pageNum,
+		TotalPages:  totalPages,
+	}, nil
 }

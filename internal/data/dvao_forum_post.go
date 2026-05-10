@@ -21,7 +21,8 @@ type ForumPostListingViewRow struct {
 
 type ForumPostListingDvao interface {
 	CreateDBObjects(ctx context.Context) error
-	SelectByThreadId(ctx context.Context, threadId string) ([]ForumPostListingViewRow, error)
+	CountForumPostListingViewRowByThreadId(ctx context.Context, threadId string) (int64, error)
+	SelectPageForumPostListingViewRowByThreadId(ctx context.Context, threadId string, beginIndex int, count int) ([]ForumPostListingViewRow, error)
 }
 
 func NewForumPostListingDvao() ForumPostListingDvao {
@@ -58,7 +59,28 @@ func (*forumPostListingDvaoImpl) CreateDBObjects(ctx context.Context) error {
 	return nil
 }
 
-var sqlSelectForumPostListingByThreadId = `
+var sqlCountForumPostListingViewRowByThreadId = `
+	SELECT
+		COUNT(*)
+	FROM
+		view_forum_post_listing
+	WHERE
+		thread_id = $1
+`
+
+func (*forumPostListingDvaoImpl) CountForumPostListingViewRowByThreadId(ctx context.Context, threadId string) (int64, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
+	var count int64
+	row := sqlh.QueryRow(sqlCountForumPostListingViewRowByThreadId, threadId)
+	err := row.Scan(&count)
+	if err != nil {
+		logger.Error(ctx, "Got database error on ForumPostListingDvao/CountForumPostListingViewRowByThreadId query: ", err)
+		return 0, err
+	}
+	return count, nil
+}
+
+var sqlSelectPageForumPostListingViewRowByThreadId = `
 	SELECT
 		post_id, thread_id, author_id, author_name, post_message, post_timestamp
 	FROM
@@ -67,13 +89,14 @@ var sqlSelectForumPostListingByThreadId = `
 		thread_id = $1
 	ORDER BY
 		post_timestamp, post_id
+	LIMIT $2 OFFSET $3
 `
 
-func (*forumPostListingDvaoImpl) SelectByThreadId(ctx context.Context, threadId string) ([]ForumPostListingViewRow, error) {
+func (*forumPostListingDvaoImpl) SelectPageForumPostListingViewRowByThreadId(ctx context.Context, threadId string, beginIndex int, count int) ([]ForumPostListingViewRow, error) {
 	sqlh := getSqlExecutorFromContext(ctx)
-	rows, err := sqlh.Query(sqlSelectForumPostListingByThreadId, threadId)
+	rows, err := sqlh.Query(sqlSelectPageForumPostListingViewRowByThreadId, threadId, count, beginIndex)
 	if err != nil {
-		logger.Error(ctx, "Got database error on ForumPostListingDvao/SelectByThreadId query: ", err)
+		logger.Error(ctx, "Got database error on ForumPostListingDvao/SelectPageForumPostListingViewRowByThreadId query: ", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -83,7 +106,7 @@ func (*forumPostListingDvaoImpl) SelectByThreadId(ctx context.Context, threadId 
 		thisRow := ForumPostListingViewRow{}
 		err = rows.Scan(&thisRow.PostId, &thisRow.ThreadId, &thisRow.AuthorId, &thisRow.AuthorName, &thisRow.PostMessage, &thisRow.PostTimestamp)
 		if err != nil {
-			logger.Error(ctx, "Got database error on ForumPostListingDvao/SelectByThreadId scan: ", err)
+			logger.Error(ctx, "Got database error on ForumPostListingDvao/SelectPageForumPostListingViewRowByThreadId scan: ", err)
 			return nil, err
 		}
 		result = append(result, thisRow)

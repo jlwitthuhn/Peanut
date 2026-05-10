@@ -61,6 +61,8 @@ var sqlCreateViewForumThreadSummary = `
 		FROM forum_threads ft
 			INNER JOIN users us ON ft.author_id = us.id
 			INNER JOIN q_post_stats_by_thread_id ps ON ft.id = ps.thread_id
+		ORDER BY
+			ft._created DESC, ft.id DESC
 	)
 `
 

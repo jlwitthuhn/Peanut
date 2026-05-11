@@ -17,6 +17,8 @@ type ForumThreadSummaryViewRow struct {
 	ThreadVisibility string
 	ThreadName       string
 	AuthorName       string
+	Pinned           bool
+	Locked           bool
 	ReplyCount       int
 	ThreadCreated    time.Time
 	LastPostDate     time.Time
@@ -55,6 +57,8 @@ var sqlCreateViewForumThreadSummary = `
 			ft.visibility as thread_visibility,
 			ft.title AS thread_name,
 			us.display_name AS author_name,
+			ft.pinned AS pinned,
+			ft.locked AS locked,
 			(ps.post_count - 1) AS reply_count,
 			ft._created AS thread_created,
 			ps.last_post_date AS last_post_date,
@@ -98,13 +102,13 @@ func (*forumThreadSummaryDvaoImpl) CountForumThreadSummaryViewRowByForumIdPublic
 
 var sqlSelectForumThreadSummaryViewRowByForumIdPublicPaged = `
 	SELECT
-		thread_id, forum_id, author_id, thread_visibility, thread_name, author_name, reply_count, thread_created, last_post_date, unread_post_count
+		thread_id, forum_id, author_id, thread_visibility, thread_name, author_name, pinned, locked, reply_count, thread_created, last_post_date, unread_post_count
 	FROM
 		view_forum_thread_summary
 	WHERE
 	    forum_id = $1 AND thread_visibility = 'Public'
 	ORDER BY
-	    last_post_date DESC, thread_id DESC
+	    pinned DESC, last_post_date DESC, thread_id DESC
 	LIMIT $2 OFFSET $3
 `
 
@@ -120,7 +124,20 @@ func (*forumThreadSummaryDvaoImpl) SelectPageForumThreadSummaryViewRowByForumIdP
 	var result []ForumThreadSummaryViewRow
 	for rows.Next() {
 		thisRow := ForumThreadSummaryViewRow{}
-		err = rows.Scan(&thisRow.ThreadId, &thisRow.ForumId, &thisRow.AuthorId, &thisRow.ThreadVisibility, &thisRow.ThreadName, &thisRow.AuthorName, &thisRow.ReplyCount, &thisRow.ThreadCreated, &thisRow.LastPostDate, &thisRow.UnreadPostCount)
+		err = rows.Scan(
+			&thisRow.ThreadId,
+			&thisRow.ForumId,
+			&thisRow.AuthorId,
+			&thisRow.ThreadVisibility,
+			&thisRow.ThreadName,
+			&thisRow.AuthorName,
+			&thisRow.Pinned,
+			&thisRow.Locked,
+			&thisRow.ReplyCount,
+			&thisRow.ThreadCreated,
+			&thisRow.LastPostDate,
+			&thisRow.UnreadPostCount,
+		)
 		if err != nil {
 			logger.Error(ctx, "Got database error on ForumThreadSummaryDvao/SelectPageForumThreadSummaryViewRowByForumIdPublic scan: ", err)
 			return nil, err

@@ -41,7 +41,7 @@
 				<div class="data-cell">
 					<div class="thread-title-row">
 						<div>
-							<h1><a href="/forum/thread/{{ $thread.ThreadId }}">{{ $thread.ThreadName }}</a></h1>
+							<h1>{{ if $thread.Pinned }}<span title="Pinned">&#128204;</span> {{ end }}{{ if $thread.Locked }}<span title="Locked">&#128274;</span> {{ end }}<a href="/forum/thread/{{ $thread.ThreadId }}">{{ $thread.ThreadName }}</a></h1>
 						</div>
 						{{ if $thread.UnreadPostCount }}
 						<span class="unread-badge">

@@ -1,0 +1,21 @@
+{{ define "content" }}
+<div class="layout">
+	<div class="layout-main">
+		<div class="panel compact">
+			<div class="panel-header">
+				<h1>Moderate Thread</h1>
+			</div>
+			<div class="panel-body">
+				<form class="standard-form" action="" method="post">
+					<label for="input_title">Title</label>
+					<input type="text" id="input_title" name="title" value="{{ .Title }}">
+					<label for="input_pinned"><input type="checkbox" id="input_pinned" name="pinned" value="1"{{ if .Pinned }} checked{{ end }}> Pinned</label>
+					<label for="input_locked"><input type="checkbox" id="input_locked" name="locked" value="1"{{ if .Locked }} checked{{ end }}> Locked</label>
+					<input type="hidden" name="csrf" value="{{ .CsrfToken }}">
+					<input class="primary-button" type="submit" value="Save">
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+{{ end }}

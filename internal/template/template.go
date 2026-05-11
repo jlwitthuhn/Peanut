@@ -77,6 +77,9 @@ func LoadTemplates(fs fs.FS) {
 	forumListingFiles := []string{"base.html", "forum/forum_listing.html", "widget/forum_section.html"}
 	loadTemplateOrDie(fs, "view_forum/forum_listing", forumListingFiles...)
 
+	forumModerateFiles := []string{"base.html", "forum/moderate.html"}
+	loadTemplateOrDie(fs, "view_forum/moderate", forumModerateFiles...)
+
 	forumNewThreadFiles := []string{"base.html", "forum/new_thread.html"}
 	loadTemplateOrDie(fs, "view_forum/new_thread", forumNewThreadFiles...)
 

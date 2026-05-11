@@ -11,6 +11,7 @@ import (
 
 func RegisterForumHandlers(mux *http.ServeMux, forumsService service.ForumService, forumThreadService service.ForumThreadService) {
 	registerForumListingHandlers(mux, forumsService)
+	registerForumModerateHandlers(mux, forumThreadService)
 	registerForumNewThreadHandlers(mux, forumsService, forumThreadService)
 	registerForumPostListingHandlers(mux, forumsService, forumThreadService)
 	registerForumReplyHandlers(mux, forumsService, forumThreadService)

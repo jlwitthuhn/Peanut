@@ -8,9 +8,10 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"github.com/lib/pq"
 	"peanut/internal/logger"
 	"time"
+
+	"github.com/lib/pq"
 )
 
 type ForumThreadRow struct {
@@ -29,6 +30,7 @@ type ForumThreadsDao interface {
 	CreateDBObjects(ctx context.Context) error
 	InsertRow(ctx context.Context, forumId string, authorId string, title string, visibility string) (string, error)
 	SelectRowById(ctx context.Context, id string) (*ForumThreadRow, error)
+	UpdateModerationById(ctx context.Context, id string, title string, pinned bool, locked bool) error
 }
 
 func NewForumThreadsDao() ForumThreadsDao {
@@ -118,4 +120,16 @@ func (*forumThreadsDaoImpl) SelectRowById(ctx context.Context, id string) (*Foru
 		return nil, err
 	}
 	return result, nil
+}
+
+var sqlUpdateForumThreadsModerationById = "UPDATE forum_threads SET title = $1, pinned = $2, locked = $3 WHERE id = $4"
+
+func (*forumThreadsDaoImpl) UpdateModerationById(ctx context.Context, id string, title string, pinned bool, locked bool) error {
+	sqlh := getSqlExecutorFromContext(ctx)
+	_, err := sqlh.Exec(sqlUpdateForumThreadsModerationById, title, pinned, locked, id)
+	if err != nil {
+		logger.Error(ctx, "Got database error on ForumThreadsDao/UpdateModerationById query: ", err)
+		return err
+	}
+	return nil
 }

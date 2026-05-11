@@ -34,8 +34,9 @@ type ForumThreadService interface {
 	CanPostThreadInForum(ctx context.Context, forumId string) (bool, error)
 	CreateThread(ctx context.Context, forumId string, title string, message string) (string, error)
 	GetForumThreadListingPublic(ctx context.Context, forumId string, pageNum int) (*ForumThreadListing, error)
-	GetThreadRowById(ctx context.Context, id string) (*data.ForumThreadRow, error)
 	GetForumPostListing(ctx context.Context, threadId string, pageNum int) (*ForumPostListing, error)
+	GetThreadRowById(ctx context.Context, id string) (*data.ForumThreadRow, error)
+	ModerateThread(ctx context.Context, threadId string, title string, pinned bool, locked bool) error
 }
 
 func NewForumThreadService(forumService ForumService, forumPostsDao data.ForumPostsDao, forumThreadsDao data.ForumThreadsDao, forumThreadSummaryDvao data.ForumThreadSummaryDvao, forumPostListingDvao data.ForumPostListingDvao) ForumThreadService {
@@ -125,10 +126,6 @@ func (this *forumThreadServiceImpl) GetForumThreadListingPublic(ctx context.Cont
 	}, nil
 }
 
-func (this *forumThreadServiceImpl) GetThreadRowById(ctx context.Context, id string) (*data.ForumThreadRow, error) {
-	return this.forumThreadsDao.SelectRowById(ctx, id)
-}
-
 func (this *forumThreadServiceImpl) GetForumPostListing(ctx context.Context, threadId string, pageNum int) (*ForumPostListing, error) {
 	totalPosts, err := this.forumPostListingDvao.CountForumPostListingViewRowByThreadId(ctx, threadId)
 	if err != nil {
@@ -155,4 +152,15 @@ func (this *forumThreadServiceImpl) GetForumPostListing(ctx context.Context, thr
 		CurrentPage: pageNum,
 		TotalPages:  totalPages,
 	}, nil
+}
+
+func (this *forumThreadServiceImpl) GetThreadRowById(ctx context.Context, id string) (*data.ForumThreadRow, error) {
+	return this.forumThreadsDao.SelectRowById(ctx, id)
+}
+
+func (this *forumThreadServiceImpl) ModerateThread(ctx context.Context, threadId string, title string, pinned bool, locked bool) error {
+	if !middleutil.ContextHasPermission(ctx, perms.Forum_Moderate) {
+		return errors.New("cannot moderate thread: missing Forum/Moderate permission")
+	}
+	return this.forumThreadsDao.UpdateModerationById(ctx, threadId, title, pinned, locked)
 }

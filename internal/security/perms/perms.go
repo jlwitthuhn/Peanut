@@ -13,6 +13,7 @@ const Admin_Forums_Structure_Edit = "Admin/Forums/Structure/Edit"
 const Admin_FrontPage_Edit = "Admin/FrontPage/Edit"
 const Admin_Gui_View = "Admin/Gui/View"
 const Admin_ScheduledJob_Run = "Admin/ScheduledJob/Run"
+const Forum_Moderate = "Forum/Moderate"
 const Forum_Thread_Post = "Forum/Thread/Post"
 const Forum_Thread_Reply = "Forum/Thread/Reply"
 
@@ -26,6 +27,7 @@ func GetPermissionsForGroup(group string) map[string]struct{} {
 		result[Admin_FrontPage_Edit] = struct{}{}
 		result[Admin_Gui_View] = struct{}{}
 		result[Admin_ScheduledJob_Run] = struct{}{}
+		result[Forum_Moderate] = struct{}{}
 		fallthrough
 	case permgroups.User:
 		result[Forum_Thread_Post] = struct{}{}

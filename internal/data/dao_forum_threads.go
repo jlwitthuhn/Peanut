@@ -19,6 +19,8 @@ type ForumThreadRow struct {
 	AuthorId   string
 	Title      string
 	Visibility string
+	Pinned     bool
+	Locked     bool
 	Created    time.Time
 	Updated    time.Time
 }
@@ -42,6 +44,8 @@ var sqlCreateTableForumThreads = `
 		author_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
 		title VARCHAR(150) NOT NULL,
 		visibility visibility_enum NOT NULL,
+		pinned BOOLEAN NOT NULL DEFAULT FALSE,
+		locked BOOLEAN NOT NULL DEFAULT FALSE,
 		_created TIMESTAMP WITH TIME ZONE NOT NULL,
 		_updated TIMESTAMP WITH TIME ZONE NOT NULL
 	);
@@ -92,13 +96,13 @@ func (*forumThreadsDaoImpl) InsertRow(ctx context.Context, forumId string, autho
 	return newId, nil
 }
 
-var sqlSelectForumThreadsRowById = "SELECT id, forum_id, author_id, title, visibility, _created, _updated FROM forum_threads WHERE id = $1"
+var sqlSelectForumThreadsRowById = "SELECT id, forum_id, author_id, title, visibility, pinned, locked, _created, _updated FROM forum_threads WHERE id = $1"
 
 func (*forumThreadsDaoImpl) SelectRowById(ctx context.Context, id string) (*ForumThreadRow, error) {
 	sqlh := getSqlExecutorFromContext(ctx)
 	result := &ForumThreadRow{}
 	row := sqlh.QueryRow(sqlSelectForumThreadsRowById, id)
-	err := row.Scan(&result.Id, &result.ForumId, &result.AuthorId, &result.Title, &result.Visibility, &result.Created, &result.Updated)
+	err := row.Scan(&result.Id, &result.ForumId, &result.AuthorId, &result.Title, &result.Visibility, &result.Pinned, &result.Locked, &result.Created, &result.Updated)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, nil
 	}

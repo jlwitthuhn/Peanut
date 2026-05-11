@@ -23,7 +23,7 @@ func registerForumReplyHandlers(mux *http.ServeMux, forumsService service.ForumS
 			return nil
 		}
 
-		canReply, err := forumThreadService.CanPostReplyInThread(r.Context(), thread.ForumId)
+		canReply, err := forumThreadService.CanPostReplyInThread(r.Context(), thread.Id)
 		if err != nil || !canReply {
 			ep_util.RenderErrorHttp404NotFound(w, r)
 			return nil

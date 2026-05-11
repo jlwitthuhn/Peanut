@@ -84,7 +84,7 @@ func registerForumPostListingHandlers(mux *http.ServeMux, forumsService service.
 			}
 		}
 
-		canReply, err := forumThreadService.CanPostReplyInThread(r.Context(), thread.ForumId)
+		canReply, err := forumThreadService.CanPostReplyInThread(r.Context(), thread.Id)
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to check permissions.", w, r)
 			return

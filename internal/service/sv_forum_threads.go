@@ -30,7 +30,7 @@ type ForumPostListing struct {
 
 type ForumThreadService interface {
 	AddThreadPost(ctx context.Context, threadId string, message string) (string, error)
-	CanPostReplyInThread(ctx context.Context, forumId string) (bool, error)
+	CanPostReplyInThread(ctx context.Context, threadId string) (bool, error)
 	CanPostThreadInForum(ctx context.Context, forumId string) (bool, error)
 	CanReadThread(ctx context.Context, threadId string) (bool, error)
 	CreateThread(ctx context.Context, forumId string, title string, message string) (string, error)
@@ -92,11 +92,21 @@ func (this *forumThreadServiceImpl) CanPostThreadInForum(ctx context.Context, fo
 	return this.forumService.CanReadForum(ctx, forumId)
 }
 
-func (this *forumThreadServiceImpl) CanPostReplyInThread(ctx context.Context, forumId string) (bool, error) {
+func (this *forumThreadServiceImpl) CanPostReplyInThread(ctx context.Context, threadId string) (bool, error) {
 	if !middleutil.ContextHasPermission(ctx, perms.Forum_Thread_Reply) {
 		return false, nil
 	}
-	return this.forumService.CanReadForum(ctx, forumId)
+	thread, err := this.forumThreadsDao.SelectRowById(ctx, threadId)
+	if err != nil {
+		return false, err
+	}
+	if thread == nil {
+		return false, nil
+	}
+	if thread.Locked {
+		return false, nil
+	}
+	return this.forumService.CanReadForum(ctx, thread.ForumId)
 }
 
 func (this *forumThreadServiceImpl) CanReadThread(ctx context.Context, threadId string) (bool, error) {

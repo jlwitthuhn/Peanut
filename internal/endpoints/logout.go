@@ -16,6 +16,10 @@ import (
 func RegisterLogoutHandlers(mux *http.ServeMux, sessionService service.SessionService) {
 	postLogoutHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sessionId := r.Context().Value(contextkeys.SessionId)
+		if sessionId == nil {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
 		sessionIdString, ok := sessionId.(string)
 		if ok == false {
 			logger.Error(r.Context(), "'sessionId' is not a string while logging out.")

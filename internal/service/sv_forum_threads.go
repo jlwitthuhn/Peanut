@@ -32,6 +32,7 @@ type ForumThreadService interface {
 	AddThreadPost(ctx context.Context, threadId string, message string) (string, error)
 	CanPostReplyInThread(ctx context.Context, forumId string) (bool, error)
 	CanPostThreadInForum(ctx context.Context, forumId string) (bool, error)
+	CanReadThread(ctx context.Context, threadId string) (bool, error)
 	CreateThread(ctx context.Context, forumId string, title string, message string) (string, error)
 	GetForumThreadListingPublic(ctx context.Context, forumId string, pageNum int) (*ForumThreadListing, error)
 	GetForumPostListing(ctx context.Context, threadId string, pageNum int) (*ForumPostListing, error)
@@ -96,6 +97,20 @@ func (this *forumThreadServiceImpl) CanPostReplyInThread(ctx context.Context, fo
 		return false, nil
 	}
 	return this.forumService.CanReadForum(ctx, forumId)
+}
+
+func (this *forumThreadServiceImpl) CanReadThread(ctx context.Context, threadId string) (bool, error) {
+	thread, err := this.forumThreadsDao.SelectRowById(ctx, threadId)
+	if err != nil {
+		return false, err
+	}
+	if thread == nil {
+		return false, nil
+	}
+	if thread.Visibility != "Public" {
+		return false, nil
+	}
+	return this.forumService.CanReadForum(ctx, thread.ForumId)
 }
 
 func (this *forumThreadServiceImpl) GetForumThreadListingPublic(ctx context.Context, forumId string, pageNum int) (*ForumThreadListing, error) {

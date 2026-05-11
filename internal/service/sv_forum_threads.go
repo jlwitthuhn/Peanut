@@ -88,14 +88,14 @@ func (this *forumThreadServiceImpl) CanPostThreadInForum(ctx context.Context, fo
 	if !middleutil.ContextHasPermission(ctx, perms.Forum_Thread_Post) {
 		return false, nil
 	}
-	return this.forumService.IsForumReadable(ctx, forumId)
+	return this.forumService.CanReadForum(ctx, forumId)
 }
 
 func (this *forumThreadServiceImpl) CanPostReplyInThread(ctx context.Context, forumId string) (bool, error) {
 	if !middleutil.ContextHasPermission(ctx, perms.Forum_Thread_Reply) {
 		return false, nil
 	}
-	return this.forumService.IsForumReadable(ctx, forumId)
+	return this.forumService.CanReadForum(ctx, forumId)
 }
 
 func (this *forumThreadServiceImpl) GetForumThreadListingPublic(ctx context.Context, forumId string, pageNum int) (*ForumThreadListing, error) {

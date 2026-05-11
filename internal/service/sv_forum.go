@@ -15,6 +15,8 @@ import (
 )
 
 type ForumService interface {
+	CanReadForum(ctx context.Context, id string) (bool, error)
+	CanReadSection(ctx context.Context, id string) (bool, error)
 	CreateForum(ctx context.Context, sectionId string, name string, description string, ordering float32, visibility string) (string, error)
 	CreateSection(ctx context.Context, name string, ordering float32) (string, error)
 	DeleteForum(ctx context.Context, id string) error
@@ -25,8 +27,6 @@ type ForumService interface {
 	GetHomeViewRowsBySectionPublic(ctx context.Context, sectionId string) ([]data.ForumHomeViewRow, error)
 	GetHomeViewRowsPublic(ctx context.Context) ([]data.ForumHomeViewRow, error)
 	GetSectionRowById(ctx context.Context, id string) (*data.ForumSectionRow, error)
-	IsForumReadable(ctx context.Context, id string) (bool, error)
-	IsSectionReadable(ctx context.Context, id string) (bool, error)
 	UpdateForumUserConfig(ctx context.Context, id string, sectionId string, name string, description string, ordering float32, visibility string) error
 	UpdateSectionUserConfig(ctx context.Context, id string, name string, ordering float32, visibility string) error
 }
@@ -40,6 +40,31 @@ type forumServiceImpl struct {
 	forumSectionsDao data.ForumSectionsDao
 	forumHomeDvao    data.ForumHomeDvao
 	systemLogDao     data.SystemLogDao
+}
+
+func (this *forumServiceImpl) CanReadForum(ctx context.Context, id string) (bool, error) {
+	forum, err := this.forumsDao.SelectRowById(ctx, id)
+	if err != nil {
+		return false, err
+	}
+	if forum == nil {
+		return false, nil
+	}
+	if forum.Visibility != "Public" {
+		return false, nil
+	}
+	return this.CanReadSection(ctx, forum.SectionId)
+}
+
+func (this *forumServiceImpl) CanReadSection(ctx context.Context, id string) (bool, error) {
+	section, err := this.forumSectionsDao.SelectRowById(ctx, id)
+	if err != nil {
+		return false, err
+	}
+	if section == nil {
+		return false, nil
+	}
+	return section.Visibility == "Public", nil
 }
 
 func (this *forumServiceImpl) CreateForum(ctx context.Context, sectionId string, name string, description string, ordering float32, visibility string) (string, error) {
@@ -162,31 +187,6 @@ func (this *forumServiceImpl) GetAllSectionRows(ctx context.Context) ([]data.For
 func (this *forumServiceImpl) GetSectionRowById(ctx context.Context, id string) (*data.ForumSectionRow, error) {
 	result, err := this.forumSectionsDao.SelectRowById(ctx, id)
 	return result, err
-}
-
-func (this *forumServiceImpl) IsForumReadable(ctx context.Context, id string) (bool, error) {
-	forum, err := this.forumsDao.SelectRowById(ctx, id)
-	if err != nil {
-		return false, err
-	}
-	if forum == nil {
-		return false, nil
-	}
-	if forum.Visibility != "Public" {
-		return false, nil
-	}
-	return this.IsSectionReadable(ctx, forum.SectionId)
-}
-
-func (this *forumServiceImpl) IsSectionReadable(ctx context.Context, id string) (bool, error) {
-	section, err := this.forumSectionsDao.SelectRowById(ctx, id)
-	if err != nil {
-		return false, err
-	}
-	if section == nil {
-		return false, nil
-	}
-	return section.Visibility == "Public", nil
 }
 
 func (this *forumServiceImpl) UpdateSectionUserConfig(ctx context.Context, id string, name string, ordering float32, visibility string) error {

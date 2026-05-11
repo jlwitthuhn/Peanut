@@ -63,7 +63,7 @@ func registerForumListingHandlers(mux *http.ServeMux, forumsService service.Foru
 	getSectionIndexHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sectionId := r.PathValue("sectionId")
 
-		readable, err := forumsService.IsSectionReadable(r.Context(), sectionId)
+		readable, err := forumsService.CanReadSection(r.Context(), sectionId)
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to load section.", w, r)
 			return

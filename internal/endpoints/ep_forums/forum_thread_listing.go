@@ -32,7 +32,7 @@ func registerForumThreadListingHandlers(mux *http.ServeMux, forumsService servic
 			return
 		}
 
-		readable, err := forumsService.IsForumReadable(r.Context(), forumId)
+		readable, err := forumsService.CanReadForum(r.Context(), forumId)
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to load forum.", w, r)
 			return

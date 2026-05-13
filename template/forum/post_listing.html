@@ -24,7 +24,7 @@
 		</div>
 		<div class="panel">
 			<div class="panel-header">
-				<h1>{{ .ThreadTitle }}</h1>
+				<h1>{{ if .ThreadPinned }}<span title="Pinned">&#128204;</span> {{ end }}{{ if .ThreadLocked }}<span title="Locked">&#128274;</span> {{ end }}{{ .ThreadTitle }}</h1>
 			</div>
 			{{ range $post := .Posts }}
 			<div class="forum-post">

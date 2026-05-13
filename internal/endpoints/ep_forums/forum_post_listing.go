@@ -98,6 +98,8 @@ func registerForumPostListingHandlers(mux *http.ServeMux, forumsService service.
 		templateCtx["CanReply"] = canReply
 		templateCtx["ThreadId"] = thread.Id
 		templateCtx["ThreadTitle"] = thread.Title
+		templateCtx["ThreadPinned"] = thread.Pinned
+		templateCtx["ThreadLocked"] = thread.Locked
 		templateCtx["ForumId"] = forum.Id
 		templateCtx["ForumName"] = forum.Name
 		templateCtx["SectionId"] = section.Id

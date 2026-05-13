@@ -307,8 +307,14 @@ td {
 }
 
 .panel.compact {
-	min-width: 45%;
-	max-width: 90%;
+	min-width: 50%;
+	max-width: 95%;
+	margin: 0 auto;
+}
+
+.panel.medium {
+	min-width: 75%;
+	max-width: 95%;
 	margin: 0 auto;
 }
 

@@ -61,7 +61,8 @@ hr {
 
 input[type="text"],
 input[type="password"],
-textarea {
+textarea,
+select {
 	padding: var(--pad);
 	color: var(--text);
 	background-color: var(--bg);
@@ -73,9 +74,25 @@ textarea {
 
 input[type="text"]:focus,
 input[type="password"]:focus,
-textarea:focus {
+textarea:focus,
+select:focus {
 	outline: none;
 	border-color: var(--accent);
+}
+
+select {
+	appearance: none;
+	padding-right: 1.75rem;
+	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'><path fill='none' stroke='%2398a8b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' d='M1 1.5l5 5 5-5'/></svg>");
+	background-repeat: no-repeat;
+	background-position: right 0.6rem center;
+	background-size: 0.7rem;
+	cursor: pointer;
+}
+
+select option {
+	background-color: var(--bg);
+	color: var(--text);
 }
 
 input[type="checkbox"] {

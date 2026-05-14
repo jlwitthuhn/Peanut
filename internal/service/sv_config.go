@@ -9,7 +9,16 @@ import (
 	"fmt"
 	"peanut/internal/data"
 	"peanut/internal/keynames/contextkeys"
+	"sync"
+	"time"
 )
+
+const stringCacheTTL = 5 * time.Second
+
+type cachedString struct {
+	value    string
+	readTime time.Time
+}
 
 type ConfigService interface {
 	GetInt(ctx context.Context, key string) (int64, error)
@@ -24,16 +33,26 @@ type SetupConfigService interface {
 }
 
 func NewConfigService(configDao data.ConfigDao, systemLogDao data.SystemLogDao) ConfigService {
-	return &configServiceImpl{configDao: configDao, systemLogDao: systemLogDao}
+	return &configServiceImpl{
+		configDao:    configDao,
+		systemLogDao: systemLogDao,
+		stringCache:  make(map[string]cachedString),
+	}
 }
 
 func NewSetupConfigService(configDao data.ConfigDao, systemLogDao data.SystemLogDao) SetupConfigService {
-	return &configServiceImpl{configDao: configDao, systemLogDao: systemLogDao}
+	return &configServiceImpl{
+		configDao:    configDao,
+		systemLogDao: systemLogDao,
+		stringCache:  make(map[string]cachedString),
+	}
 }
 
 type configServiceImpl struct {
-	configDao    data.ConfigDao
-	systemLogDao data.SystemLogDao
+	configDao        data.ConfigDao
+	systemLogDao     data.SystemLogDao
+	stringCacheMutex sync.Mutex
+	stringCache      map[string]cachedString
 }
 
 func (this *configServiceImpl) GetInt(ctx context.Context, key string) (int64, error) {
@@ -45,10 +64,16 @@ func (this *configServiceImpl) GetInt(ctx context.Context, key string) (int64, e
 }
 
 func (this *configServiceImpl) GetString(ctx context.Context, key string) (string, error) {
+	this.stringCacheMutex.Lock()
+	defer this.stringCacheMutex.Unlock()
+	if cached, ok := this.stringCache[key]; ok && time.Since(cached.readTime) < stringCacheTTL {
+		return cached.value, nil
+	}
 	row, err := this.configDao.SelectStringRowByName(ctx, key)
 	if err != nil {
 		return "", err
 	}
+	this.stringCache[key] = cachedString{value: row.Value, readTime: time.Now()}
 	return row.Value, nil
 }
 
@@ -65,6 +90,12 @@ func (this *configServiceImpl) SetInt(ctx context.Context, name string, value in
 	return this.systemLogDao.InsertRow(ctx, userId, "", message)
 }
 
+func clearStringCache(this *configServiceImpl, name string) {
+	this.stringCacheMutex.Lock()
+	defer this.stringCacheMutex.Unlock()
+	delete(this.stringCache, name)
+}
+
 func (this *configServiceImpl) SetString(ctx context.Context, name string, value string) error {
 	userId, ok := ctx.Value(contextkeys.UserId).(string)
 	if !ok {
@@ -74,6 +105,7 @@ func (this *configServiceImpl) SetString(ctx context.Context, name string, value
 	if err != nil {
 		return err
 	}
+	clearStringCache(this, name)
 	message := fmt.Sprintf("Set config string '%s' to: %s", name, value)
 	return this.systemLogDao.InsertRow(ctx, userId, "", message)
 }

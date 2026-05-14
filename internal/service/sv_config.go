@@ -25,16 +25,24 @@ type cachedString struct {
 	readTime time.Time
 }
 
+type cachedUuid struct {
+	value    string
+	readTime time.Time
+}
+
 type ConfigService interface {
 	GetInt(ctx context.Context, key string) (int64, error)
 	GetString(ctx context.Context, key string) (string, error)
+	GetUuid(ctx context.Context, key string) (string, error)
 	SetInt(ctx context.Context, key string, value int64) error
 	SetString(ctx context.Context, key string, value string) error
+	SetUuid(ctx context.Context, key string, value string) error
 }
 
 type SetupConfigService interface {
 	SetIntSetup(ctx context.Context, key string, value int64) error
 	SetStringSetup(ctx context.Context, key string, value string) error
+	SetUuidSetup(ctx context.Context, key string, value string) error
 }
 
 func NewConfigService(configDao data.ConfigDao, systemLogDao data.SystemLogDao) ConfigService {
@@ -43,6 +51,7 @@ func NewConfigService(configDao data.ConfigDao, systemLogDao data.SystemLogDao) 
 		systemLogDao: systemLogDao,
 		intCache:     make(map[string]cachedInt),
 		stringCache:  make(map[string]cachedString),
+		uuidCache:    make(map[string]cachedUuid),
 	}
 }
 
@@ -52,6 +61,7 @@ func NewSetupConfigService(configDao data.ConfigDao, systemLogDao data.SystemLog
 		systemLogDao: systemLogDao,
 		intCache:     make(map[string]cachedInt),
 		stringCache:  make(map[string]cachedString),
+		uuidCache:    make(map[string]cachedUuid),
 	}
 }
 
@@ -62,6 +72,8 @@ type configServiceImpl struct {
 	intCache         map[string]cachedInt
 	stringCacheMutex sync.Mutex
 	stringCache      map[string]cachedString
+	uuidCacheMutex   sync.Mutex
+	uuidCache        map[string]cachedUuid
 }
 
 func (this *configServiceImpl) GetInt(ctx context.Context, key string) (int64, error) {
@@ -89,6 +101,20 @@ func (this *configServiceImpl) GetString(ctx context.Context, key string) (strin
 		return "", err
 	}
 	this.stringCache[key] = cachedString{value: row.Value, readTime: time.Now()}
+	return row.Value, nil
+}
+
+func (this *configServiceImpl) GetUuid(ctx context.Context, key string) (string, error) {
+	this.uuidCacheMutex.Lock()
+	defer this.uuidCacheMutex.Unlock()
+	if cached, ok := this.uuidCache[key]; ok && time.Since(cached.readTime) < cacheTTL {
+		return cached.value, nil
+	}
+	row, err := this.configDao.SelectUuidRowByName(ctx, key)
+	if err != nil {
+		return "", err
+	}
+	this.uuidCache[key] = cachedUuid{value: row.Value, readTime: time.Now()}
 	return row.Value, nil
 }
 
@@ -132,10 +158,34 @@ func (this *configServiceImpl) SetString(ctx context.Context, name string, value
 	return this.systemLogDao.InsertRow(ctx, userId, "", message)
 }
 
+func (this *configServiceImpl) clearUuidCache(name string) {
+	this.uuidCacheMutex.Lock()
+	defer this.uuidCacheMutex.Unlock()
+	delete(this.uuidCache, name)
+}
+
+func (this *configServiceImpl) SetUuid(ctx context.Context, name string, value string) error {
+	userId, ok := ctx.Value(contextkeys.UserId).(string)
+	if !ok {
+		return fmt.Errorf("cannot set config uuid '%s': no user id in context", name)
+	}
+	err := this.configDao.UpsertUuidByName(ctx, name, value)
+	if err != nil {
+		return err
+	}
+	this.clearUuidCache(name)
+	message := fmt.Sprintf("Set config uuid '%s' to: %s", name, value)
+	return this.systemLogDao.InsertRow(ctx, userId, "", message)
+}
+
 func (this *configServiceImpl) SetIntSetup(ctx context.Context, name string, value int64) error {
 	return this.configDao.UpsertIntByName(ctx, name, value)
 }
 
 func (this *configServiceImpl) SetStringSetup(ctx context.Context, name string, value string) error {
 	return this.configDao.UpsertStringByName(ctx, name, value)
+}
+
+func (this *configServiceImpl) SetUuidSetup(ctx context.Context, name string, value string) error {
+	return this.configDao.UpsertUuidByName(ctx, name, value)
 }

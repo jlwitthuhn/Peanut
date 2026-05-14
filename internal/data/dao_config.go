@@ -19,12 +19,19 @@ type ConfigStringRow struct {
 	Value string
 }
 
+type ConfigUuidRow struct {
+	Name  string
+	Value string
+}
+
 type ConfigDao interface {
 	CreateDBObjects(ctx context.Context) error
 	SelectIntRowByName(ctx context.Context, name string) (*ConfigIntRow, error)
 	SelectStringRowByName(ctx context.Context, name string) (*ConfigStringRow, error)
+	SelectUuidRowByName(ctx context.Context, name string) (*ConfigUuidRow, error)
 	UpsertIntByName(ctx context.Context, name string, value int64) error
 	UpsertStringByName(ctx context.Context, name string, value string) error
+	UpsertUuidByName(ctx context.Context, name string, value string) error
 }
 
 func NewConfigDao() ConfigDao {
@@ -79,6 +86,29 @@ var sqlCreateTableConfigString = `
 		fn_created_updated_before_update();
 `
 
+var sqlCreateTableConfigUuid = `
+	CREATE TABLE config_uuid (
+		name VARCHAR(100) PRIMARY KEY,
+		value UUID NOT NULL,
+		_created TIMESTAMP WITH TIME ZONE NOT NULL,
+		_updated TIMESTAMP WITH TIME ZONE NOT NULL
+	);
+
+	CREATE TRIGGER
+		config_uuid_trigger_created_updated_before_insert
+	BEFORE INSERT ON
+		config_uuid
+	FOR EACH ROW EXECUTE FUNCTION
+		fn_created_updated_before_insert();
+
+	CREATE TRIGGER
+		config_uuid_trigger_created_updated_before_update
+	BEFORE UPDATE ON
+		config_uuid
+	FOR EACH ROW EXECUTE FUNCTION
+		fn_created_updated_before_update();
+`
+
 func (*configDaoImpl) CreateDBObjects(ctx context.Context) error {
 	sqlh := getSqlExecutorFromContext(ctx)
 	_, err := sqlh.Exec(sqlCreateTableConfigInt)
@@ -87,6 +117,11 @@ func (*configDaoImpl) CreateDBObjects(ctx context.Context) error {
 		return err
 	}
 	_, err = sqlh.Exec(sqlCreateTableConfigString)
+	if err != nil {
+		logger.Error(ctx, "Got database error on ConfigDao/CreateDBObjects query: ", err)
+		return err
+	}
+	_, err = sqlh.Exec(sqlCreateTableConfigUuid)
 	if err != nil {
 		logger.Error(ctx, "Got database error on ConfigDao/CreateDBObjects query: ", err)
 		return err
@@ -155,6 +190,39 @@ func (*configDaoImpl) UpsertStringByName(ctx context.Context, name string, value
 	_, err := sqlh.Exec(sqlUpsertConfigStringByName, name, value)
 	if err != nil {
 		logger.Error(ctx, "Got database error on ConfigDao/UpsertStringByName query: ", err)
+		return err
+	}
+	return nil
+}
+
+var sqlSelectConfigUuidRowByName = "SELECT name, value FROM config_uuid WHERE name = $1"
+
+func (*configDaoImpl) SelectUuidRowByName(ctx context.Context, name string) (*ConfigUuidRow, error) {
+	sqlh := getSqlExecutorFromContext(ctx)
+	result := &ConfigUuidRow{}
+	row := sqlh.QueryRow(sqlSelectConfigUuidRowByName, name)
+	err := row.Scan(&result.Name, &result.Value)
+	if err != nil {
+		logger.Error(ctx, "Got database error on ConfigDao/SelectUuidRowByName query: ", err)
+		return nil, err
+	}
+	return result, nil
+}
+
+var sqlUpsertConfigUuidByName = `
+	INSERT INTO
+		config_uuid (name, value)
+	VALUES
+		($1, $2::uuid)
+	ON CONFLICT (name)
+		DO UPDATE SET value = EXCLUDED.value;
+`
+
+func (*configDaoImpl) UpsertUuidByName(ctx context.Context, name string, value string) error {
+	sqlh := getSqlExecutorFromContext(ctx)
+	_, err := sqlh.Exec(sqlUpsertConfigUuidByName, name, value)
+	if err != nil {
+		logger.Error(ctx, "Got database error on ConfigDao/UpsertUuidByName query: ", err)
 		return err
 	}
 	return nil

@@ -6,9 +6,9 @@ package ep_admin
 
 import (
 	"net/http"
-	"peanut/internal/data/configkey"
 	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
+	"peanut/internal/keynames/configkey"
 	"peanut/internal/logger"
 	"peanut/internal/security/perms"
 	"peanut/internal/service"

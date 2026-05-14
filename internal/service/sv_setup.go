@@ -8,7 +8,7 @@ import (
 	"context"
 	"errors"
 	"peanut/internal/data"
-	"peanut/internal/data/configkey"
+	"peanut/internal/keynames/configkey"
 	"peanut/internal/logger"
 	"peanut/internal/security/perms/permgroups"
 	"strconv"
@@ -45,54 +45,54 @@ func NewSetupService(
 	userService UserService,
 ) SetupService {
 	return &setupServiceImpl{
-		configDao:           configDao,
-		forumsDao:           forumsDao,
-		forumPostsDao:       forumPostsDao,
-		forumSectionsDao:    forumSectionsDao,
-		forumThreadsDao:     forumThreadsDao,
-		databaseService:     databaseService,
-		groupDao:            groupDao,
-		groupMembershipDao:  groupMembershipDao,
-		metaDao:             metaDao,
-		scheduledJobDao:     scheduledJobDao,
-		scheduledJobRunDao:  scheduledJobRunDao,
-		sessionDao:          sessionDao,
-		sessionStringDao:    sessionStringDao,
-		systemLogDao:        systemLogDao,
-		userDao:             userDao,
+		configDao:              configDao,
+		forumsDao:              forumsDao,
+		forumPostsDao:          forumPostsDao,
+		forumSectionsDao:       forumSectionsDao,
+		forumThreadsDao:        forumThreadsDao,
+		databaseService:        databaseService,
+		groupDao:               groupDao,
+		groupMembershipDao:     groupMembershipDao,
+		metaDao:                metaDao,
+		scheduledJobDao:        scheduledJobDao,
+		scheduledJobRunDao:     scheduledJobRunDao,
+		sessionDao:             sessionDao,
+		sessionStringDao:       sessionStringDao,
+		systemLogDao:           systemLogDao,
+		userDao:                userDao,
 		forumHomeDvao:          forumHomeDvao,
 		forumPostListingDvao:   forumPostListingDvao,
 		forumThreadSummaryDvao: forumThreadSummaryDvao,
 		setupConfigService:     setupConfigService,
-		groupService:        groupService,
-		scheduledJobService: scheduledJobService,
-		userService:         userService,
+		groupService:           groupService,
+		scheduledJobService:    scheduledJobService,
+		userService:            userService,
 	}
 }
 
 type setupServiceImpl struct {
-	configDao           data.ConfigDao
-	forumsDao           data.ForumsDao
-	forumPostsDao       data.ForumPostsDao
-	forumSectionsDao    data.ForumSectionsDao
-	forumThreadsDao     data.ForumThreadsDao
-	groupDao            data.GroupDao
-	groupMembershipDao  data.GroupMembershipDao
-	metaDao             data.MetaDao
-	scheduledJobDao     data.ScheduledJobDao
-	scheduledJobRunDao  data.ScheduledJobRunDao
-	sessionDao          data.SessionDao
-	sessionStringDao    data.SessionStringDao
-	systemLogDao        data.SystemLogDao
-	userDao             data.UserDao
+	configDao              data.ConfigDao
+	forumsDao              data.ForumsDao
+	forumPostsDao          data.ForumPostsDao
+	forumSectionsDao       data.ForumSectionsDao
+	forumThreadsDao        data.ForumThreadsDao
+	groupDao               data.GroupDao
+	groupMembershipDao     data.GroupMembershipDao
+	metaDao                data.MetaDao
+	scheduledJobDao        data.ScheduledJobDao
+	scheduledJobRunDao     data.ScheduledJobRunDao
+	sessionDao             data.SessionDao
+	sessionStringDao       data.SessionStringDao
+	systemLogDao           data.SystemLogDao
+	userDao                data.UserDao
 	forumHomeDvao          data.ForumHomeDvao
 	forumPostListingDvao   data.ForumPostListingDvao
 	forumThreadSummaryDvao data.ForumThreadSummaryDvao
 	setupConfigService     SetupConfigService
-	databaseService     DatabaseService
-	groupService        GroupService
-	scheduledJobService ScheduledJobService
-	userService         UserService
+	databaseService        DatabaseService
+	groupService           GroupService
+	scheduledJobService    ScheduledJobService
+	userService            UserService
 }
 
 func (this *setupServiceImpl) InitializeDatabase(ctx context.Context, adminName string, adminEmail string, adminPlainPassword string) error {

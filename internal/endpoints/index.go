@@ -7,9 +7,9 @@ package endpoints
 import (
 	"html/template"
 	"net/http"
-	"peanut/internal/data/configkey"
 	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
+	"peanut/internal/keynames/configkey"
 	"peanut/internal/logger"
 	"peanut/internal/msgfmt"
 	"peanut/internal/service"

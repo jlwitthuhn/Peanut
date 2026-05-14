@@ -45,6 +45,15 @@ func RenderSimpleMessage(title string, message string, w http.ResponseWriter, r 
 	RenderTemplate("view_simple_message", templateCtx, w, r)
 }
 
+func RenderSimpleMessageWithLink(title string, message string, linkText string, linkTarget string, w http.ResponseWriter, r *http.Request) {
+	templateCtx := templatecontext.GetStandardTemplateContext(r)
+	templateCtx["MessageBody"] = message
+	templateCtx["MessageTitle"] = title
+	templateCtx["MessageLinkText"] = linkText
+	templateCtx["MessageLinkTarget"] = linkTarget
+	RenderTemplate("view_simple_message", templateCtx, w, r)
+}
+
 // RequirePermissionOr403
 // When this returns false the caller must abort handling the request and write no further output
 func RequirePermissionOr403(w http.ResponseWriter, r *http.Request, permission string) bool {

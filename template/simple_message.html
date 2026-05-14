@@ -7,6 +7,9 @@
 			</div>
 			<div class="panel-body">
 				<p>{{ .MessageBody }}</p>
+				{{ if and .MessageLinkText .MessageLinkTarget }}
+				<p><a href="{{ .MessageLinkTarget }}">{{ .MessageLinkText }}</a></p>
+				{{ end }}
 			</div>
 		</div>
 	</div>

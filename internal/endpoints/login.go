@@ -51,7 +51,7 @@ func RegisterLoginHandlers(mux *http.ServeMux, sessionService service.SessionSer
 
 		sesssionCookie := cookie.CreateSessionCookie(sessionId)
 		http.SetCookie(w, &sesssionCookie)
-		ep_util.RenderSimpleMessage("Success", "You have logged in.", w, r)
+		ep_util.RenderSimpleMessageWithLink("Success", "You have logged in.", "Return to index", "/", w, r)
 	})
 	mux.Handle("POST /login", postLoginHandler)
 }

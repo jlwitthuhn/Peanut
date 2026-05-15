@@ -26,9 +26,14 @@ func registerAdminFrontPageHandlers(mux *http.ServeMux, configService service.Co
 			ep_util.RenderErrorHttp500InternalServerError(w, r)
 			return
 		}
+		if welcomeMessage == nil {
+			logger.Error(r.Context(), "Welcome message is not set in config.")
+			ep_util.RenderErrorHttp500InternalServerError(w, r)
+			return
+		}
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
-		templateCtx["WelcomeMessage"] = welcomeMessage
+		templateCtx["WelcomeMessage"] = *welcomeMessage
 		ep_util.RenderTemplate("view_admin/front_page", templateCtx, w, r)
 	})
 	mux.Handle("GET /admin/front_page", getFrontPageHandler)

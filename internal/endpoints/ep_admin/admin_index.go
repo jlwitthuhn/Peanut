@@ -33,6 +33,10 @@ func registerAdminIndexHandlers(
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query init time.", w, r)
 			return
 		}
+		if initTime == nil {
+			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Init time is not set.", w, r)
+			return
+		}
 
 		dbVersion, err := databaseService.GetPostgresVersion(r.Context())
 		if err != nil {
@@ -53,7 +57,7 @@ func registerAdminIndexHandlers(
 		}
 
 		var websiteInfo = []adminIndexStringPair{
-			{A: "Initialized time", B: time.Unix(initTime, 0).UTC().Format("2006-01-02 15:04:05 MST")},
+			{A: "Initialized time", B: time.Unix(*initTime, 0).UTC().Format("2006-01-02 15:04:05 MST")},
 			{A: "Registered users", B: strconv.FormatInt(userCount, 10)},
 			{A: "Logged in users", B: strconv.FormatInt(userSessionCount, 10)},
 		}

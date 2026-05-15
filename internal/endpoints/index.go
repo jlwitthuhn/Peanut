@@ -21,11 +21,16 @@ func RegisterIndexHandlers(mux *http.ServeMux, configService service.ConfigServi
 		welcomeMessage, err := configService.GetString(r.Context(), configkey.StringWelcomeMessage)
 		if err != nil {
 			logger.Error(r.Context(), "Error retrieving welcome message, using error message.", err)
-			welcomeMessage = "Error: unable to retrieve welcome message."
+		}
+		var welcomeMessageText string
+		if err != nil || welcomeMessage == nil {
+			welcomeMessageText = "Error: unable to retrieve welcome message."
+		} else {
+			welcomeMessageText = *welcomeMessage
 		}
 
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
-		templateCtx["WelcomeMessage"] = template.HTML(msgfmt.Format(welcomeMessage))
+		templateCtx["WelcomeMessage"] = template.HTML(msgfmt.Format(welcomeMessageText))
 		ep_util.RenderTemplate("view_index", templateCtx, w, r)
 	})
 	mux.Handle("GET /{$}", getIndexHandler)

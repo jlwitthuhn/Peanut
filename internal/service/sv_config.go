@@ -16,24 +16,24 @@ import (
 const cacheTTL = 5 * time.Second
 
 type cachedInt struct {
-	value    int64
+	value    *int64
 	readTime time.Time
 }
 
 type cachedString struct {
-	value    string
+	value    *string
 	readTime time.Time
 }
 
 type cachedUuid struct {
-	value    string
+	value    *string
 	readTime time.Time
 }
 
 type ConfigService interface {
-	GetInt(ctx context.Context, key string) (int64, error)
-	GetString(ctx context.Context, key string) (string, error)
-	GetUuid(ctx context.Context, key string) (string, error)
+	GetInt(ctx context.Context, key string) (*int64, error)
+	GetString(ctx context.Context, key string) (*string, error)
+	GetUuid(ctx context.Context, key string) (*string, error)
 	SetInt(ctx context.Context, key string, value int64) error
 	SetString(ctx context.Context, key string, value string) error
 	SetUuid(ctx context.Context, key string, value string) error
@@ -76,7 +76,7 @@ type configServiceImpl struct {
 	uuidCache        map[string]cachedUuid
 }
 
-func (this *configServiceImpl) GetInt(ctx context.Context, key string) (int64, error) {
+func (this *configServiceImpl) GetInt(ctx context.Context, key string) (*int64, error) {
 	this.intCacheMutex.Lock()
 	defer this.intCacheMutex.Unlock()
 	if cached, ok := this.intCache[key]; ok && time.Since(cached.readTime) < cacheTTL {
@@ -84,13 +84,17 @@ func (this *configServiceImpl) GetInt(ctx context.Context, key string) (int64, e
 	}
 	row, err := this.configDao.SelectIntRowByName(ctx, key)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
-	this.intCache[key] = cachedInt{value: row.Value, readTime: time.Now()}
-	return row.Value, nil
+	var value *int64
+	if row != nil {
+		value = &row.Value
+	}
+	this.intCache[key] = cachedInt{value: value, readTime: time.Now()}
+	return value, nil
 }
 
-func (this *configServiceImpl) GetString(ctx context.Context, key string) (string, error) {
+func (this *configServiceImpl) GetString(ctx context.Context, key string) (*string, error) {
 	this.stringCacheMutex.Lock()
 	defer this.stringCacheMutex.Unlock()
 	if cached, ok := this.stringCache[key]; ok && time.Since(cached.readTime) < cacheTTL {
@@ -98,13 +102,17 @@ func (this *configServiceImpl) GetString(ctx context.Context, key string) (strin
 	}
 	row, err := this.configDao.SelectStringRowByName(ctx, key)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	this.stringCache[key] = cachedString{value: row.Value, readTime: time.Now()}
-	return row.Value, nil
+	var value *string
+	if row != nil {
+		value = &row.Value
+	}
+	this.stringCache[key] = cachedString{value: value, readTime: time.Now()}
+	return value, nil
 }
 
-func (this *configServiceImpl) GetUuid(ctx context.Context, key string) (string, error) {
+func (this *configServiceImpl) GetUuid(ctx context.Context, key string) (*string, error) {
 	this.uuidCacheMutex.Lock()
 	defer this.uuidCacheMutex.Unlock()
 	if cached, ok := this.uuidCache[key]; ok && time.Since(cached.readTime) < cacheTTL {
@@ -112,10 +120,14 @@ func (this *configServiceImpl) GetUuid(ctx context.Context, key string) (string,
 	}
 	row, err := this.configDao.SelectUuidRowByName(ctx, key)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	this.uuidCache[key] = cachedUuid{value: row.Value, readTime: time.Now()}
-	return row.Value, nil
+	var value *string
+	if row != nil {
+		value = &row.Value
+	}
+	this.uuidCache[key] = cachedUuid{value: value, readTime: time.Now()}
+	return value, nil
 }
 
 func (this *configServiceImpl) clearIntCache(name string) {

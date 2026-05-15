@@ -6,6 +6,8 @@ package data
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"peanut/internal/logger"
 )
 
@@ -136,6 +138,9 @@ func (*configDaoImpl) SelectIntRowByName(ctx context.Context, name string) (*Con
 	result := &ConfigIntRow{}
 	row := sqlh.QueryRow(sqlSelectConfigIntRowByName, name)
 	err := row.Scan(&result.Name, &result.Value)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
 	if err != nil {
 		logger.Error(ctx, "Got database error on ConfigDao/SelectIntRowByName query: ", err)
 		return nil, err
@@ -150,6 +155,9 @@ func (*configDaoImpl) SelectStringRowByName(ctx context.Context, name string) (*
 	result := &ConfigStringRow{}
 	row := sqlh.QueryRow(sqlSelectConfigStringRowByName, name)
 	err := row.Scan(&result.Name, &result.Value)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
 	if err != nil {
 		logger.Error(ctx, "Got database error on ConfigDao/SelectStringRowByName query: ", err)
 		return nil, err
@@ -202,6 +210,9 @@ func (*configDaoImpl) SelectUuidRowByName(ctx context.Context, name string) (*Co
 	result := &ConfigUuidRow{}
 	row := sqlh.QueryRow(sqlSelectConfigUuidRowByName, name)
 	err := row.Scan(&result.Name, &result.Value)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
 	if err != nil {
 		logger.Error(ctx, "Got database error on ConfigDao/SelectUuidRowByName query: ", err)
 		return nil, err

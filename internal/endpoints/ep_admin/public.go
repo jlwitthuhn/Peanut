@@ -27,7 +27,7 @@ func RegisterAdminHandlers(
 	adminMux := http.NewServeMux()
 	registerAdminIndexHandlers(adminMux, configService, databaseService, sessionService, userService)
 	registerAdminForumsHandlers(adminMux, forumService)
-	registerAdminFrontPageHandlers(adminMux, configService)
+	registerAdminFrontPageHandlers(adminMux, configService, forumService)
 	registerAdminGroupsHandlers(adminMux, groupService)
 	registerAdminScheduledJobHandlers(adminMux, scheduledJobService)
 	registerAdminUsersHandlers(adminMux, groupService, userService)

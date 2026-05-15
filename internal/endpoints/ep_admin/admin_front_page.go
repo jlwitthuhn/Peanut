@@ -6,6 +6,7 @@ package ep_admin
 
 import (
 	"net/http"
+	"peanut/internal/data"
 	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/keynames/configkey"
@@ -14,7 +15,7 @@ import (
 	"peanut/internal/service"
 )
 
-func registerAdminFrontPageHandlers(mux *http.ServeMux, configService service.ConfigService) {
+func registerAdminFrontPageHandlers(mux *http.ServeMux, configService service.ConfigService, forumService service.ForumService) {
 	getFrontPageHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !ep_util.RequirePermissionOr403(w, r, perms.Admin_FrontPage_Edit) {
 			return
@@ -32,8 +33,22 @@ func registerAdminFrontPageHandlers(mux *http.ServeMux, configService service.Co
 			return
 		}
 
+		forumRows, err := forumService.GetAllForumRows(r.Context())
+		if err != nil {
+			logger.Error(r.Context(), "Error retrieving forums:", err)
+			ep_util.RenderErrorHttp500InternalServerError(w, r)
+			return
+		}
+		var publicForums []data.ForumRow
+		for _, forum := range forumRows {
+			if forum.Visibility == "Public" {
+				publicForums = append(publicForums, forum)
+			}
+		}
+
 		templateCtx := templatecontext.GetStandardTemplateContext(r)
 		templateCtx["WelcomeMessage"] = *welcomeMessage
+		templateCtx["PublicForums"] = publicForums
 		ep_util.RenderTemplate("view_admin/front_page", templateCtx, w, r)
 	})
 	mux.Handle("GET /admin/front_page", getFrontPageHandler)

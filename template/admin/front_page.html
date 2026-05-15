@@ -25,4 +25,22 @@
 		</form>
 	</div>
 </div>
+<div class="panel">
+	<div class="panel-header">
+		<h1>Home Forum</h1>
+	</div>
+	<div class="panel-body">
+		<form class="standard-form" action="/admin/front_page/home_forum" method="post">
+			<label for="home_forum">Forum:</label>
+			<select id="home_forum" name="forum_id">
+				<option value="none">None</option>
+				{{ range $forum := .PublicForums }}
+					<option value="{{ $forum.Id }}">{{ $forum.Name }} [{{ $forum.Id }}]</option>
+				{{ end }}
+			</select>
+			<input type="hidden" name="csrf" value="{{ .CsrfToken }}">
+			<input class="primary-button" type="submit" value="Update">
+		</form>
+	</div>
+</div>
 {{ end }}

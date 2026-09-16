@@ -82,13 +82,14 @@ func (this *configServiceImpl) GetInt(ctx context.Context, key string) (*int64, 
 	if cached, ok := this.intCache[key]; ok && time.Since(cached.readTime) < cacheTTL {
 		return cached.value, nil
 	}
-	row, err := this.configDao.SelectIntRowByName(ctx, key)
+	row, err := this.configDao.SelectRowByName(ctx, key)
 	if err != nil {
 		return nil, err
 	}
 	var value *int64
-	if row != nil {
-		value = &row.Value
+	if row != nil && row.ValueInt.Valid {
+		v := row.ValueInt.Int64
+		value = &v
 	}
 	this.intCache[key] = cachedInt{value: value, readTime: time.Now()}
 	return value, nil
@@ -100,13 +101,14 @@ func (this *configServiceImpl) GetString(ctx context.Context, key string) (*stri
 	if cached, ok := this.stringCache[key]; ok && time.Since(cached.readTime) < cacheTTL {
 		return cached.value, nil
 	}
-	row, err := this.configDao.SelectStringRowByName(ctx, key)
+	row, err := this.configDao.SelectRowByName(ctx, key)
 	if err != nil {
 		return nil, err
 	}
 	var value *string
-	if row != nil {
-		value = &row.Value
+	if row != nil && row.ValueString.Valid {
+		v := row.ValueString.String
+		value = &v
 	}
 	this.stringCache[key] = cachedString{value: value, readTime: time.Now()}
 	return value, nil
@@ -118,13 +120,14 @@ func (this *configServiceImpl) GetUuid(ctx context.Context, key string) (*string
 	if cached, ok := this.uuidCache[key]; ok && time.Since(cached.readTime) < cacheTTL {
 		return cached.value, nil
 	}
-	row, err := this.configDao.SelectUuidRowByName(ctx, key)
+	row, err := this.configDao.SelectRowByName(ctx, key)
 	if err != nil {
 		return nil, err
 	}
 	var value *string
-	if row != nil {
-		value = &row.Value
+	if row != nil && row.ValueUuid.Valid {
+		v := row.ValueUuid.String
+		value = &v
 	}
 	this.uuidCache[key] = cachedUuid{value: value, readTime: time.Now()}
 	return value, nil

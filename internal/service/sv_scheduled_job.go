@@ -91,7 +91,7 @@ func (this *scheduledJobServiceImpl) backgroundThreadIter() {
 	defer tx.Rollback()
 
 	// Check if the database exists
-	exists, err := this.dbService.DoesTableExist(ctx, "config_int")
+	exists, err := this.dbService.DoesTableExist(ctx, "config")
 	if err != nil {
 		logger.Error(ctx, "Failed to check if database exists")
 		return

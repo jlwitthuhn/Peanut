@@ -43,8 +43,8 @@ var sqlCreateTableSessions = `
 	RETURNS TRIGGER AS $$
 	BEGIN
 		NEW.valid_until := NOW() + (
-			SELECT value || ' minutes'
-			FROM config_int
+			SELECT value_int || ' minutes'
+			FROM config
 			WHERE name = 'sessionLengthMinutes'
 		)::interval;
     RETURN NEW;

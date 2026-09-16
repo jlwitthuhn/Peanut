@@ -22,7 +22,7 @@ func RegisterSetupHandlers(mux *http.ServeMux, dbService service.DatabaseService
 	mux.Handle("GET /setup", getSetupHandler)
 
 	postSetupHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		configTableExists, configTableErr := dbService.DoesTableExist(r.Context(), "config_int")
+		configTableExists, configTableErr := dbService.DoesTableExist(r.Context(), "config")
 		if configTableErr != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to query data.", w, r)
 			return

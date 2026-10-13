@@ -9,8 +9,11 @@ import (
 	"peanut/internal/keynames/contextkeys"
 )
 
-func ContextHasPermission(ctx context.Context, permission string) bool {
-	permissions := ctx.Value(contextkeys.UserPerms).(map[string]struct{})
-	_, has := permissions[permission]
+func ContextHasCapability(ctx context.Context, capability string) bool {
+	capabilities, ok := ctx.Value(contextkeys.UserCaps).(map[string]struct{})
+	if !ok {
+		return false
+	}
+	_, has := capabilities[capability]
 	return has
 }

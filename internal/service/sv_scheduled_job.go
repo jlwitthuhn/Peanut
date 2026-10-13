@@ -13,7 +13,7 @@ import (
 	"peanut/internal/keynames/contextkeys"
 	"peanut/internal/logger"
 	"peanut/internal/middleutil"
-	"peanut/internal/security/perms"
+	"peanut/internal/security/caps"
 	"time"
 )
 
@@ -70,9 +70,9 @@ func createBackgroundContext() (context.Context, error) {
 	}
 	ctx = context.WithValue(ctx, contextkeys.PostgresTx, tx)
 
-	// Add permissions
-	permissions := map[string]struct{}{perms.Admin_ScheduledJob_Run: {}}
-	ctx = context.WithValue(ctx, contextkeys.UserPerms, permissions)
+	// Add capabilities
+	capabilities := map[string]struct{}{caps.Admin_ScheduledJob_Run: {}}
+	ctx = context.WithValue(ctx, contextkeys.UserCaps, capabilities)
 
 	return ctx, nil
 }
@@ -144,7 +144,7 @@ func (this *scheduledJobServiceImpl) GetJobNameById(ctx context.Context, id stri
 }
 
 func (this *scheduledJobServiceImpl) RunJob(ctx context.Context, jobName string) error {
-	if middleutil.ContextHasPermission(ctx, perms.Admin_ScheduledJob_Run) == false {
+	if middleutil.ContextHasCapability(ctx, caps.Admin_ScheduledJob_Run) == false {
 		return errors.New("permission denied")
 	}
 

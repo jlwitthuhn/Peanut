@@ -10,16 +10,16 @@ import (
 	"peanut/internal/keynames/contextkeys"
 )
 
-func CheckPermissions(requiredPerms ...string) MiddlewareFunc {
+func CheckCapabilities(requiredCaps ...string) MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			userPerms, ok := r.Context().Value(contextkeys.UserPerms).(map[string]struct{})
+			userCaps, ok := r.Context().Value(contextkeys.UserCaps).(map[string]struct{})
 			if !ok {
 				ep_util.RenderErrorHttp403Forbidden(w, r)
 				return
 			}
-			for _, requiredPerm := range requiredPerms {
-				if _, has := userPerms[requiredPerm]; !has {
+			for _, requiredCap := range requiredCaps {
+				if _, has := userCaps[requiredCap]; !has {
 					ep_util.RenderErrorHttp403Forbidden(w, r)
 					return
 				}

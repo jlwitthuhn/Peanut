@@ -54,10 +54,10 @@ func RenderSimpleMessageWithLink(title string, message string, linkText string, 
 	RenderTemplate("view_simple_message", templateCtx, w, r)
 }
 
-// RequirePermissionOr403
+// RequireCapabilityOr403
 // When this returns false the caller must abort handling the request and write no further output
-func RequirePermissionOr403(w http.ResponseWriter, r *http.Request, permission string) bool {
-	if middleutil.ContextHasPermission(r.Context(), permission) {
+func RequireCapabilityOr403(w http.ResponseWriter, r *http.Request, capability string) bool {
+	if middleutil.ContextHasCapability(r.Context(), capability) {
 		return true
 	}
 	RenderErrorHttp403Forbidden(w, r)

@@ -10,7 +10,7 @@ import (
 	"peanut/internal/data"
 	"peanut/internal/keynames/configkey"
 	"peanut/internal/logger"
-	"peanut/internal/security/perms/permgroups"
+	"peanut/internal/security/groupnames"
 	"strconv"
 	"strings"
 	"time"
@@ -216,15 +216,15 @@ func (this *setupServiceImpl) InitializeDatabase(ctx context.Context, adminName 
 		return err
 	}
 
-	err = this.groupService.CreateGroup(ctx, permgroups.TurboAdmin, "Full control over everything.", true)
+	err = this.groupService.CreateGroup(ctx, groupnames.TurboAdmin, "Full control over everything.", true)
 	if err != nil {
 		return err
 	}
-	err = this.groupService.CreateGroup(ctx, permgroups.Admin, "Much control over most things.", true)
+	err = this.groupService.CreateGroup(ctx, groupnames.Admin, "Much control over most things.", true)
 	if err != nil {
 		return err
 	}
-	err = this.groupService.CreateGroup(ctx, permgroups.User, "Ordinary registered user.", true)
+	err = this.groupService.CreateGroup(ctx, groupnames.User, "Ordinary registered user.", true)
 	if err != nil {
 		return err
 	}
@@ -235,15 +235,15 @@ func (this *setupServiceImpl) InitializeDatabase(ctx context.Context, adminName 
 	if err != nil {
 		return err
 	}
-	err = this.groupService.EnrollUserInGroup(ctx, userId, permgroups.TurboAdmin)
+	err = this.groupService.EnrollUserInGroup(ctx, userId, groupnames.TurboAdmin)
 	if err != nil {
 		return err
 	}
-	err = this.groupService.EnrollUserInGroup(ctx, userId, permgroups.Admin)
+	err = this.groupService.EnrollUserInGroup(ctx, userId, groupnames.Admin)
 	if err != nil {
 		return err
 	}
-	err = this.groupService.EnrollUserInGroup(ctx, userId, permgroups.User)
+	err = this.groupService.EnrollUserInGroup(ctx, userId, groupnames.User)
 	if err != nil {
 		return err
 	}

@@ -9,13 +9,13 @@ import (
 	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/logger"
-	"peanut/internal/security/perms"
+	"peanut/internal/security/caps"
 	"peanut/internal/service"
 )
 
 func registerForumModerateHandlers(mux *http.ServeMux, forumThreadService service.ForumThreadService) {
 	getModerateHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !ep_util.RequirePermissionOr403(w, r, perms.Forum_Moderate) {
+		if !ep_util.RequireCapabilityOr403(w, r, caps.Forum_Moderate) {
 			return
 		}
 
@@ -41,7 +41,7 @@ func registerForumModerateHandlers(mux *http.ServeMux, forumThreadService servic
 	mux.Handle("GET /forum/thread/{threadId}/moderate", getModerateHandler)
 
 	postModerateHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !ep_util.RequirePermissionOr403(w, r, perms.Forum_Moderate) {
+		if !ep_util.RequireCapabilityOr403(w, r, caps.Forum_Moderate) {
 			return
 		}
 

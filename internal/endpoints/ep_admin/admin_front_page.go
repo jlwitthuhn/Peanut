@@ -11,13 +11,13 @@ import (
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/keynames/configkey"
 	"peanut/internal/logger"
-	"peanut/internal/security/perms"
+	"peanut/internal/security/caps"
 	"peanut/internal/service"
 )
 
 func registerAdminFrontPageHandlers(mux *http.ServeMux, configService service.ConfigService, forumService service.ForumService) {
 	getFrontPageHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !ep_util.RequirePermissionOr403(w, r, perms.Admin_FrontPage_Edit) {
+		if !ep_util.RequireCapabilityOr403(w, r, caps.Admin_FrontPage_Edit) {
 			return
 		}
 
@@ -54,7 +54,7 @@ func registerAdminFrontPageHandlers(mux *http.ServeMux, configService service.Co
 	mux.Handle("GET /admin/front_page", getFrontPageHandler)
 
 	postFrontPageWelcomeMessageHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !ep_util.RequirePermissionOr403(w, r, perms.Admin_FrontPage_Edit) {
+		if !ep_util.RequireCapabilityOr403(w, r, caps.Admin_FrontPage_Edit) {
 			return
 		}
 

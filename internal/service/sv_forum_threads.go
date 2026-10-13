@@ -10,7 +10,7 @@ import (
 	"peanut/internal/data"
 	"peanut/internal/keynames/contextkeys"
 	"peanut/internal/middleutil"
-	"peanut/internal/security/perms"
+	"peanut/internal/security/caps"
 )
 
 const ForumThreadsPerPage = 20
@@ -86,14 +86,14 @@ func (this *forumThreadServiceImpl) CreateThread(ctx context.Context, forumId st
 }
 
 func (this *forumThreadServiceImpl) CanPostThreadInForum(ctx context.Context, forumId string) (bool, error) {
-	if !middleutil.ContextHasPermission(ctx, perms.Forum_Thread_Post) {
+	if !middleutil.ContextHasCapability(ctx, caps.Forum_Thread_Post) {
 		return false, nil
 	}
 	return this.forumService.CanReadForum(ctx, forumId)
 }
 
 func (this *forumThreadServiceImpl) CanPostReplyInThread(ctx context.Context, threadId string) (bool, error) {
-	if !middleutil.ContextHasPermission(ctx, perms.Forum_Thread_Reply) {
+	if !middleutil.ContextHasCapability(ctx, caps.Forum_Thread_Reply) {
 		return false, nil
 	}
 	thread, err := this.forumThreadsDao.SelectRowById(ctx, threadId)
@@ -184,8 +184,8 @@ func (this *forumThreadServiceImpl) GetThreadRowById(ctx context.Context, id str
 }
 
 func (this *forumThreadServiceImpl) ModerateThread(ctx context.Context, threadId string, title string, pinned bool, locked bool) error {
-	if !middleutil.ContextHasPermission(ctx, perms.Forum_Moderate) {
-		return errors.New("cannot moderate thread: missing Forum/Moderate permission")
+	if !middleutil.ContextHasCapability(ctx, caps.Forum_Moderate) {
+		return errors.New("cannot moderate thread: missing Forum/Moderate capability")
 	}
 	return this.forumThreadsDao.UpdateModerationById(ctx, threadId, title, pinned, locked)
 }

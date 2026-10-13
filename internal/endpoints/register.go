@@ -9,7 +9,7 @@ import (
 	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/logger"
-	"peanut/internal/security/perms/permgroups"
+	"peanut/internal/security/groupnames"
 	"peanut/internal/service"
 	"peanut/internal/validator"
 )
@@ -49,7 +49,7 @@ func RegisterRegisterHandlers(mux *http.ServeMux, groupService service.GroupServ
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to create user.", w, r)
 			return
 		}
-		err = groupService.EnrollUserInGroup(r.Context(), userId, permgroups.User)
+		err = groupService.EnrollUserInGroup(r.Context(), userId, groupnames.User)
 		if err != nil {
 			ep_util.RenderErrorHttp500InternalServerErrorWithMessage("Failed to add new user to default group.", w, r)
 			return

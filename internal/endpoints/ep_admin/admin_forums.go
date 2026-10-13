@@ -9,7 +9,7 @@ import (
 	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/logger"
-	"peanut/internal/security/perms"
+	"peanut/internal/security/caps"
 	"peanut/internal/service"
 	"strconv"
 )
@@ -43,7 +43,7 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 	mux.Handle("GET /admin/forum/forums/add", getForumsAddHandler)
 
 	postForumsAddHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !ep_util.RequirePermissionOr403(w, r, perms.Admin_Forums_Structure_Edit) {
+		if !ep_util.RequireCapabilityOr403(w, r, caps.Admin_Forums_Structure_Edit) {
 			return
 		}
 
@@ -78,7 +78,7 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 	mux.Handle("POST /admin/forum/forums/add", postForumsAddHandler)
 
 	postForumsDeleteHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !ep_util.RequirePermissionOr403(w, r, perms.Admin_Forums_Structure_Edit) {
+		if !ep_util.RequireCapabilityOr403(w, r, caps.Admin_Forums_Structure_Edit) {
 			return
 		}
 
@@ -137,7 +137,7 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 	mux.Handle("GET /admin/forum/forums/edit/{forumId}", getForumsEditHandler)
 
 	postForumsEditHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !ep_util.RequirePermissionOr403(w, r, perms.Admin_Forums_Structure_Edit) {
+		if !ep_util.RequireCapabilityOr403(w, r, caps.Admin_Forums_Structure_Edit) {
 			return
 		}
 
@@ -159,7 +159,7 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 	mux.Handle("POST /admin/forum/forums/edit", postForumsEditHandler)
 
 	postForumsEditByIdHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !ep_util.RequirePermissionOr403(w, r, perms.Admin_Forums_Structure_Edit) {
+		if !ep_util.RequireCapabilityOr403(w, r, caps.Admin_Forums_Structure_Edit) {
 			return
 		}
 
@@ -243,7 +243,7 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 	mux.Handle("GET /admin/forum/sections/edit/{sectionId}", getSectionsEditHandler)
 
 	postSectionsAddHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !ep_util.RequirePermissionOr403(w, r, perms.Admin_Forums_Structure_Edit) {
+		if !ep_util.RequireCapabilityOr403(w, r, caps.Admin_Forums_Structure_Edit) {
 			return
 		}
 
@@ -275,7 +275,7 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 	mux.Handle("POST /admin/forum/sections/add", postSectionsAddHandler)
 
 	postSectionsDeleteHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !ep_util.RequirePermissionOr403(w, r, perms.Admin_Forums_Structure_Edit) {
+		if !ep_util.RequireCapabilityOr403(w, r, caps.Admin_Forums_Structure_Edit) {
 			return
 		}
 
@@ -306,7 +306,7 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 	mux.Handle("POST /admin/forum/sections/delete", postSectionsDeleteHandler)
 
 	postSectionsEditHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !ep_util.RequirePermissionOr403(w, r, perms.Admin_Forums_Structure_Edit) {
+		if !ep_util.RequireCapabilityOr403(w, r, caps.Admin_Forums_Structure_Edit) {
 			return
 		}
 
@@ -328,7 +328,7 @@ func registerAdminForumsHandlers(mux *http.ServeMux, forumsService service.Forum
 	mux.Handle("POST /admin/forum/sections/edit", postSectionsEditHandler)
 
 	postSectionsEditByIdHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !ep_util.RequirePermissionOr403(w, r, perms.Admin_Forums_Structure_Edit) {
+		if !ep_util.RequireCapabilityOr403(w, r, caps.Admin_Forums_Structure_Edit) {
 			return
 		}
 

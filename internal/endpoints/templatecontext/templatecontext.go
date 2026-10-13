@@ -19,12 +19,12 @@ func GetStandardTemplateContext(r *http.Request) map[string]any {
 	// CSRF
 	result["CsrfToken"] = r.Context().Value(contextkeys.CsrfToken)
 
-	// Permissions
-	permSet, ok := r.Context().Value(contextkeys.UserPerms).(map[string]struct{})
+	// Capabilities
+	capSet, ok := r.Context().Value(contextkeys.UserCaps).(map[string]struct{})
 	if ok {
-		for perm := range permSet {
-			fullPerm := "Perm_" + strings.ReplaceAll(perm, "/", "_")
-			result[fullPerm] = true
+		for capability := range capSet {
+			fullCap := "Cap_" + strings.ReplaceAll(capability, "/", "_")
+			result[fullCap] = true
 		}
 	}
 

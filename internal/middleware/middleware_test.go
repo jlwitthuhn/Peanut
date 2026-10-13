@@ -134,18 +134,18 @@ func TestRequestTimer_SetsContextValue(t *testing.T) {
 	}
 }
 
-func TestCheckPermissions_BlocksWhenPermMissing(t *testing.T) {
+func TestCheckCapabilities_BlocksWhenCapMissing(t *testing.T) {
 	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		t.Fatal("next handler should not be called when permission is missing")
+		t.Fatal("next handler should not be called when capability is missing")
 	})
 
-	perms := map[string]struct{}{
+	capabilities := map[string]struct{}{
 		"Admin/Gui/View": {},
 	}
-	ctx := context.WithValue(context.Background(), contextkeys.UserPerms, perms)
+	ctx := context.WithValue(context.Background(), contextkeys.UserCaps, capabilities)
 	req := httptest.NewRequest("GET", "/", nil).WithContext(ctx)
 
-	handler := CheckPermissions("Admin/Gui/View", "Admin/Forums/Edit")(next)
+	handler := CheckCapabilities("Admin/Gui/View", "Admin/Forums/Edit")(next)
 	rec := httptest.NewRecorder()
 
 	func() {
@@ -158,20 +158,20 @@ func TestCheckPermissions_BlocksWhenPermMissing(t *testing.T) {
 	}
 }
 
-func TestCheckPermissions_NoRequiredPerms(t *testing.T) {
+func TestCheckCapabilities_NoRequiredCaps(t *testing.T) {
 	called := false
 	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		called = true
 	})
 
-	perms := map[string]struct{}{}
-	ctx := context.WithValue(context.Background(), contextkeys.UserPerms, perms)
+	capabilities := map[string]struct{}{}
+	ctx := context.WithValue(context.Background(), contextkeys.UserCaps, capabilities)
 	req := httptest.NewRequest("GET", "/", nil).WithContext(ctx)
 
-	handler := CheckPermissions()(next)
+	handler := CheckCapabilities()(next)
 	handler.ServeHTTP(httptest.NewRecorder(), req)
 
 	if !called {
-		t.Fatal("next handler was not called when no permissions are required")
+		t.Fatal("next handler was not called when no capabilities are required")
 	}
 }

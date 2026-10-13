@@ -9,7 +9,7 @@ import (
 	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/logger"
-	"peanut/internal/security/perms"
+	"peanut/internal/security/caps"
 	"peanut/internal/service"
 )
 
@@ -28,7 +28,7 @@ func registerAdminScheduledJobHandlers(mux *http.ServeMux, scheduledJobService s
 	mux.HandleFunc("GET /admin/scheduled_jobs", getScheduledJobHandler)
 
 	postScheduledJobRunHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !ep_util.RequirePermissionOr403(w, r, perms.Admin_ScheduledJob_Run) {
+		if !ep_util.RequireCapabilityOr403(w, r, caps.Admin_ScheduledJob_Run) {
 			return
 		}
 

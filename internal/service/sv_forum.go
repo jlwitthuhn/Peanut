@@ -11,7 +11,7 @@ import (
 	"peanut/internal/data"
 	"peanut/internal/keynames/contextkeys"
 	"peanut/internal/middleutil"
-	"peanut/internal/security/perms"
+	"peanut/internal/security/caps"
 )
 
 type ForumService interface {
@@ -68,7 +68,7 @@ func (this *forumServiceImpl) CanReadSection(ctx context.Context, id string) (bo
 }
 
 func (this *forumServiceImpl) CreateForum(ctx context.Context, sectionId string, name string, description string, ordering float32, visibility string) (string, error) {
-	if middleutil.ContextHasPermission(ctx, perms.Admin_Forums_Structure_Edit) == false {
+	if middleutil.ContextHasCapability(ctx, caps.Admin_Forums_Structure_Edit) == false {
 		return "", errors.New("permission denied")
 	}
 
@@ -91,7 +91,7 @@ func (this *forumServiceImpl) CreateForum(ctx context.Context, sectionId string,
 }
 
 func (this *forumServiceImpl) CreateSection(ctx context.Context, name string, ordering float32) (string, error) {
-	if middleutil.ContextHasPermission(ctx, perms.Admin_Forums_Structure_Edit) == false {
+	if middleutil.ContextHasCapability(ctx, caps.Admin_Forums_Structure_Edit) == false {
 		return "", errors.New("permission denied")
 	}
 
@@ -114,7 +114,7 @@ func (this *forumServiceImpl) CreateSection(ctx context.Context, name string, or
 }
 
 func (this *forumServiceImpl) DeleteForum(ctx context.Context, id string) error {
-	if middleutil.ContextHasPermission(ctx, perms.Admin_Forums_Structure_Edit) == false {
+	if middleutil.ContextHasCapability(ctx, caps.Admin_Forums_Structure_Edit) == false {
 		return errors.New("permission denied")
 	}
 
@@ -137,7 +137,7 @@ func (this *forumServiceImpl) DeleteForum(ctx context.Context, id string) error 
 }
 
 func (this *forumServiceImpl) DeleteSection(ctx context.Context, id string) error {
-	if middleutil.ContextHasPermission(ctx, perms.Admin_Forums_Structure_Edit) == false {
+	if middleutil.ContextHasCapability(ctx, caps.Admin_Forums_Structure_Edit) == false {
 		return errors.New("permission denied")
 	}
 
@@ -190,7 +190,7 @@ func (this *forumServiceImpl) GetSectionRowById(ctx context.Context, id string) 
 }
 
 func (this *forumServiceImpl) UpdateSectionUserConfig(ctx context.Context, id string, name string, ordering float32, visibility string) error {
-	if middleutil.ContextHasPermission(ctx, perms.Admin_Forums_Structure_Edit) == false {
+	if middleutil.ContextHasCapability(ctx, caps.Admin_Forums_Structure_Edit) == false {
 		return errors.New("permission denied")
 	}
 
@@ -213,7 +213,7 @@ func (this *forumServiceImpl) UpdateSectionUserConfig(ctx context.Context, id st
 }
 
 func (this *forumServiceImpl) UpdateForumUserConfig(ctx context.Context, id string, sectionId string, name string, description string, ordering float32, visibility string) error {
-	if middleutil.ContextHasPermission(ctx, perms.Admin_Forums_Structure_Edit) == false {
+	if middleutil.ContextHasCapability(ctx, caps.Admin_Forums_Structure_Edit) == false {
 		return errors.New("permission denied")
 	}
 

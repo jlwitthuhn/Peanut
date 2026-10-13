@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"peanut/internal/cookie"
 	"peanut/internal/keynames/contextkeys"
-	"peanut/internal/security/perms"
+	"peanut/internal/security/caps"
 	"peanut/internal/service"
 )
 
@@ -30,20 +30,20 @@ func Authentication(groupService service.GroupService, sessionService service.Se
 				if groupsErr != nil {
 					continue
 				}
-				permissions := perms.GetGranularPermissionsForGroups(groups...)
+				capabilities := caps.GetCapabilitiesForGroups(groups...)
 				ctx = context.WithValue(ctx, contextkeys.LoggedIn, true)
 				ctx = context.WithValue(ctx, contextkeys.SessionId, thisCookie.Value)
 				ctx = context.WithValue(ctx, contextkeys.UserGroups, groups)
 				ctx = context.WithValue(ctx, contextkeys.UserId, userId)
-				ctx = context.WithValue(ctx, contextkeys.UserPerms, permissions)
+				ctx = context.WithValue(ctx, contextkeys.UserCaps, capabilities)
 				break
 			}
 			if ctx.Value(contextkeys.LoggedIn) == nil {
 				defaultGroups := []string{"Guest"}
-				permissions := perms.GetGranularPermissionsForGroups(defaultGroups...)
+				capabilities := caps.GetCapabilitiesForGroups(defaultGroups...)
 				ctx = context.WithValue(ctx, contextkeys.LoggedIn, false)
 				ctx = context.WithValue(ctx, contextkeys.UserGroups, defaultGroups)
-				ctx = context.WithValue(ctx, contextkeys.UserPerms, permissions)
+				ctx = context.WithValue(ctx, contextkeys.UserCaps, capabilities)
 			}
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})

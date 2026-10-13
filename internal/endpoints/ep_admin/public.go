@@ -9,7 +9,7 @@ import (
 	"peanut/internal/endpoints/ep_util"
 	"peanut/internal/endpoints/templatecontext"
 	"peanut/internal/middleware"
-	"peanut/internal/security/perms"
+	"peanut/internal/security/caps"
 	"peanut/internal/service"
 )
 
@@ -33,7 +33,7 @@ func RegisterAdminHandlers(
 	registerAdminUsersHandlers(adminMux, groupService, userService)
 	registerAdminDebugHandlers(adminMux, forumService, forumThreadService)
 
-	wrappedAdminMux := middleware.WrapHandler(adminMux, middleware.CheckPermissions(perms.Admin_Gui_View))
+	wrappedAdminMux := middleware.WrapHandler(adminMux, middleware.CheckCapabilities(caps.Admin_Gui_View))
 
 	mux.Handle("/admin", wrappedAdminMux)
 	mux.Handle("/admin/", wrappedAdminMux)

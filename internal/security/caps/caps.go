@@ -2,11 +2,11 @@
 // https://www.gnu.org/licenses/agpl-3.0.en.html
 // SPDX-License-Identifier: AGPL-3.0-only
 
-package perms
+package caps
 
 import (
 	"peanut/internal/logger"
-	"peanut/internal/security/perms/permgroups"
+	"peanut/internal/security/groupnames"
 )
 
 const Admin_Forums_Structure_Edit = "Admin/Forums/Structure/Edit"
@@ -17,34 +17,34 @@ const Forum_Moderate = "Forum/Moderate"
 const Forum_Thread_Post = "Forum/Thread/Post"
 const Forum_Thread_Reply = "Forum/Thread/Reply"
 
-func GetPermissionsForGroup(group string) map[string]struct{} {
+func GetCapabilitiesForGroup(group string) map[string]struct{} {
 	result := make(map[string]struct{})
 	switch group {
-	case permgroups.TurboAdmin:
+	case groupnames.TurboAdmin:
 		fallthrough
-	case permgroups.Admin:
+	case groupnames.Admin:
 		result[Admin_Forums_Structure_Edit] = struct{}{}
 		result[Admin_FrontPage_Edit] = struct{}{}
 		result[Admin_Gui_View] = struct{}{}
 		result[Admin_ScheduledJob_Run] = struct{}{}
 		result[Forum_Moderate] = struct{}{}
 		fallthrough
-	case permgroups.User:
+	case groupnames.User:
 		result[Forum_Thread_Post] = struct{}{}
 		result[Forum_Thread_Reply] = struct{}{}
 		fallthrough
-	case permgroups.Guest:
+	case groupnames.Guest:
 	default:
-		logger.Error(nil, "Attempted to get perms for illegal group: ", group)
+		logger.Error(nil, "Attempted to get capabilities for illegal group: ", group)
 	}
 	return result
 }
 
-func GetGranularPermissionsForGroups(groups ...string) map[string]struct{} {
+func GetCapabilitiesForGroups(groups ...string) map[string]struct{} {
 	result := make(map[string]struct{})
 	for _, group := range groups {
-		for perm := range GetPermissionsForGroup(group) {
-			result[perm] = struct{}{}
+		for capability := range GetCapabilitiesForGroup(group) {
+			result[capability] = struct{}{}
 		}
 	}
 	return result

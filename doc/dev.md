@@ -10,7 +10,7 @@ Session keys are stored in the database and expired server-side after a configur
 
 ## Authorization
 
-Each user belongs to some amount of groups and each group conveys a list of individual permissions. Whenever a user hits an endpoint that performs a priveleged operation, the endpoint first checks that the user has the appropriate permissions. These permissions are enforced once again at the service layer when possible.
+Each user belongs to some amount of groups and each group conveys a list of individual capabilities. Whenever a user hits an endpoint that performs a privileged operation, the endpoint first checks that the user has the appropriate capability. This check is also enforced at the service layer when possible.
 
 ## Data access
 
